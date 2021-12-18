@@ -6,10 +6,8 @@ class Game(tk.Frame):
         super().__init__(master)
         self.pack()
         self.board = [[0 for i in range(size)] for i in range(size)]
-        self.board[10][10] = 2    # COM OUT
-        self.board[9][10] = 2    # COM OUT
-        self.board[10][11] = 2    # COM OUT
-        self.board[11][11] = 1    # COM OUT
+        self.buttons = []
+        self.frm_position = []
         self.size = size
         self.player = 1
         self.white = tk.PhotoImage(file='white.png')
@@ -32,6 +30,7 @@ class Game(tk.Frame):
         i, j = args
         print(f"Clicked on row: {i}, col: {j}")
         # How to destroy the button before creating a new one?
+        self.buttons[i * self.size + j].destroy()
         self.play_game(i, j)
 
     def pick_color(self, i, j):
@@ -42,47 +41,41 @@ class Game(tk.Frame):
         else:
             button_img=self.black
         return button_img
-
+  
     def display_board(self):
         for i in range(self.size):
             for j in range(self.size):
-                frm_position = ttk.Frame(
+                self.frm_position.append(ttk.Frame(
                     master=self.frm_board,
                     relief=tk.RIDGE,
                     borderwidth=1
-                    )
+                    ))
                 button_img = self.pick_color(i, j)
-                frm_position.grid(row=i, column=j, padx=5, pady=5)
-                button = tk.Button(
-                    master=frm_position\
+                self.frm_position[i * self.size + j].grid(row=i, column=j, padx=5, pady=5)
+                self.buttons.append(tk.Button(
+                    master=self.frm_position[i * self.size + j]\
                     , image=button_img\
                     , command=lambda row=i, column=j: self.handle_click((row, column))
                     , height=26
                     , width=26
-                    )
-                button.pack()
+                    ))
+                self.buttons[i * self.size + j].pack()
 
     def make_move(self, i, j):
-        # delete before add a new one
         self.board[i][j] = self.player
-        # https://stackoverflow.com/questions/12364981/how-to-delete-tkinter-widgets-from-a-window
-        # if self.board[i][j] == 1:
-        #     button_img=self.white
-        # else:
-        #     button_img=self.black
-        # frm_position = ttk.Frame(
-        #         master=self.frm_board,
-        #         relief=tk.RIDGE,
-        #         borderwidth=1
-        #     ).grid(row=i, column=j, padx=5, pady=5)
-        # button = tk.Button(
-        #     master=frm_position\
-        #     , image=button_img\
-        #     , command=lambda row=i, column=j: self.handle_click((row, column))
-        #     , height=26
-        #     , width=26
-        #     )
-        # button.pack()
+        if self.board[i][j] == 1:
+            button_img=self.white
+        else:
+            button_img=self.black
+        self.buttons[i * self.size + j] = tk.Button(
+            master=self.frm_position[i * self.size + j]\
+            , image=button_img\
+            , command=lambda row=i, column=j: self.handle_click((row, column))
+            , height=26
+            , width=26
+            )
+        self.buttons[i * self.size + j].pack()
+        self.print_board()
 
     def change_player(self):
         if self.player == 1:
