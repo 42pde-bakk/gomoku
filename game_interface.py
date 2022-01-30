@@ -23,6 +23,7 @@ class Game(tk.Frame):
         lbl_name.pack()
         self.frm_board = ttk.Frame(self, relief=tk.RAISED, borderwidth=10, height=500, width=500)
         self.frm_board.pack(padx=25, pady=25)
+        self.new_game_bt()
         self.display_board()
         self.mainloop()
 
@@ -30,7 +31,8 @@ class Game(tk.Frame):
         i, j = args
         print(f"Clicked on row: {i}, col: {j}")
         # How to destroy the button before creating a new one?
-        self.buttons[i * self.size + j].destroy()
+        if self.board[i][j] == 0:
+            self.buttons[i * self.size + j].destroy()
         self.play_game(i, j)
 
     def pick_color(self, i, j):
@@ -89,9 +91,37 @@ class Game(tk.Frame):
         else:
             print("Position taken")
             return
+        # Check for captures/win
         self.change_player()
         # self.display_board()
 
+    def delete_buttons(self):
+        # delete all self.buttons[]
+        # delete all self.frm_position[]
+        for i in range(len(self.buttons)):
+            self.buttons[i].destroy()
+        # for pos in range(len(self.frm_position)):
+            self.frm_position[i].destroy()
+        self.buttons = []
+        self.frm_position = []
+
+
+    def reset_board(self):
+        self.player = 1
+        self.board = [[0 for i in range(self.size)] for i in range(self.size)]
+        self.delete_buttons()
+        self.display_board()
+
+    def new_game_bt(self):
+        bt_new_game = tk.Button(
+            text="NEW GAME"
+            , command=self.reset_board
+            , width=25
+            , height=5
+            , bg="gray"
+            , fg="red"
+            )
+        bt_new_game.pack()
 
     def update_board(self, i, j):
         pass
