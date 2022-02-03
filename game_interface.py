@@ -1,10 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
+from legal_moves import is_last_in_capture, move_is_legal
 
 class Game(tk.Frame):
     def __init__(self, size, master=None):
         super().__init__(master)
         self.pack()
+        # self.geometry('300x200') DOEST WORK
         self.board = [[0 for i in range(size)] for i in range(size)]
         self.buttons = []
         self.frm_position = []
@@ -30,10 +32,9 @@ class Game(tk.Frame):
     def handle_click(self, args):
         i, j = args
         print(f"Clicked on row: {i}, col: {j}")
-        # How to destroy the button before creating a new one?
-        if self.board[i][j] == 0:
-            self.buttons[i * self.size + j].destroy()
         self.play_game(i, j)
+        # if self.board[i][j] == 0:
+        #     self.buttons[i * self.size + j].destroy()
 
     def pick_color(self, i, j):
         if self.board[i][j] == 0:
@@ -48,9 +49,9 @@ class Game(tk.Frame):
         for i in range(self.size):
             for j in range(self.size):
                 self.frm_position.append(ttk.Frame(
-                    master=self.frm_board,
-                    relief=tk.RIDGE,
-                    borderwidth=1
+                    master=self.frm_board
+                    , relief=tk.RIDGE
+                    , borderwidth=1
                     ))
                 button_img = self.pick_color(i, j)
                 self.frm_position[i * self.size + j].grid(row=i, column=j, padx=5, pady=5)
@@ -64,11 +65,9 @@ class Game(tk.Frame):
                 self.buttons[i * self.size + j].pack()
 
     def make_move(self, i, j):
-        self.board[i][j] = self.player
-        if self.board[i][j] == 1:
-            button_img=self.white
-        else:
-            button_img=self.black
+        # self.board[i][j] = self.player
+        # move_is_legal(self.board, i, j)
+        button_img = self.pick_color(i, j)
         self.buttons[i * self.size + j] = tk.Button(
             master=self.frm_position[i * self.size + j]\
             , image=button_img\
@@ -87,7 +86,12 @@ class Game(tk.Frame):
 
     def play_game(self, i, j):
         if self.board[i][j] == 0:
-           self.make_move(i, j)
+            if move_is_legal(self.board, i, j, self.player):
+                print("Illegal move")
+                return
+            self.board[i][j] = self.player
+            self.buttons[i * self.size + j].destroy()
+            self.make_move(i, j)
         else:
             print("Position taken")
             return
@@ -96,15 +100,11 @@ class Game(tk.Frame):
         # self.display_board()
 
     def delete_buttons(self):
-        # delete all self.buttons[]
-        # delete all self.frm_position[]
         for i in range(len(self.buttons)):
             self.buttons[i].destroy()
-        # for pos in range(len(self.frm_position)):
-            self.frm_position[i].destroy()
+            self.frm_position[i].destroy() # Could there be different lengths here? Empty positions
         self.buttons = []
         self.frm_position = []
-
 
     def reset_board(self):
         self.player = 1
