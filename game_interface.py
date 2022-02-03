@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-from legal_moves import is_last_in_capture, move_is_legal
 
 from srcs.gamestate import Gamestate
 
@@ -91,7 +90,8 @@ class Game(tk.Frame):
 
 	def play_game(self, i, j):
 		if self.gamestate.board.get(i, j) == 0:
-			if move_is_legal(self.gamestate.board.get_board(), i, j, self.player):
+			# if move_is_legal(self.gamestate.board.get_board(), i, j, self.player):
+			if not self.gamestate.rules.move_is_legal(i, j):
 				print("Illegal move")
 				return
 			self.gamestate.board.set(i, j, self.player)
@@ -102,7 +102,6 @@ class Game(tk.Frame):
 			return
 		# Check for captures/win
 		self.change_player()
-		# self.display_board()
 
 	def delete_buttons(self):
 		for i in range(len(self.buttons)):
