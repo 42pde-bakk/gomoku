@@ -1,5 +1,6 @@
-from srcs.gamestate import Gamestate, Stone
 from math import inf
+
+from srcs.gamestate import Gamestate
 
 
 class Minimax:
@@ -11,7 +12,7 @@ class Minimax:
 
 	@staticmethod
 	def add_to_transp_table(gamestate: Gamestate, maximizing_player: bool) -> None:
-		board_bytes = gamestate.board.tobytes()
+		board_bytes = gamestate.board.arr.tobytes()
 		if board_bytes in Minimax.transposition_table.keys():
 			gamestate.children = Minimax.transposition_table[board_bytes].children
 		else:
