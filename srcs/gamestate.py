@@ -1,5 +1,6 @@
 import enum
 from copy import deepcopy
+from random import randint
 
 import numpy as np
 
@@ -11,21 +12,48 @@ class Stone(enum.IntEnum):
 	PLAYER_1 = 1
 	PLAYER_2 = 2
 
+	def get_other_player(self):
+		if self == Stone.PLAYER_1:
+			return Stone.PLAYER_2
+		return Stone.PLAYER_1
+
+
+class Move:
+	def __init__(self, y: int, x: int):
+		self.y = y
+		self.x = x
+
+	def __repr__(self):
+		return f'Move: y={self.y},x={self.x}'
+
 
 class Gamestate:
 	PLAYER_ONE = 0
 	PLAYER_TWO = 1
 
 	def __init__(self, parent = None):
-		self.board = Board()
-		self.captures = [0, 0]
-		self.parent = parent
-		self.children = []
-		self.winner = None
+		if isinstance(parent, Gamestate):
+			self.board = deepcopy(parent.board)
+			self.last_move = parent.last_move
+			self.parent = parent
+			self.captures = parent.captures
+			self.children = []
+			self.winner = None
+			self.h = parent.h
+			self.turn = parent.turn + 1
+		else:
+			self.board = Board()
+			# Maybe store indexes of all empty cells too?
+			self.captures = [0, 0]
+			self.parent = parent
+			self.children = []
+			self.winner = None
+			self.last_move = Move(-1, -1)
+			self.h = 0
+			self.turn = 0
 
-	@property
-	def h(self):
-		return self.captures[0] - self.captures[1]
+	def clone(self):
+		return Gamestate(self)
 
 	def __lt__(self, other):
 		return self.h < other.h
@@ -48,7 +76,7 @@ class Gamestate:
 		for dy, dx in [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]:
 			if self.player_check(y + dy, x + dx, other_player) and self.player_check(y + 2 * dy, x + 2 * dx, other_player) and self.player_check(y + 3 * dy, x + 3 * dx, player):
 				self.capture((y + dy, x + dx), (y + 2 * dy, x + 2 * dx), player)
-			print((dy, dx))
+			# print((dy, dx))
 		return True
 
 	def game_over_check(self, y: int, x: int, player: Stone) -> bool:
@@ -59,16 +87,22 @@ class Gamestate:
 			while self.board.get(y + m * -dy, x + m * -dx) == player.value:
 				m += 1
 			if n + m + 1 >= 5:
-				# self.winner = player
+				self.winner = player
 				self.captures[player.value - 1] += 10  # Win
 				return True
 		return False
 
-	def place_stone(self, y: int, x: int, player: Stone) -> None:
-		self.board.set(y, x, player)
-		self.capture_check(y, x, player)
+	def place_stone(self, y: int, x: int, stone: Stone) -> None:
+		self.board.set(y, x, stone.value)
+		self.capture_check(y, x, stone)
+		self.last_move = Move(y = y, x = x)
+		self.h = randint(-10, 10)
 
-	def generate_children(self, player: int) -> list:
+	def generate_children(self) -> list:
+		player = self.turn % 2
+		# 0 for player 1 (User)
+		# 1 for player 2 (Bot)
+
 		def touches_occupied() -> bool:
 			for dy, dx in [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]:
 				if self.board.get(y = y + dy, x = x + dx):
@@ -80,7 +114,10 @@ class Gamestate:
 			return []
 		for (y, x), item in np.ndenumerate(self.board.arr):
 			if item == Stone.EMPTY and touches_occupied():
-				child = deepcopy(self)
-				child.board.set(y = y, x = x, item = player)
+				child = Gamestate(self)
+				child.place_stone(y = y, x = x, stone = Stone(player + 1))
+				# child.board.set(y = y, x = x, item = player + 1)  # +1 because player 0 has stone value 1
+				print(f'child sets {y, x} to stone {player + 1}')
 				self.children.append(child)
+		# exit(1)
 		return self.children

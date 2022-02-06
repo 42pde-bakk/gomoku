@@ -5,18 +5,20 @@ from srcs.gamestate import Gamestate
 
 
 # from srcs.board import Board
+from srcs.minimax import Minimax
 
 
 class Game(tk.Frame):
-	def __init__(self, size, master = None):
+	def __init__(self, size, hotseat: bool, master = None):
 		super().__init__(master)
 		self.pack()
 		self.gamestate = Gamestate()
-		# self.board = [[0 for _ in range(size)] for _ in range(size)]
 		self.buttons = []
 		self.frm_position = []
 		self.size = size
 		self.player = 1
+		self.minimax = Minimax()
+		self.hotseat = hotseat
 		self.frm_board = None
 		self.white = tk.PhotoImage(file = 'assets/white.png')
 		self.black = tk.PhotoImage(file = 'assets/black.png')
@@ -91,15 +93,29 @@ class Game(tk.Frame):
 			self.player = 2
 		else:
 			self.player = 1
+		self.gamestate.turn += 1
 
 	def play_game(self, i, j):
-		if self.gamestate.board.get(i, j) == 0:
-			self.make_move(i, j)
-		else:
+		if self.gamestate.board.get(i, j) != 0:
 			print("Position taken")
 			return
+		self.make_move(i, j)  # this is the players move
 		# Check for captures/win
-		self.change_player()
+		self.change_player()  # Changing player, so next move will be for the AI
+		if self.hotseat:
+			outcome = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
+			# gotta extract the last move from here?
+			# Or I could just take that board and push it to the tk window, not sure tho
+			self.change_player()
+		else:
+			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = False)
+			i, j = state.last_move.x, state.last_move.y
+			if self.gamestate.board.get(i, j) == 0:
+				self.buttons[i * self.size + j].destroy()
+			print(f'last_move={state.last_move}')
+			self.make_move(j, i)
+			self.change_player()
+
 
 	# self.display_board()
 
