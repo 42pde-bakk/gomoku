@@ -79,18 +79,18 @@ class Gamestate:
 			# print((dy, dx))
 		return True
 
-	def game_over_check(self, y: int, x: int, player: Stone) -> bool:
-		for dy, dx in [(1, 0), (0, 1), (1, 1), (-1, 1)]:
-			n = m = 1
-			while self.board.get(y + n * dy, x + n * dx) == player.value:
-				n += 1
-			while self.board.get(y + m * -dy, x + m * -dx) == player.value:
-				m += 1
-			if n + m + 1 >= 5:
-				self.winner = player
-				self.captures[player.value - 1] += 10  # Win
-				return True
-		return False
+	# def game_over_check(self, y: int, x: int, player: Stone) -> bool:
+	# 	for dy, dx in [(1, 0), (0, 1), (1, 1), (-1, 1)]:
+	# 		n = m = 1
+	# 		while self.board.get(y + n * dy, x + n * dx) == player.value:
+	# 			n += 1
+	# 		while self.board.get(y + m * -dy, x + m * -dx) == player.value:
+	# 			m += 1
+	# 		if n + m + 1 >= 5:
+	# 			# self.winner = player
+	# 			self.captures[player.value - 1] += 10  # Win
+	# 			return True
+	# 	return False
 
 	def place_stone(self, y: int, x: int, stone: Stone) -> None:
 		self.board.set(y, x, stone.value)

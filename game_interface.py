@@ -39,28 +39,27 @@ class Game(tk.Frame):
 	def handle_click(self, args):
 		i, j = args
 		print(f"Clicked on row: {i}, col: {j}")
-		# How to destroy the button before creating a new one?
-		if self.gamestate.board.get(i, j) == 0:
-			self.buttons[i * self.size + j].destroy()
 		self.play_game(i, j)
+		# if self.board[i][j] == 0:
+		#     self.buttons[i * self.size + j].destroy()
 
 	def pick_color(self, i, j):
-		if self.gamestate.board.get(i, j) == 0:
-			button_img = self.gray
-		elif self.gamestate.board.get(i, j) == 1:
-			button_img = self.white
-		else:
-			button_img = self.black
-		return button_img
-
+			if self.gamestate.board.get(i, j) == 0:
+				button_img = self.gray
+			elif self.gamestate.board.get(i, j) == 1:
+				button_img = self.white
+			else:
+				button_img = self.black
+			return button_img
+  
 	def display_board(self):
 		for i in range(self.size):
 			for j in range(self.size):
 				self.frm_position.append(ttk.Frame(
-					master = self.frm_board,
-					relief = tk.RIDGE,
-					borderwidth = 1
-				))
+					master = self.frm_board
+					, relief = tk.RIDGE
+					, borderwidth = 1
+					))
 				button_img = self.pick_color(i, j)
 				self.frm_position[i * self.size + j].grid(row = i, column = j, padx = 5, pady = 5)
 				self.buttons.append(tk.Button(
@@ -72,19 +71,17 @@ class Game(tk.Frame):
 				))
 				self.buttons[i * self.size + j].pack()
 
-	def make_move(self, i, j):
-		self.gamestate.board.set(i, j, self.player)
-		if self.gamestate.board.get(i, j) == 1:
-			button_img = self.white
-		else:
-			button_img = self.black
+	def update_button(self, i, j):
+		# self.board[i][j] = self.player
+		# move_is_legal(self.board, i, j)
+		button_img = self.pick_color(i, j)
 		self.buttons[i * self.size + j] = tk.Button(
-			master = self.frm_position[i * self.size + j],
-			image = button_img,
-			command = lambda row = i, column = j: self.handle_click((row, column)),
-			height = 26,
-			width = 26
-		)
+			master = self.frm_position[i * self.size + j]\
+			, image = button_img\
+			, command = lambda row = i, column = j: self.handle_click((row, column))
+			, height = 26
+			, width = 26
+			)
 		self.buttons[i * self.size + j].pack()
 		self.print_board()
 
@@ -96,36 +93,43 @@ class Game(tk.Frame):
 		self.gamestate.turn += 1
 
 	def play_game(self, i, j):
-		if self.gamestate.board.get(i, j) != 0:
+		if self.gamestate.board.get(i, j) == 0:
+			# if not self.gamestate.rules.move_is_legal(i, j):
+			# 	print("Illegal move")
+			# 	return
+			self.gamestate.board.set(i, j, self.player)
+			self.buttons[i * self.size + j].destroy()
+			self.update_button(i, j)
+		else:
 			print("Position taken")
 			return
-		self.make_move(i, j)  # this is the players move
 		# Check for captures/win
 		self.change_player()  # Changing player, so next move will be for the AI
+		self.ai_move()
+
+	def ai_move(self):
 		if self.hotseat:
-			outcome = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
+			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
 			# gotta extract the last move from here?
 			# Or I could just take that board and push it to the tk window, not sure tho
-			self.change_player()
+			# self.change_player()
 		else:
 			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = False)
 			i, j = state.last_move.x, state.last_move.y
 			if self.gamestate.board.get(i, j) == 0:
+				self.gamestate.board.set(i, j, self.player)
 				self.buttons[i * self.size + j].destroy()
+				self.update_button(i, j)
+			else:
+				raise ValueError()
 			print(f'last_move={state.last_move}')
-			self.make_move(j, i)
 			self.change_player()
 
 
-	# self.display_board()
-
 	def delete_buttons(self):
-		# delete all self.buttons[]
-		# delete all self.frm_position[]
 		for i in range(len(self.buttons)):
 			self.buttons[i].destroy()
-			# for pos in range(len(self.frm_position)):
-			self.frm_position[i].destroy()
+			self.frm_position[i].destroy() # Could there be different lengths here? Empty positions
 		self.buttons = []
 		self.frm_position = []
 
