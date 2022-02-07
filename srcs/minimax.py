@@ -37,6 +37,7 @@ class Minimax:
 				value, state = self.minimax(child, depth - 1, not maximizing_player)
 				if value < best_value:
 					best_value, best_state = value, state
+		assert best_state is not None
 		return best_value, best_state
 
 	def alphabeta(self, state: Gamestate, depth: int, maximizing_player: bool) -> tuple[int, Gamestate]:
