@@ -37,69 +37,67 @@ class Game(tk.Frame):
 		self.mainloop()
 
 	def handle_click(self, args):
-		i, j = args
-		print(f"Clicked on row: {i}, col: {j}")
-		self.play_game(i, j)
-		# if self.board[i][j] == 0:
-		#     self.buttons[i * self.size + j].destroy()
+		row, col = args
+		print(f"Clicked on row: {row}, col: {col}")
+		self.play_game(row, col)
+		# if self.board[row][col] == 0:
+		#     self.buttons[row * self.size + col].destroy()
 
-	def pick_color(self, i, j):
-			if self.gamestate.board.get(i, j) == 0:
+	def pick_color(self, row: int, col: int):
+			if self.gamestate.board.get(row, col) == 0:
 				button_img = self.gray
-			elif self.gamestate.board.get(i, j) == 1:
+			elif self.gamestate.board.get(row, col) == 1:
 				button_img = self.white
 			else:
 				button_img = self.black
 			return button_img
   
-	def display_board(self):
-		for i in range(self.size):
-			for j in range(self.size):
+	def display_board(self) -> None:
+		for row in range(self.size):
+			for col in range(self.size):
 				self.frm_position.append(ttk.Frame(
 					master = self.frm_board
 					, relief = tk.RIDGE
 					, borderwidth = 1
 					))
-				button_img = self.pick_color(i, j)
-				self.frm_position[i * self.size + j].grid(row = i, column = j, padx = 5, pady = 5)
+				button_img = self.pick_color(row, col)
+				self.frm_position[row * self.size + col].grid(row = row, column = col, padx = 5, pady = 5)
 				self.buttons.append(tk.Button(
-					master = self.frm_position[i * self.size + j],
+					master = self.frm_position[row * self.size + col],
 					image = button_img,
-					command = lambda row = i, column = j: self.handle_click((row, column)),
+					command = lambda row = row, column = col: self.handle_click((row, column)),
 					height = 26,
 					width = 26
 				))
-				self.buttons[i * self.size + j].pack()
+				self.buttons[row * self.size + col].pack()
 
-	def update_button(self, i, j):
-		# self.board[i][j] = self.player
-		# move_is_legal(self.board, i, j)
-		button_img = self.pick_color(i, j)
-		self.buttons[i * self.size + j] = tk.Button(
-			master = self.frm_position[i * self.size + j]\
+	def update_button(self, row: int, col: int) -> None:
+		button_img = self.pick_color(row, col)
+		self.buttons[row * self.size + col] = tk.Button(
+			master = self.frm_position[row * self.size + col]\
 			, image = button_img\
-			, command = lambda row = i, column = j: self.handle_click((row, column))
+			, command = lambda row = row, column = col: self.handle_click((row, column))
 			, height = 26
 			, width = 26
 			)
-		self.buttons[i * self.size + j].pack()
+		self.buttons[row * self.size + col].pack()
 		self.print_board()
 
-	def change_player(self):
+	def change_player(self) -> None:
 		if self.player == 1:
 			self.player = 2
 		else:
 			self.player = 1
 		self.gamestate.turn += 1
 
-	def play_game(self, i, j):
-		if self.gamestate.board.get(i, j) == 0:
-			# if not self.gamestate.rules.move_is_legal(i, j):
+	def play_game(self, row: int, col: int) -> None:
+		if self.gamestate.board.get(row, col) == 0:
+			# if not self.gamestate.rules.move_is_legal(row, col):
 			# 	print("Illegal move")
 			# 	return
-			self.gamestate.board.set(i, j, self.player)
-			self.buttons[i * self.size + j].destroy()
-			self.update_button(i, j)
+			self.gamestate.board.set(row, col, self.player)
+			self.buttons[row * self.size + col].destroy()
+			self.update_button(row, col)
 		else:
 			print("Position taken")
 			return
@@ -110,16 +108,13 @@ class Game(tk.Frame):
 	def ai_move(self):
 		if self.hotseat:
 			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
-			# gotta extract the last move from here?
-			# Or I could just take that board and push it to the tk window, not sure tho
-			# self.change_player()
 		else:
 			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = False)
-			i, j = state.last_move.x, state.last_move.y
-			if self.gamestate.board.get(i, j) == 0:
-				self.gamestate.board.set(i, j, self.player)
-				self.buttons[i * self.size + j].destroy()
-				self.update_button(i, j)
+			row, col = state.last_move.x, state.last_move.y
+			if self.gamestate.board.get(row, col) == 0:
+				self.gamestate.board.set(row, col, self.player)
+				self.buttons[row * self.size + col].destroy()
+				self.update_button(row, col)
 			else:
 				raise ValueError()
 			print(f'last_move={state.last_move}')
@@ -127,9 +122,9 @@ class Game(tk.Frame):
 
 
 	def delete_buttons(self):
-		for i in range(len(self.buttons)):
-			self.buttons[i].destroy()
-			self.frm_position[i].destroy() # Could there be different lengths here? Empty positions
+		for row in range(len(self.buttons)):
+			self.buttons[row].destroy()
+			self.frm_position[row].destroy() # Could there be different lengths here? Empty positions
 		self.buttons = []
 		self.frm_position = []
 
@@ -150,5 +145,5 @@ class Game(tk.Frame):
 		)
 		bt_new_game.pack()
 
-	def update_board(self, i, j):
-		print(f'updating board, i={i}, h={j}')
+	def update_board(self, row, col):
+		print(f'updating board, row={row}, h={col}')
