@@ -25,7 +25,8 @@ class Game(tk.Frame):
 		self.gray = tk.PhotoImage(file = 'assets/gray.png')
 
 	def print_board(self):
-		print(self.gamestate)
+		pass
+		# print(self.gamestate)
 
 	def create_window(self):
 		lbl_name = ttk.Label(self, text = "Go Go Gomoku")
@@ -51,7 +52,7 @@ class Game(tk.Frame):
 			else:
 				button_img = self.black
 			return button_img
-  
+
 	def display_board(self) -> None:
 		for row in range(self.size):
 			for col in range(self.size):
@@ -74,8 +75,8 @@ class Game(tk.Frame):
 	def update_button(self, row: int, col: int) -> None:
 		button_img = self.pick_color(row, col)
 		self.buttons[row * self.size + col] = tk.Button(
-			master = self.frm_position[row * self.size + col]\
-			, image = button_img\
+			master = self.frm_position[row * self.size + col]
+			, image = button_img
 			, command = lambda row = row, column = col: self.handle_click((row, column))
 			, height = 26
 			, width = 26
@@ -110,16 +111,14 @@ class Game(tk.Frame):
 			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
 		else:
 			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = False)
-			row, col = state.last_move.x, state.last_move.y
-			if self.gamestate.board.get(row, col) == 0:
-				self.gamestate.board.set(row, col, self.player)
+			col, row = state.first_move.x, state.first_move.y
+			if self.gamestate.board.get(y = row, x = col) == 0:
+				self.gamestate.board.set(y = row, x = col, item = self.player)
 				self.buttons[row * self.size + col].destroy()
 				self.update_button(row, col)
 			else:
 				raise ValueError()
-			print(f'last_move={state.last_move}')
 			self.change_player()
-
 
 	def delete_buttons(self):
 		for row in range(len(self.buttons)):
