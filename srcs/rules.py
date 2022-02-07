@@ -1,4 +1,7 @@
 class Rules:
+    def __init__(self):
+        pass
+
     def move_is_legal(board, mv_row, mv_col, player):
         opponent = get_opponent_num(player)
         if is_last_in_capture(board, mv_row, mv_col, player, opponent):
@@ -22,9 +25,31 @@ class Rules:
                         return True
         return False
 
-    def get_opponent_num(player): # TEST THIS do I write the move before it is checked? if not just pass player param
+    def get_opponent_num(player):
         if player == 1:
             opponent = 2
         else:
             opponent = 1
         return opponent
+
+    def is_winning_condition(self):
+        pass
+
+    def win_by_captures(self):
+        pass
+
+    def win_by_five(self, y: int, x: int, player: Stone) -> bool:
+    	for dy, dx in [(1, 0), (0, 1), (1, 1), (-1, 1)]:
+			n = m = 1
+			while self.board.get(y + n * dy, x + n * dx) == player.value:
+				n += 1
+			while self.board.get(y + m * -dy, x + m * -dx) == player.value:
+				m += 1
+			if n + m + 1 >= 5:
+				# self.winner = player
+				self.captures[player.value - 1] += 10  # Win
+				return True
+		return False
+
+    def can_be_captured(self):
+        pass
