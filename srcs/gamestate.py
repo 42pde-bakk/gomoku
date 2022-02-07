@@ -34,9 +34,9 @@ class Gamestate:
 	def __init__(self, parent = None):
 		if isinstance(parent, Gamestate):
 			self.board = deepcopy(parent.board)
-			self.last_move = parent.last_move
+			self.first_move = parent.first_move
 			self.parent = parent
-			self.captures = parent.captures
+			self.captures = deepcopy(parent.captures)
 			self.children = []
 			self.winner = None
 			self.h = parent.h
@@ -48,7 +48,7 @@ class Gamestate:
 			self.parent = parent
 			self.children = []
 			self.winner = None
-			self.last_move = Move(-1, -1)
+			self.first_move = None
 			self.h = 0
 			self.turn = 0
 
@@ -95,7 +95,8 @@ class Gamestate:
 	def place_stone(self, y: int, x: int, stone: Stone) -> None:
 		self.board.set(y, x, stone.value)
 		self.capture_check(y, x, stone)
-		self.last_move = Move(y = y, x = x)
+		if self.first_move is None:
+			self.first_move = Move(y = y, x = x)
 		self.h = randint(-10, 10)
 
 	def generate_children(self) -> list:
