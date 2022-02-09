@@ -1,4 +1,5 @@
 import time
+import numpy as np
 import tkinter as tk
 from tkinter import ttk
 
@@ -112,13 +113,15 @@ class Game(tk.Frame):
 			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
 		else:
 			time_start = time.time()
-			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = False)
+			value, state = self.minimax.alphabeta(state = self.gamestate, depth = self.minimax.maxdepth, alpha = -np.inf, beta = np.inf, maximizing_player = False)
 			col, row = state.first_move.x, state.first_move.y
-			print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}')
+			print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}, heur={state.h}')
 			if self.gamestate.board.get(y = row, x = col) == 0:
 				self.gamestate.board.set(y = row, x = col, item = self.player)
 				self.buttons[row * self.size + col].destroy()
 				self.update_button(row, col)
+				if state.winner:
+					exit(1)
 			else:
 				raise ValueError()
 			self.change_player()

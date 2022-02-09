@@ -1,6 +1,6 @@
 import enum
 from copy import deepcopy
-from random import randint
+import random
 
 import numpy as np
 
@@ -93,8 +93,8 @@ class Gamestate:
 	# 	return False
 
 	def set_h(self) -> int:
-		p1 = get_connects_of_player(self.board.arr, player = 1)
-		p2 = get_connects_of_player(self.board.arr, player = 2)
+		p1, game_over1 = get_connects_of_player(self.board.arr, player = 1)
+		p2, game_over2 = get_connects_of_player(self.board.arr, player = 2)
 		self.h = p1 - p2
 		return self.h
 
@@ -124,4 +124,5 @@ class Gamestate:
 				child = Gamestate(self)
 				child.place_stone(y = y, x = x, stone = Stone(player + 1))
 				self.children.append(child)
+		random.shuffle(self.children)
 		return self.children
