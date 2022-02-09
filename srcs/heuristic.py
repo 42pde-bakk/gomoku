@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def get_connects_of_player(arr: np.ndarray, player: int):
+def get_connects_of_player(arr: np.ndarray, player: int) -> int:
 	# Only checks to the right, downwards and down-right
 	connections = {i: 0 for i in range(1, 5)}
 	rightchecked = set()
