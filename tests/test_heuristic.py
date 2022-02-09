@@ -38,9 +38,7 @@ class TestHeuristic(TestCase):
 	def test_four_diagonal(self):
 		board = np.zeros(shape=(19, 19), dtype = np.int8)
 		board[range(2, 6), range(2, 6)] = 1
-		print(board)
 		connects = get_connects_of_player(arr = board, player = 1)
-		print(f'connects = {connects}')
 		assert connects == 1000
 
 	def test_two_fours(self):
@@ -49,3 +47,12 @@ class TestHeuristic(TestCase):
 		board[0:4, 0] = 1
 		connects = get_connects_of_player(arr = board, player = 1)
 		assert connects == 2000
+
+	def test_two_players(self):
+		board = np.zeros(shape=(19, 19), dtype = np.int8)
+		board[0][0] = 1
+		board[0][1:4] = 2
+		board[1][1:3] = 1
+		connects1 = get_connects_of_player(board, player = 1)
+		connects2 = get_connects_of_player(board, player = 2)
+		assert connects1 - connects2 < 0
