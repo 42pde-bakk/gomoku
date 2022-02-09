@@ -28,13 +28,13 @@ class Minimax:
 		if maximizing_player:
 			best_value = float(-inf)
 			for child in state.children:
-				value, state = self.minimax(child, depth - 1, not maximizing_player)
+				value, state = self.minimax(child, depth - 1, maximizing_player = False)
 				if value > best_value:
 					best_value, best_state = value, state
 		else:
 			best_value = float(inf)
 			for child in state.children:
-				value, state = self.minimax(child, depth - 1, not maximizing_player)
+				value, state = self.minimax(child, depth - 1, maximizing_player = True)
 				if value < best_value:
 					best_value, best_state = value, state
 		assert best_state is not None

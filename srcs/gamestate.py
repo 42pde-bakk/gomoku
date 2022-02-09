@@ -77,7 +77,6 @@ class Gamestate:
 		for dy, dx in [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]:
 			if self.player_check(y + dy, x + dx, other_player) and self.player_check(y + 2 * dy, x + 2 * dx, other_player) and self.player_check(y + 3 * dy, x + 3 * dx, player):
 				self.capture((y + dy, x + dx), (y + 2 * dy, x + 2 * dx), player)
-			# print((dy, dx))
 		return True
 
 	# def game_over_check(self, y: int, x: int, player: Stone) -> bool:
@@ -94,12 +93,14 @@ class Gamestate:
 	# 	return False
 
 	def set_h(self) -> int:
-		self.h = get_connects_of_player(self.board.arr, player = 1) - get_connects_of_player(self.board.arr, player = 2)
+		p1 = get_connects_of_player(self.board.arr, player = 1)
+		p2 = get_connects_of_player(self.board.arr, player = 2)
+		self.h = p1 - p2
 		return self.h
 
 	def place_stone(self, y: int, x: int, stone: Stone) -> None:
 		self.board.set(y, x, stone.value)
-		self.capture_check(y, x, stone)
+		# self.capture_check(y, x, stone)
 		if self.first_move is None:
 			self.first_move = Move(y = y, x = x)
 		self.set_h()
@@ -111,6 +112,8 @@ class Gamestate:
 
 		def touches_occupied() -> bool:
 			for dy, dx in [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]:
+				# if y == 0 and x == 3:
+					# print(f'dy,dx={dy,dx}, newpos={y+dy,x+dx}, ret={self.board.get(y = y+dy, x = x+dx)}')
 				if self.board.get(y = y + dy, x = x + dx):
 					return True
 			return False
@@ -120,8 +123,11 @@ class Gamestate:
 			return []
 		for (y, x), item in np.ndenumerate(self.board.arr):
 			if item == Stone.EMPTY and touches_occupied():
+				print(f'{y, x} => wayooo we in here, Stone.EMPTY={Stone.EMPTY}')
 				child = Gamestate(self)
 				child.place_stone(y = y, x = x, stone = Stone(player + 1))
+				print(f'child.h = {child.h}, stone = {Stone(player + 1)}')
+				if (y, x) == (0, 3):
+					print(f'board=\n{child.board.arr}')
 				self.children.append(child)
-		# exit(1)
 		return self.children
