@@ -5,6 +5,7 @@ from random import randint
 import numpy as np
 
 from srcs.board import Board
+from srcs.heuristic import get_connects_of_player
 
 
 class Stone(enum.IntEnum):
@@ -92,12 +93,16 @@ class Gamestate:
 	# 			return True
 	# 	return False
 
+	def set_h(self) -> int:
+		self.h = get_connects_of_player(self.board.arr, player = 1) - get_connects_of_player(self.board.arr, player = 2)
+		return self.h
+
 	def place_stone(self, y: int, x: int, stone: Stone) -> None:
 		self.board.set(y, x, stone.value)
 		self.capture_check(y, x, stone)
 		if self.first_move is None:
 			self.first_move = Move(y = y, x = x)
-		self.h = randint(-10, 10)
+		self.set_h()
 
 	def generate_children(self) -> list:
 		player = self.turn % 2
