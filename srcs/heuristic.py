@@ -3,7 +3,7 @@ import numpy as np
 
 def get_connects_of_player(arr: np.ndarray, player: int) -> int:
 	# Only checks to the right, downwards and down-right
-	connections = {i: 0 for i in range(1, 5)}
+	connections = {i: 0 for i in range(1, 6)}
 	rightchecked = set()
 	downchecked = set()
 	downrightchecked = set()
@@ -32,4 +32,4 @@ def get_connects_of_player(arr: np.ndarray, player: int) -> int:
 				y2 += 1
 				x2 += 1
 			connections[y2 - y] += 1
-	return connections[2] * 10 + connections[3] * 100 + connections[4] * 1000
+	return connections[2] * 10 + connections[3] * 100 + connections[4] * 1000 + connections[5] * 10000
