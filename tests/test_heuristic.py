@@ -9,10 +9,39 @@ class TestHeuristic(TestCase):
 		assert get_connects_of_player(board, player = 1) == 0
 		assert get_connects_of_player(board, player = 2) == 0
 
-	def test_four(self):
+	def test_three_right(self):
+		board = np.zeros(shape=(19, 19), dtype = np.int8)
+		board[2][10:13] = 2
+		assert get_connects_of_player(arr = board, player = 2) == 100
+
+	def test_three_down(self):
+		board = np.zeros(shape=(19, 19), dtype = np.int8)
+		board[2][10:13] = 2
+		assert get_connects_of_player(arr = board, player = 2) == 100
+
+	def test_three_diagonal(self):
+		board = np.zeros(shape=(19, 19), dtype = np.int8)
+		board[range(2, 5), range(2, 5)] = 2
+		connects = get_connects_of_player(arr = board, player = 2)
+		assert connects == 100
+
+	def test_four_right(self):
 		board = np.zeros(shape=(19, 19), dtype = np.int8)
 		board[2][10:14] = 1
 		assert get_connects_of_player(arr = board, player = 1) == 1000
+
+	def test_four_down(self):
+		board = np.zeros(shape=(19, 19), dtype = np.int8)
+		board[2][10:14] = 1
+		assert get_connects_of_player(arr = board, player = 1) == 1000
+
+	def test_four_diagonal(self):
+		board = np.zeros(shape=(19, 19), dtype = np.int8)
+		board[range(2, 6), range(2, 6)] = 1
+		print(board)
+		connects = get_connects_of_player(arr = board, player = 1)
+		print(f'connects = {connects}')
+		assert connects == 1000
 
 	def test_two_fours(self):
 		board = np.zeros(shape=(19, 19), dtype = np.int8)
