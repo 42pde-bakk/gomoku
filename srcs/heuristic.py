@@ -28,7 +28,7 @@ def get_connects_of_player(arr: np.ndarray, player: int):
 		y2, x2 = y + 1, x + 1
 		if (y2, x2) not in downrightchecked:
 			while x2 < arr.shape[0] and arr[y2][x2] == player:  # check diagonally down and right
-				downrightchecked.add((y2, x))
+				downrightchecked.add((y2, x2))
 				y2 += 1
 				x2 += 1
 			connections[y2 - y] += 1
