@@ -112,8 +112,6 @@ class Gamestate:
 
 		def touches_occupied() -> bool:
 			for dy, dx in [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]:
-				# if y == 0 and x == 3:
-					# print(f'dy,dx={dy,dx}, newpos={y+dy,x+dx}, ret={self.board.get(y = y+dy, x = x+dx)}')
 				if self.board.get(y = y + dy, x = x + dx):
 					return True
 			return False
@@ -123,11 +121,7 @@ class Gamestate:
 			return []
 		for (y, x), item in np.ndenumerate(self.board.arr):
 			if item == Stone.EMPTY and touches_occupied():
-				print(f'{y, x} => wayooo we in here, Stone.EMPTY={Stone.EMPTY}')
 				child = Gamestate(self)
 				child.place_stone(y = y, x = x, stone = Stone(player + 1))
-				print(f'child.h = {child.h}, stone = {Stone(player + 1)}')
-				if (y, x) == (0, 3):
-					print(f'board=\n{child.board.arr}')
 				self.children.append(child)
 		return self.children

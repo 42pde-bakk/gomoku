@@ -1,3 +1,4 @@
+import time
 import tkinter as tk
 from tkinter import ttk
 
@@ -110,8 +111,10 @@ class Game(tk.Frame):
 		if self.hotseat:
 			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
 		else:
+			time_start = time.time()
 			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = False)
 			col, row = state.first_move.x, state.first_move.y
+			print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}')
 			if self.gamestate.board.get(y = row, x = col) == 0:
 				self.gamestate.board.set(y = row, x = col, item = self.player)
 				self.buttons[row * self.size + col].destroy()
