@@ -113,8 +113,8 @@ class Game(tk.Frame):
 			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
 		else:
 			time_start = time.time()
-			value, state = self.minimax.alphabeta(state = self.gamestate, depth = self.minimax.maxdepth, alpha = -np.inf, beta = np.inf, maximizing_player = False)
-			col, row = state.first_move.x, state.first_move.y
+			value, state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
+			col, row = state.moves[0].x, state.moves[0].y
 			print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}, heur={state.h}')
 			if self.gamestate.board.get(y = row, x = col) == 0:
 				self.gamestate.board.set(y = row, x = col, item = self.player)
