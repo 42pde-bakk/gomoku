@@ -71,3 +71,9 @@ class TestHeuristic(TestCase):
 		connects2, _ = get_connects_of_player(board, player = 2)
 		print(board, connects1 - connects2)
 		assert connects1 - connects2 == 0
+
+	def test_winner(self):
+		board = np.zeros(shape = (19, 19), dtype = np.int8)
+		board[range(5, 11), range(9, 15)] = 2
+		_, game_over = get_connects_of_player(board, player = 2)
+		assert game_over
