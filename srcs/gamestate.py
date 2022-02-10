@@ -97,6 +97,8 @@ class Gamestate:
 		p1, game_over1 = get_connects_of_player(self.board.arr, player = 1)
 		p2, game_over2 = get_connects_of_player(self.board.arr, player = 2)
 		self.h = p1 - p2
+		if game_over1: self.winner = 1
+		elif game_over2: self.winner = 2
 		return self.h
 
 	def place_stone(self, y: int, x: int, stone: Stone) -> None:

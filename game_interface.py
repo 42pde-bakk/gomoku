@@ -120,6 +120,8 @@ class Game(tk.Frame):
 				self.gamestate.board.set(y = row, x = col, item = self.player)
 				self.buttons[row * self.size + col].destroy()
 				self.update_button(row, col)
+				while state.parent != self.gamestate:
+					state = state.parent
 				if state.winner:
 					exit(1)
 			else:
