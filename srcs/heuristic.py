@@ -3,7 +3,7 @@ import numpy as np
 
 def get_connects_of_player(arr: np.ndarray, player: int) -> tuple[int, bool]:
 	# Only checks to the right, downwards and down-right
-	connections = {i: 0 for i in range(1, 6)}
+	connections = {i: 0 for i in range(1, 19)}
 	rightchecked = set()
 	downchecked = set()
 	downrightchecked = set()
@@ -42,4 +42,5 @@ def get_connects_of_player(arr: np.ndarray, player: int) -> tuple[int, bool]:
 				x2 -= 1
 			connections[y2 - y] += 1
 	heur_value = connections[2] * 10 + connections[3] * 100 + connections[4] * 1000 + connections[5] * 1000000
-	return heur_value, bool(connections[5] > 0)
+	game_over = any(connections[i] > 0 for i in range(5, 19))
+	return heur_value, game_over
