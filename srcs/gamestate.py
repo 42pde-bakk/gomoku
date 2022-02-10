@@ -20,12 +20,13 @@ class Stone(enum.IntEnum):
 
 
 class Move:
-	def __init__(self, y: int, x: int):
+	def __init__(self, y: int, x: int, player: int):
+		self.player = player
 		self.y = y
 		self.x = x
 
 	def __repr__(self):
-		return f'Move: y={self.y},x={self.x}'
+		return f'Move({self.player}): y={self.y},x={self.x}'
 
 
 class Gamestate:
@@ -35,7 +36,7 @@ class Gamestate:
 	def __init__(self, parent = None):
 		if isinstance(parent, Gamestate):
 			self.board = deepcopy(parent.board)
-			self.first_move = parent.first_move
+			self.moves = deepcopy(parent.moves)
 			self.parent = parent
 			self.captures = deepcopy(parent.captures)
 			self.children = []
@@ -45,11 +46,11 @@ class Gamestate:
 		else:
 			self.board = Board()
 			# Maybe store indexes of all empty cells too?
+			self.moves = list()
 			self.captures = [0, 0]
 			self.parent = parent
 			self.children = []
 			self.winner = None
-			self.first_move = None
 			self.h = 0
 			self.turn = 0
 
@@ -101,8 +102,8 @@ class Gamestate:
 	def place_stone(self, y: int, x: int, stone: Stone) -> None:
 		self.board.set(y, x, stone.value)
 		# self.capture_check(y, x, stone)
-		if self.first_move is None:
-			self.first_move = Move(y = y, x = x)
+		move = Move(y = y, x = x, player = stone.value)
+		self.moves.append(move)
 		self.set_h()
 
 	def generate_children(self) -> list:
