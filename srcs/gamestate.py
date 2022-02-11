@@ -4,7 +4,6 @@ from random import randint
 
 import numpy as np
 
-from srcs.board import Board
 
 
 class Stone(enum.IntEnum):
@@ -17,6 +16,8 @@ class Stone(enum.IntEnum):
 			return Stone.PLAYER_2
 		return Stone.PLAYER_1
 
+
+from srcs.board import Board
 
 class Move:
 	def __init__(self, y: int, x: int):
@@ -94,7 +95,7 @@ class Gamestate:
 
 	def place_stone(self, y: int, x: int, stone: Stone) -> None:
 		self.board.set(y, x, stone.value)
-		self.capture_check(y, x, stone)
+		# self.capture_check(y, x, stone)
 		if self.first_move is None:
 			self.first_move = Move(y = y, x = x)
 		self.h = randint(-10, 10)

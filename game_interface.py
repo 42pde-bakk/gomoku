@@ -2,13 +2,15 @@ import tkinter as tk
 from tkinter import ttk
 
 from srcs.gamestate import Gamestate
-
+from srcs.rules import Rules
 
 # from srcs.board import Board
 from srcs.minimax import Minimax
 
 
 class Game(tk.Frame):
+	rules = Rules()
+
 	def __init__(self, size, hotseat: bool, master = None):
 		super().__init__(master)
 		self.pack()
@@ -45,13 +47,13 @@ class Game(tk.Frame):
 		#     self.buttons[row * self.size + col].destroy()
 
 	def pick_color(self, row: int, col: int):
-			if self.gamestate.board.get(row, col) == 0:
-				button_img = self.gray
-			elif self.gamestate.board.get(row, col) == 1:
-				button_img = self.white
-			else:
-				button_img = self.black
-			return button_img
+		if self.gamestate.board.get(row, col) == 0:
+			button_img = self.gray
+		elif self.gamestate.board.get(row, col) == 1:
+			button_img = self.white
+		else:
+			button_img = self.black
+		return button_img
 
 	def display_board(self) -> None:
 		for row in range(self.size):
@@ -93,9 +95,9 @@ class Game(tk.Frame):
 
 	def play_game(self, row: int, col: int) -> None:
 		if self.gamestate.board.get(row, col) == 0:
-			# if not self.gamestate.rules.move_is_legal(row, col):
-			# 	print("Illegal move")
-			# 	return
+			if not Game.rules.is_legal_move(row, col, self.player, self.gamestate.board.get_board()):
+				print("Illegal move")
+				return
 			self.gamestate.board.set(row, col, self.player)
 			self.buttons[row * self.size + col].destroy()
 			self.update_button(row, col)
@@ -103,6 +105,7 @@ class Game(tk.Frame):
 			print("Position taken")
 			return
 		# Check for captures/win
+		Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board.get_board())
 		self.change_player()  # Changing player, so next move will be for the AI
 		self.ai_move()
 
