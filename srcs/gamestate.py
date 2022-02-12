@@ -97,8 +97,35 @@ class Gamestate:
 		p1, game_over1 = get_connects_of_player(self.board.arr, player = 1)
 		p2, game_over2 = get_connects_of_player(self.board.arr, player = 2)
 		self.h = p1 - p2
-		if game_over1: self.winner = 1
-		elif game_over2: self.winner = 2
+		if game_over1:
+			self.winner = 1
+		elif game_over2:
+			self.winner = 2
+		return self.h
+
+	def update_h(self, pos: tuple[int, int]) -> int:
+		left = self.board.get_consecutive_stones(start = pos, direction = (0, -1))
+		right = self.board.get_consecutive_stones(start = pos, direction = (0, 1))
+		down = self.board.get_consecutive_stones(start = pos, direction = (1, 0))
+		up = self.board.get_consecutive_stones(start = pos, direction = (-1, 0))
+		downleft = self.board.get_consecutive_stones(start = pos, direction = (1, -1))
+		upright = self.board.get_consecutive_stones(start = pos, direction = (-1, 1))
+		downright = self.board.get_consecutive_stones(start = pos, direction = (1, 1))
+		upleft = self.board.get_consecutive_stones(start = pos, direction = (-1, -1))
+		print(left, right, down, up, downleft, upright, downright, upleft)
+		for a, b in zip([left, down, downleft, downright], [right, up, upright, upleft]):
+			print(f'a, b = {a, b}')
+			if a > 1:
+				print(f'a.subtracting {pow(10, a - 2)}')
+				self.h -= pow(10, a - 2)
+			if b > 1:
+				print(f'b.subtracting {pow(10, b - 2)}')
+				self.h -= pow(10, b - 2)
+			newlength = (a - 1) + (b - 1) + 1
+			print(f'newlength = {newlength}')
+			if newlength > 1:
+				print(f'adding {pow(10, newlength - 1)}')
+				self.h += pow(10, newlength - 1)
 		return self.h
 
 	def place_stone(self, y: int, x: int, stone: Stone) -> None:
