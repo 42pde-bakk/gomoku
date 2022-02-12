@@ -1,3 +1,4 @@
+import operator
 from typing import Union
 
 import numpy as np
@@ -26,3 +27,13 @@ class Board:
 
 	def reset(self) -> None:
 		self.arr = np.zeros(shape = (Board.SIZE, Board.SIZE), dtype = np.int8)
+
+	def get_consecutive_stones(self, start: tuple, direction: tuple) -> int:
+		"""Direction in the form of (y, x)"""
+		stone = self.arr[start]
+		newpos = tuple(map(operator.add, start, direction))
+		length = 1
+		while self.get(*newpos) == stone:
+			length += 1
+			newpos = tuple(map(operator.add, newpos, direction))
+		return length

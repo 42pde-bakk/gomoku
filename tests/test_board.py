@@ -39,3 +39,26 @@ class TestBoard(TestCase):
 		board = Board()
 		board.set(y = 7, x = -1, item = 7)
 		assert board.get(y = 7, x = 19 - 1) == 0
+
+	def test_get_consecutive_stones_empty(self):
+		board = Board()
+		board.arr[(0, 0)] = 1
+		board.arr[(4, 5)] = 2
+		assert board.get_consecutive_stones(start = (0, 0), direction = (1, 0)) == 1
+		assert board.get_consecutive_stones(start = (0, 0), direction = (-1, 0)) == 1
+		assert board.get_consecutive_stones(start = (0, 0), direction = (1, 1)) == 1
+		assert board.get_consecutive_stones(start = (0, 0), direction = (-1, -1)) == 1
+		assert board.get_consecutive_stones(start = (4, 5), direction = (1, 0)) == 1
+		assert board.get_consecutive_stones(start = (4, 5), direction = (-1, 0)) == 1
+		assert board.get_consecutive_stones(start = (4, 5), direction = (1, 1)) == 1
+		assert board.get_consecutive_stones(start = (4, 5), direction = (-1, -1)) == 1
+
+	def test_get_consecutive_stones(self):
+		board = Board()
+		board.arr[(0, 0)] = 1
+		board.arr[(0, 1)] = 1
+		board.arr[(0, 2)] = 1
+		board.arr[(0, 3)] = 1
+		board.arr[(0, 4)] = 1
+		assert board.get_consecutive_stones(start = (0, 0), direction = (0, 1)) == 5
+		assert board.get_consecutive_stones(start = (0, 4), direction = (0, -1)) == 5
