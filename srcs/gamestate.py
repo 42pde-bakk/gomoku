@@ -42,7 +42,7 @@ class Gamestate:
 			self.children = []
 			self.winner = None
 			self.h = parent.h
-			self.turn = parent.turn + 1
+			self.turn = parent.turn
 		else:
 			self.board = Board()
 			# Maybe store indexes of all empty cells too?
@@ -112,28 +112,28 @@ class Gamestate:
 		upright = self.board.get_consecutive_stones(start = pos, direction = (-1, 1))
 		downright = self.board.get_consecutive_stones(start = pos, direction = (1, 1))
 		upleft = self.board.get_consecutive_stones(start = pos, direction = (-1, -1))
-		print(left, right, down, up, downleft, upright, downright, upleft)
-		for a, b in zip([left, down, downleft, downright], [right, up, upright, upleft]):
-			print(f'a, b = {a, b}')
-			if a > 1:
-				print(f'a.subtracting {pow(10, a - 2)}')
-				self.h -= pow(10, a - 2)
-			if b > 1:
-				print(f'b.subtracting {pow(10, b - 2)}')
-				self.h -= pow(10, b - 2)
+		h = 0
+		for a, b in zip([left, down, downleft, upleft], [right, up, upright, downright]):
+			if a > 2:
+				h -= pow(10, a - 2)
+			if b > 2:
+				h -= pow(10, b - 2)
 			newlength = (a - 1) + (b - 1) + 1
-			print(f'newlength = {newlength}')
 			if newlength > 1:
-				print(f'adding {pow(10, newlength - 1)}')
-				self.h += pow(10, newlength - 1)
+				h += pow(10, newlength - 1)
+		if self.turn % 2 == 0:
+			self.h += h
+		else:
+			self.h -= h
 		return self.h
 
-	def place_stone(self, y: int, x: int, stone: Stone) -> None:
-		self.board.set(y, x, stone.value)
+	def place_stone(self, y: int, x: int, stone: int) -> None:
+		self.board.set(y, x, stone)
 		# self.capture_check(y, x, stone)
-		move = Move(y = y, x = x, player = stone.value)
+		move = Move(y = y, x = x, player = stone)
 		self.moves.append(move)
-		self.set_h()
+		self.update_h(pos = (y, x))
+		self.turn += 1
 
 	def generate_children(self) -> list:
 		player = self.turn % 2
@@ -152,7 +152,7 @@ class Gamestate:
 		for (y, x), item in np.ndenumerate(self.board.arr):
 			if item == Stone.EMPTY and touches_occupied():
 				child = Gamestate(self)
-				child.place_stone(y = y, x = x, stone = Stone(player + 1))
+				child.place_stone(y = y, x = x, stone = player + 1)
 				self.children.append(child)
 		random.shuffle(self.children)
 		return self.children
