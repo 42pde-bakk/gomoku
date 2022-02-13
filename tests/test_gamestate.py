@@ -39,3 +39,9 @@ class TestGamestate(TestCase):
 			updated_h = gamestate.h
 			set_h = gamestate.set_h()
 			assert updated_h == set_h
+
+	def test_capture_check(self):
+		gamestate = Gamestate()
+		for move, item in zip([(9, 9), (9, 8), (9, 10), (9, 11)], [1, 2, 1, 2]):
+			gamestate.place_stone(*move, stone = item)
+		print(gamestate.board)
