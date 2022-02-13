@@ -13,10 +13,11 @@ class Stone(enum.IntEnum):
 	PLAYER_1 = 1
 	PLAYER_2 = 2
 
-	def get_other_player(self):
-		if self == Stone.PLAYER_1:
-			return Stone.PLAYER_2
-		return Stone.PLAYER_1
+	@staticmethod
+	def get_other_player(val: int):
+		if val == 1:
+			return 2
+		return 1
 
 
 class Move:
@@ -73,11 +74,16 @@ class Gamestate:
 		self.board.set(pos1_y, pos1_x, Stone.EMPTY.value)
 		self.board.set(pos2_y, pos2_x, Stone.EMPTY.value)
 
-	def capture_check(self, y: int, x: int, player: Stone) -> bool:
-		other_player = player.get_other_player()
+	def capture_check(self, y: int, x: int, player: int) -> bool:
+		other_player = Stone.get_other_player(player)
 		for dy, dx in [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]:
-			if self.player_check(y + dy, x + dx, other_player) and self.player_check(y + 2 * dy, x + 2 * dx, other_player) and self.player_check(y + 3 * dy, x + 3 * dx, player):
-				self.capture((y + dy, x + dx), (y + 2 * dy, x + 2 * dx), player)
+			captures = [(y + dy, x + dx), (y + 2 * dy, x + 2 * dx)]
+			other_stone_of_player = y + 3 * dy, x + 3 * dx
+			if 0 <= other_stone_of_player[0] < Board.SIZE and 0 <= other_stone_of_player[1] < Board.SIZE:
+				if self.board.arr[other_stone_of_player] == player and self.board.arr[captures[0]] == self.board.arr[captures[1]] == other_player:
+					print(f'would capture')
+					# TODO: implement capture mechanics
+					# capture
 		return True
 
 	# def game_over_check(self, y: int, x: int, player: Stone) -> bool:
@@ -129,7 +135,7 @@ class Gamestate:
 
 	def place_stone(self, y: int, x: int, stone: int) -> None:
 		self.board.set(y, x, stone)
-		# self.capture_check(y, x, stone)
+		self.capture_check(y, x, stone)
 		move = Move(y = y, x = x, player = stone)
 		self.moves.append(move)
 		self.update_h(pos = (y, x))
