@@ -119,7 +119,7 @@ class Game(tk.Frame):
 			print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}, heur={state.h}')
 			print(f'moves: {state.moves}')
 			if self.gamestate.board.get(y = row, x = col) == 0:
-				self.gamestate.board.set(y = row, x = col, item = self.player)
+				self.gamestate.place_stone(y = row, x = col, stone = self.player)
 				self.buttons[row * self.size + col].destroy()
 				self.update_button(row, col)
 				while state.parent != self.gamestate:
