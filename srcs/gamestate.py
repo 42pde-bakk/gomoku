@@ -61,7 +61,7 @@ class Gamestate:
 		return self.h < other.h
 
 	def __repr__(self):
-		return '\n'.join(map(str, self.board.arr))
+		return str(self.h)
 
 	def player_check(self, y: int, x: int, player_to_check: int) -> bool:
 		return y < 0 or y >= 19 or x < 0 or x >= 19 or self.board.get(y, x) != player_to_check
@@ -149,10 +149,12 @@ class Gamestate:
 		self.children = []
 		if self.winner or any(c >= 10 for c in self.captures):
 			return []
+		# TODO: change enumeration to np.nonzero or np.where(arr == 0)
 		for (y, x), item in np.ndenumerate(self.board.arr):
 			if item == Stone.EMPTY and touches_occupied():
 				child = Gamestate(self)
 				child.place_stone(y = y, x = x, stone = player + 1)
 				self.children.append(child)
 		random.shuffle(self.children)
+		self.children.sort(reverse = bool(player == 1))
 		return self.children
