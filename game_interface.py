@@ -47,13 +47,13 @@ class Game(tk.Frame):
 		#     self.buttons[row * self.size + col].destroy()
 
 	def pick_color(self, row: int, col: int):
-			if self.gamestate.board.get(row, col) == 0:
-				button_img = self.gray
-			elif self.gamestate.board.get(row, col) == 1:
-				button_img = self.white
-			else:
-				button_img = self.black
-			return button_img
+		if self.gamestate.board.get(row, col) == 0:
+			button_img = self.gray
+		elif self.gamestate.board.get(row, col) == 1:
+			button_img = self.white
+		else:
+			button_img = self.black
+		return button_img
 
 	def display_board(self) -> None:
 		for row in range(self.size):
@@ -91,13 +91,13 @@ class Game(tk.Frame):
 			self.player = 2
 		else:
 			self.player = 1
-		self.gamestate.turn += 1
 
 	def play_game(self, row: int, col: int) -> None:
 		if self.gamestate.board.get(row, col) == 0:
 			# if not self.gamestate.rules.move_is_legal(row, col):
 			# 	print("Illegal move")
 			# 	return
+			self.gamestate.place_stone(y = row, x = col, stone = self.player)
 			self.gamestate.board.set(row, col, self.player)
 			self.buttons[row * self.size + col].destroy()
 			self.update_button(row, col)
@@ -109,6 +109,7 @@ class Game(tk.Frame):
 		self.ai_move()
 
 	def ai_move(self):
+		self.gamestate.moves.clear()
 		if self.hotseat:
 			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
 		else:
@@ -116,6 +117,7 @@ class Game(tk.Frame):
 			value, state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
 			col, row = state.moves[0].x, state.moves[0].y
 			print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}, heur={state.h}')
+			print(f'moves: {state.moves}')
 			if self.gamestate.board.get(y = row, x = col) == 0:
 				self.gamestate.board.set(y = row, x = col, item = self.player)
 				self.buttons[row * self.size + col].destroy()
@@ -131,7 +133,7 @@ class Game(tk.Frame):
 	def delete_buttons(self):
 		for row in range(len(self.buttons)):
 			self.buttons[row].destroy()
-			self.frm_position[row].destroy() # Could there be different lengths here? Empty positions
+			self.frm_position[row].destroy()  # Could there be different lengths here? Empty positions
 		self.buttons = []
 		self.frm_position = []
 
