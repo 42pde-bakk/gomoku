@@ -40,6 +40,7 @@ class Rules:
 					if board[row + opp_plus[i][1]][col + opp_plus[i][0]] == opponent:
 						return True
 		return False
+
 	#
 	# def get_opponent_num(player):
 	# 	if player == 1:
@@ -48,28 +49,49 @@ class Rules:
 	# 		opponent = 1
 	# 	return opponent
 
-	def is_winning_condition(self, row: int, col: int, player: int, board: np.ndarray) -> bool:
+	def is_winning_condition(self, row: int, col: int, player: int, board: np.ndarray, captures: list) -> bool:
 		if self.win_by_five(row, col, player, board):
 			# check if can be captured next move.
-			print('WIN')
-			pass
+			print('WIN \n\n\n\n\n\n\nby five in a row for player: ' + str(player))
+			return True
+		elif self.win_by_captures(player, captures):
+			print('WIN by captures')
+			return True
+		return False
 
-	def win_by_captures(self):
-		pass
+	@staticmethod
+	def win_by_captures(player: int, captures: list):
+		if captures[player - 1] == 10:
+			return True
+		return False
 
-	def win_by_five(self, row: int, col: int, player: int, board: np.ndarray) -> bool:
-		for dy, dx in [(1, 0), (0, 1), (1, 1), (-1, 1)]:
-			n = m = 1
-			print(player)
-			while board[row + n * dy][col + n * dx] and board[row + n * dy][col + n * dx] == player:
+	@staticmethod
+	def win_by_five(row: int, col: int, player: int, board: np.ndarray) -> bool:
+		d = [(-1, 0), (-1, -1), (0, -1), (1, -1)]
+		for d_col, d_row in d:
+			n = 1
+			n_opp = -1
+			while board[row + (n * d_row)][col + (n * d_col)] and board[row + (n * d_row)][col + (n * d_col)] == player:
 				n += 1
-			while board[row + m * -dy][col + m * -dx] and board[row + n * dy][col + n * dx] == player:
-				m += 1
-			if n + m >= 5:
-				self.winner = player
-				# self.captures[player.value - 1] += 10  # Win
+			while board[row + (n_opp * d_row)][col + (n_opp * d_col)] and board[row + (n_opp * d_row)][col + (n_opp * d_col)] == player:
+				n_opp -= 1
+			if n + abs(n_opp) - 1 >= 5:
 				return True
 		return False
+
+	# def win_by_five(self, row: int, col: int, player: int, board: np.ndarray) -> bool:
+	# 	for dy, dx in [(1, 0), (0, 1), (1, 1), (-1, 1)]:
+	# 		n = m = 1
+	# 		print(player)
+	# 		while board[row + n * dy][col + n * dx] and board[row + n * dy][col + n * dx] == player:
+	# 			n += 1
+	# 		while board[row + m * -dy][col + m * -dx] and board[row + n * dy][col + n * dx] == player:
+	# 			m += 1
+	# 		if n + m >= 5:
+	# 			self.winner = player
+	# 			# self.captures[player.value - 1] += 10  # Win
+	# 			return True
+	# 	return False
 
 	def can_be_captured(self):
 		pass

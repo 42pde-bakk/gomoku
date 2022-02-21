@@ -119,7 +119,7 @@ class Gamestate:
 				child = Gamestate(self)
 				child.place_stone(y = y, x = x, stone = Stone(player + 1))
 				# child.board.set(y = y, x = x, item = player + 1)  # +1 because player 0 has stone value 1
-				print(f'child sets {y, x} to stone {player + 1}')
+				# print(f'child sets {y, x} to stone {player + 1}')
 				self.children.append(child)
 		# exit(1)
 		return self.children
