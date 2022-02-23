@@ -1,12 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
-
-from srcs.gamestate import Gamestate
+from srcs.gamestate import Gamestate, Stone
 from srcs.rules import Rules
-
-# from srcs.board import Board
 from srcs.minimax import Minimax
-
 
 class Game(tk.Frame):
 	rules = Rules()
@@ -95,7 +91,7 @@ class Game(tk.Frame):
 			print("Position taken")
 			return
 		# Check for captures/win
-		self.update_captures()
+		self.handle_captures(row, col)
 		Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board.get_board(), self.gamestate.captures)
 		self.change_player()  # Changing player, so next move will be for the AI
 		self.ai_move()
@@ -107,14 +103,12 @@ class Game(tk.Frame):
 			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = False)
 			col, row = state.first_move.x, state.first_move.y
 			if self.gamestate.board.get(y = row, x = col) == 0:
+				self.handle_captures(row, col)
 				self.gamestate.board.set(y = row, x = col, item = self.player)
 				self.update_button(row, col)
 			else:
 				raise ValueError()
 			self.change_player()
-
-	def remove_captured(self):
-		pass
 
 	def reset_pieces(self):
 		button_img = self.gray
@@ -138,7 +132,20 @@ class Game(tk.Frame):
 		)
 		bt_new_game.pack()
 
-	def update_captures(self):
+	def handle_captures(self, row, col):
+		capture_check = Game.rules.is_capturing(row, col, self.player, self.gamestate.board)
+		if capture_check is not None:
+			self.gamestate.capture(capture_check[0], capture_check[1], self.player)
+			self.update_captures(capture_check[0], capture_check[1])
+
+	def remove_captured(self, pos1: tuple, pos2: tuple):
+		pos1_row, pos1_col = pos1
+		pos2_row, pos2_col = pos2
+		self.buttons[pos1_row * self.size + pos1_col].config(image=self.gray)
+		self.buttons[pos2_row * self.size + pos2_col].config(image=self.gray)
+
+	def update_captures(self, pos1: tuple, pos2: tuple):
+		self.remove_captured(pos1, pos2)
 		self.lbl_captures1.configure(text=f"Player {self.player} has {self.gamestate.captures[self.player - 1]} captures")
 		self.lbl_captures2.configure(text=f"Player {self.player - 1} has {self.gamestate.captures[self.player - 1]} captures")
 

@@ -5,7 +5,6 @@ from random import randint
 import numpy as np
 
 
-
 class Stone(enum.IntEnum):
 	EMPTY = 0
 	PLAYER_1 = 1
@@ -62,23 +61,22 @@ class Gamestate:
 	def __repr__(self):
 		return '\n'.join(map(str, self.board.arr))
 
-	def player_check(self, y: int, x: int, player_to_check: int) -> bool:
-		return y < 0 or y >= 19 or x < 0 or x >= 19 or self.board.get(y, x) != player_to_check
+	# def player_check(self, y: int, x: int, player_to_check: int) -> bool:
+	# 	return y < 0 or y >= 19 or x < 0 or x >= 19 or self.board.get(y, x) != player_to_check
+
+	@staticmethod
+	def get_other_player(player):
+		if player == 1:
+			return 2
+		else:
+			return 1
 
 	def capture(self, pos1: tuple, pos2: tuple, capturing_player: Stone) -> None:
 		pos1_y, pos1_x = pos1
 		pos2_y, pos2_x = pos2
 		self.captures[capturing_player - 1] += 2  # -1 because player 1 has index 0 in the captures array
-		self.board.set(pos1_y, pos1_x, Stone.EMPTY.value)
-		self.board.set(pos2_y, pos2_x, Stone.EMPTY.value)
-
-	def capture_check(self, y: int, x: int, player: Stone) -> bool:
-		other_player = player.get_other_player()
-		for dy, dx in [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]:
-			if self.player_check(y + dy, x + dx, other_player) and self.player_check(y + 2 * dy, x + 2 * dx, other_player) and self.player_check(y + 3 * dy, x + 3 * dx, player):
-				self.capture((y + dy, x + dx), (y + 2 * dy, x + 2 * dx), player)
-			# print((dy, dx))
-		return True
+		self.board.set(pos1_y, pos1_x, Stone.EMPTY)
+		self.board.set(pos2_y, pos2_x, Stone.EMPTY)
 
 	# def game_over_check(self, y: int, x: int, player: Stone) -> bool:
 	# 	for dy, dx in [(1, 0), (0, 1), (1, 1), (-1, 1)]:
