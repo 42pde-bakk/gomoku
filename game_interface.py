@@ -1,3 +1,5 @@
+import time
+import numpy as np
 import tkinter as tk
 from tkinter import ttk
 from srcs.gamestate import Gamestate, Stone
@@ -78,13 +80,13 @@ class Game(tk.Frame):
 			self.player = 2
 		else:
 			self.player = 1
-		self.gamestate.turn += 1
 
 	def play_game(self, row: int, col: int) -> None:
 		if self.gamestate.board.get(row, col) == 0:
 			if not Game.rules.is_legal_move(row, col, self.player, self.gamestate.board.get_board()):
 				print("Illegal move")
 				return
+			self.gamestate.place_stone(y = row, x = col, stone = self.player)
 			self.gamestate.board.set(row, col, self.player)
 			self.update_button(row, col)
 		else:
@@ -97,15 +99,24 @@ class Game(tk.Frame):
 		self.ai_move()
 
 	def ai_move(self):
+		self.gamestate.moves.clear()
 		if self.hotseat:
 			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
 		else:
-			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = False)
-			col, row = state.first_move.x, state.first_move.y
+			time_start = time.time()
+			value, state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
+			col, row = state.moves[0].x, state.moves[0].y
+			print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}, heur={state.h}')
+			print(f'moves: {state.moves}')
 			if self.gamestate.board.get(y = row, x = col) == 0:
 				self.handle_captures(row, col)
-				self.gamestate.board.set(y = row, x = col, item = self.player)
+				self.gamestate.place_stone(y = row, x = col, stone = self.player)
+				# self.buttons[row * self.size + col].destroy()
 				self.update_button(row, col)
+				while state.parent != self.gamestate:
+					state = state.parent
+				if state.winner:
+					exit(1)
 			else:
 				raise ValueError()
 			self.change_player()
@@ -115,6 +126,13 @@ class Game(tk.Frame):
 		for row in range(self.size):
 			for col in range(self.size):
 				self.buttons[row * self.size + col].config(image=button_img)
+
+	def delete_buttons(self):
+		for row in range(len(self.buttons)):
+			self.buttons[row].destroy()
+			self.frm_position[row].destroy()  # Could there be different lengths here? Empty positions
+		self.buttons = []
+		self.frm_position = []
 
 	def reset_board(self):
 		self.player = 1
