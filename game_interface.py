@@ -87,7 +87,6 @@ class Game(tk.Frame):
 				print("Illegal move")
 				return
 			self.gamestate.place_stone(y = row, x = col, stone = self.player)
-			self.gamestate.board.set(row, col, self.player)
 			self.update_button(row, col)
 		else:
 			print("Position taken")
@@ -110,8 +109,8 @@ class Game(tk.Frame):
 			print(f'moves: {state.moves}')
 			if self.gamestate.board.get(y = row, x = col) == 0:
 				self.handle_captures(row, col)
-				self.gamestate.place_stone(y = row, x = col, stone = self.player)
 				# self.buttons[row * self.size + col].destroy()
+				self.gamestate.place_stone(y = row, x = col, stone = self.player)
 				self.update_button(row, col)
 				while state.parent != self.gamestate:
 					state = state.parent
