@@ -43,10 +43,10 @@ class Rules:
 	def is_winning_condition(self, row: int, col: int, player: int, board: np.ndarray, captures: list) -> bool:
 		if self.win_by_five(row, col, player, board):
 			# check if can be captured next move.
-			print('WIN \n\n\n\n\n\n\nby five in a row for player: ' + str(player))
+			print('WIN \nby five in a row for player: ' + str(player))
 			return True
 		elif self.win_by_captures(player, captures):
-			print('WIN by captures')
+			print('WIN \nby 10 captured stones for player: ' + str(player))
 			return True
 		return False
 

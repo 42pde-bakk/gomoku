@@ -137,6 +137,7 @@ class Game(tk.Frame):
 		self.player = 1
 		self.gamestate = Gamestate()
 		self.reset_pieces()
+		# self.update_captures()
 
 	def new_game_bt(self):
 		bt_new_game = tk.Button(
@@ -163,7 +164,7 @@ class Game(tk.Frame):
 
 	def update_captures(self, pos1: tuple, pos2: tuple):
 		self.remove_captured(pos1, pos2)
-		self.lbl_captures1.configure(text=f"Player {self.player} has {self.gamestate.captures[self.player - 1]} captures")
+		self.lbl_captures1.configure(text=f"Player {self.player} has {self.gamestate.captures[self.player]} captures")
 		self.lbl_captures2.configure(text=f"Player {self.player - 1} has {self.gamestate.captures[self.player - 1]} captures")
 
 	def display_captures(self):
