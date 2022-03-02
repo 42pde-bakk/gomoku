@@ -51,6 +51,7 @@ class Game(tk.Frame):
 			button_img = self.white
 		else:
 			button_img = self.black
+		print(f'buttom_im={button_img}, item = {self.gamestate.board.get(row, col)}')
 		return button_img
 
 	def display_board(self) -> None:
@@ -90,6 +91,7 @@ class Game(tk.Frame):
 				return
 			self.gamestate.place_stone(y = row, x = col, stone = self.player)
 			self.update_button(row, col)
+			self.update()
 		else:
 			print("Position taken")
 			return
