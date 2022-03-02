@@ -84,11 +84,7 @@ class Rules:
 			if not self.player_check(row + self.dir[d][0], col + self.dir[d][1], opponent, board) \
 				and not self.player_check(row + 2 * self.dir[d][0], col + 2 * self.dir[d][1], opponent, board) \
 				and not self.player_check(row + 3 * self.dir[d][0], col + 3 * self.dir[d][1], player, board):
-				print("CAPTURED\n\n\n\n")
-				print(f'x1:{col + self.dir[d][1]}, y1:{row + self.dir[d][0]}\nx2:{row + 2 * self.dir[d][0]}, y2:{col + 2 * self.dir[d][1]}')
-				print('Player:', player)
 				first_capture = first_capture + [(row + self.dir[d][0], col + self.dir[d][1]), (row + 2 * self.dir[d][0], col + 2 * self.dir[d][1])]
-		print(first_capture)
 		if len(first_capture):
 			return first_capture
 		return None
