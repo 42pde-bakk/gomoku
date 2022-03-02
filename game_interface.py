@@ -98,6 +98,7 @@ class Game(tk.Frame):
 		if Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board, self.gamestate.captures):
 			if congratulate_winner(self.player):
 				self.reset_board()
+				return
 		self.change_player()  # Changing player, so next move will be for the AI
 		self.ai_move()
 
