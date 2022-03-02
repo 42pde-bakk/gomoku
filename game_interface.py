@@ -5,6 +5,8 @@ from tkinter import ttk
 from srcs.gamestate import Gamestate, Stone
 from srcs.rules import Rules
 from srcs.minimax import Minimax
+from srcs.gui import congratulate_winner
+
 
 class Game(tk.Frame):
 	rules = Rules()
@@ -83,7 +85,7 @@ class Game(tk.Frame):
 
 	def play_game(self, row: int, col: int) -> None:
 		if self.gamestate.board.get(row, col) == 0:
-			if not Game.rules.is_legal_move(row, col, self.player, self.gamestate.board.get_board()):
+			if not Game.rules.is_legal_move(row, col, self.player, self.gamestate.board):
 				print("Illegal move")
 				return
 			self.gamestate.place_stone(y = row, x = col, stone = self.player)
@@ -93,7 +95,9 @@ class Game(tk.Frame):
 			return
 		# Check for captures/win
 		self.handle_captures(row, col)
-		Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board.get_board(), self.gamestate.captures)
+		if Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board, self.gamestate.captures):
+			if congratulate_winner(self.player):
+				self.reset_board()
 		self.change_player()  # Changing player, so next move will be for the AI
 		self.ai_move()
 
@@ -109,7 +113,6 @@ class Game(tk.Frame):
 			print(f'moves: {state.moves}')
 			if self.gamestate.board.get(y = row, x = col) == 0:
 				self.handle_captures(row, col)
-				# self.buttons[row * self.size + col].destroy()
 				self.gamestate.place_stone(y = row, x = col, stone = self.player)
 				self.update_button(row, col)
 				while state.parent != self.gamestate:
@@ -125,13 +128,6 @@ class Game(tk.Frame):
 		for row in range(self.size):
 			for col in range(self.size):
 				self.buttons[row * self.size + col].config(image=button_img)
-
-	def delete_buttons(self):
-		for row in range(len(self.buttons)):
-			self.buttons[row].destroy()
-			self.frm_position[row].destroy()  # Could there be different lengths here? Empty positions
-		self.buttons = []
-		self.frm_position = []
 
 	def reset_board(self):
 		self.player = 1
