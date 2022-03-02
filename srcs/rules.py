@@ -6,6 +6,7 @@ from typing import Union
 class Rules:
 	def __init__(self):
 		self.winner = None
+		self.dir = [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]
 
 	def is_legal_move(self, row, col, player, board):
 		if self.is_last_in_capture(row, col, player, board):
@@ -78,12 +79,16 @@ class Rules:
 	# Add board to Rules class
 	def is_capturing(self, row: int, col: int, player: int, board: Board) -> Union[list, None]:
 		opponent = self.opponent_value(player)
-		for dy, dx in [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]:
-			if not self.player_check(row + dy, col + dx, opponent, board)\
-					and not self.player_check(row + 2 * dy, col + 2 * dx, opponent, board)\
-					and not self.player_check(row + 3 * dy, col + 3 * dx, player, board):
+		first_capture = []
+		for d in range(8):
+			if not self.player_check(row + self.dir[d][0], col + self.dir[d][1], opponent, board) \
+				and not self.player_check(row + 2 * self.dir[d][0], col + 2 * self.dir[d][1], opponent, board) \
+				and not self.player_check(row + 3 * self.dir[d][0], col + 3 * self.dir[d][1], player, board):
 				print("CAPTURED\n\n\n\n")
-				print(f'x1:{col + dx}, y1:{row + dy}\nx2:{row + 2 * dy}, y2:{col + 2 * dx}')
+				print(f'x1:{col + self.dir[d][1]}, y1:{row + self.dir[d][0]}\nx2:{row + 2 * self.dir[d][0]}, y2:{col + 2 * self.dir[d][1]}')
 				print('Player:', player)
-				return [(row + dy, col + dx), (row + 2 * dy, col + 2 * dx)]
+				first_capture = first_capture + [(row + self.dir[d][0], col + self.dir[d][1]), (row + 2 * self.dir[d][0], col + 2 * self.dir[d][1])]
+		print(first_capture)
+		if len(first_capture):
+			return first_capture
 		return None

@@ -137,7 +137,7 @@ class Game(tk.Frame):
 		self.player = 1
 		self.gamestate = Gamestate()
 		self.reset_pieces()
-		# self.update_captures()
+		self.update_captures()
 
 	def new_game_bt(self):
 		bt_new_game = tk.Button(
@@ -153,8 +153,11 @@ class Game(tk.Frame):
 	def handle_captures(self, row, col):
 		capture_check = Game.rules.is_capturing(row, col, self.player, self.gamestate.board)
 		if capture_check is not None:
-			self.gamestate.capture(capture_check[0], capture_check[1], self.player)
-			self.update_captures(capture_check[0], capture_check[1])
+			for i in range(int(len(capture_check) / 2)):
+				i = i * 2
+				self.gamestate.capture(capture_check[i], capture_check[i+1], self.player)
+				self.remove_captured(capture_check[i], capture_check[i+1])
+				self.update_captures()
 
 	def remove_captured(self, pos1: tuple, pos2: tuple):
 		pos1_row, pos1_col = pos1
@@ -162,14 +165,13 @@ class Game(tk.Frame):
 		self.buttons[pos1_row * self.size + pos1_col].config(image=self.gray)
 		self.buttons[pos2_row * self.size + pos2_col].config(image=self.gray)
 
-	def update_captures(self, pos1: tuple, pos2: tuple):
-		self.remove_captured(pos1, pos2)
-		self.lbl_captures1.configure(text=f"Player {self.player} has {self.gamestate.captures[self.player]} captures")
-		self.lbl_captures2.configure(text=f"Player {self.player - 1} has {self.gamestate.captures[self.player - 1]} captures")
+	def update_captures(self):
+		self.lbl_captures1.configure(text=f"Player {1} has {self.gamestate.captures[0]} captures")
+		self.lbl_captures2.configure(text=f"Player {2} has {self.gamestate.captures[1]} captures")
 
 	def display_captures(self):
 		self.lbl_captures1 = ttk.Label(self,
-								text=f"Player {self.player} has {self.gamestate.captures[self.player - 1]} captures")
+								text=f"Player {self.player} has {self.gamestate.captures[self.player]} captures")
 		self.lbl_captures1.pack()
 		self.lbl_captures2 = ttk.Label(self,
 								text=f"Player {self.player - 1} has {self.gamestate.captures[self.player - 1]} captures")
