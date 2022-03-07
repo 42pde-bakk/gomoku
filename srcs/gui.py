@@ -1,6 +1,5 @@
 from tkinter import messagebox
 
-
 def congratulate_winner(player: int):
     messagebox.showinfo('Congratulations', f"🎉🎉🎉 PLAYER {player} WON 🎉🎉🎉")
     res = messagebox.askquestion("Try again", "New game?")
@@ -8,3 +7,6 @@ def congratulate_winner(player: int):
         exit(1)
     else:
         return True
+
+def choose_game_type():
+    pass
