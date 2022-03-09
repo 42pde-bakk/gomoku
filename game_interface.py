@@ -22,9 +22,10 @@ class Game(tk.Frame):
 		self.minimax = Minimax()
 		self.hotseat = hotseat
 		self.frm_board = None
-		self.white = tk.PhotoImage(file = 'assets/white.png')
-		self.black = tk.PhotoImage(file = 'assets/black.png')
-		self.gray = tk.PhotoImage(file = 'assets/gray.png')
+		self.white = tk.PhotoImage(file = '/Users/abumbier/gomoku/assets/white.png')
+		self.black = tk.PhotoImage(file = '/Users/abumbier/gomoku/assets/black.png')
+		self.gray = tk.PhotoImage(file = '/Users/abumbier/gomoku/assets/gray.png')
+		self.red = tk.PhotoImage(file = "/Users/abumbier/gomoku/assets/red.png")
 
 	def print_board(self):
 		print(self.gamestate.board.get_board())
@@ -107,6 +108,7 @@ class Game(tk.Frame):
 		self.gamestate.moves.clear()
 		if self.hotseat:
 			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
+			col, row = state.moves[0].x, state.moves[0].y
 		else:
 			time_start = time.time()
 			value, state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
@@ -147,6 +149,17 @@ class Game(tk.Frame):
 			fg = "red"
 		)
 		bt_new_game.pack()
+
+	def choose_different_game_bt(self):
+		bt_choose_game = tk.Button(
+			text = "Choose Game Mode",
+			command = self.change_game_mode,
+			width = 25,
+			height = 5,
+			bg = "gray",
+			fg = "red"
+		)
+		bt_choose_game.pack()
 
 	def handle_captures(self, row, col):
 		capture_check = Game.rules.is_capturing(row, col, self.player, self.gamestate.board)

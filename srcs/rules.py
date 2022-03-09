@@ -20,24 +20,24 @@ class Rules:
 	def is_open_three(self, row: int, col: int, player: int, board: Board, d: tuple) -> bool:
 		inside_zero = False
 		stones = 0
-		for i in range(1, 5):
+		for i in range(1, 5): # check given direction
 			rel = board.get_relative_position(d, i)
-			if stones == 2 and board.get(row + rel[0], col + rel[1]):
-				return False
-			elif stones == 2:
-				return True
+			if stones == 2:
+				if board.get(row + rel[0], col + rel[1]): # if forms three and is not null
+					return False # cant be open three
+				break
 			if not self.is_not_player_check(row + rel[0], col + rel[1], player, board) or not board.get(row + rel[0], col + rel[1]):
 				if not board.get(row + rel[0], col + rel[1]):
 					if inside_zero:
-						continue
+						break
 					inside_zero = True
 				else:
 					stones += 1
-		for i in range(-1, -4, -1):
+		for i in range(-1, -4, -1): # check opposite direction
 			rel = board.get_relative_position(d, i)
-			if stones == 2 and board.get(row + rel[0], col + rel[1]):
-				return False
-			elif stones == 2:
+			if stones == 2:
+				if board.get(row + rel[0], col + rel[1]): # if forms three and is not null
+					return False # cant be open three
 				return True
 			if not self.is_not_player_check(row + rel[0], col + rel[1], player, board) or not board.get(row + rel[0], col + rel[1]):
 				if not board.get(row + rel[0], col + rel[1]):
@@ -50,7 +50,6 @@ class Rules:
 		return False
 
 	def is_two_open_threes(self, row: int, col: int, player: int, board: Board) -> bool:
-		pass
 		second_three = False
 		for direction in self.dir[:4]:
 			if self.is_open_three(row, col, player, board, direction):
