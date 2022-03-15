@@ -100,7 +100,7 @@ class Game(tk.Frame):
 	def ai_move(self):
 		self.gamestate.moves.clear()
 		if self.hotseat:
-			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
+			value, state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
 		else:
 			time_start = time.time()
 			value, state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
