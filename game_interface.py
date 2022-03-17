@@ -102,8 +102,9 @@ class Game(tk.Frame):
 		# Check for captures/win
 		self.handle_captures(row, col)
 		self.game_over = Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board.get_board(), self.gamestate.captures)
-		self.change_player()  # Changing player, so next move will be for the AI
-		self.ai_move()
+		if not self.game_over:
+			self.change_player()  # Changing player, so next move will be for the AI
+			self.ai_move()
 
 	def ai_move(self):
 		self.gamestate.moves.clear()
@@ -120,13 +121,10 @@ class Game(tk.Frame):
 				# self.buttons[row * self.size + col].destroy()
 				self.gamestate.place_stone(y = row, x = col, stone = self.player)
 				self.update_button(row, col)
-				while state.parent != self.gamestate:
-					state = state.parent
-				if state.winner:
-					exit(1)
+				self.game_over = Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board.get_board(), self.gamestate.captures)
 			else:
 				raise ValueError()
-			self.change_player()
+		self.change_player()
 
 	def reset_pieces(self):
 		button_img = self.gray
@@ -143,6 +141,7 @@ class Game(tk.Frame):
 
 	def reset_board(self):
 		self.player = 1
+		self.game_over = False
 		self.gamestate = Gamestate()
 		self.reset_pieces()
 
