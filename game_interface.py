@@ -1,3 +1,4 @@
+import sys
 import time
 import numpy as np
 import tkinter as tk
@@ -5,6 +6,7 @@ from tkinter import ttk
 from srcs.gamestate import Gamestate, Stone
 from srcs.rules import Rules
 from srcs.minimax import Minimax
+
 
 class Game(tk.Frame):
 	rules = Rules()
@@ -19,6 +21,7 @@ class Game(tk.Frame):
 		self.player = 1
 		self.minimax = Minimax()
 		self.hotseat = hotseat
+		self.game_over = False
 		self.frm_board = None
 		self.white = tk.PhotoImage(file = 'assets/white.png')
 		self.black = tk.PhotoImage(file = 'assets/black.png')
@@ -37,7 +40,10 @@ class Game(tk.Frame):
 		self.display_captures()
 		self.mainloop()
 
-	def handle_click(self, args):
+	def handle_click(self, args) -> None:
+		if self.game_over:
+			print(f'What are you doing? The game is over!', file = sys.stderr)
+			return
 		row, col = args
 		print(f"Clicked on row: {row}, col: {col}")
 		self.play_game(row, col)
@@ -82,6 +88,8 @@ class Game(tk.Frame):
 			self.player = 1
 
 	def play_game(self, row: int, col: int) -> None:
+		if self.game_over:
+			return
 		if self.gamestate.board.get(row, col) == 0:
 			if not Game.rules.is_legal_move(row, col, self.player, self.gamestate.board.get_board()):
 				print("Illegal move")
@@ -93,7 +101,7 @@ class Game(tk.Frame):
 			return
 		# Check for captures/win
 		self.handle_captures(row, col)
-		Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board.get_board(), self.gamestate.captures)
+		self.game_over = Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board.get_board(), self.gamestate.captures)
 		self.change_player()  # Changing player, so next move will be for the AI
 		self.ai_move()
 

@@ -3,6 +3,7 @@ import numpy as np
 from srcs.board import Board
 from typing import Union
 
+
 class Rules:
 	def __init__(self):
 		self.winner = None
@@ -52,9 +53,7 @@ class Rules:
 
 	@staticmethod
 	def win_by_captures(player: int, captures: list) -> bool:
-		if captures[player - 1] == 10:
-			return True
-		return False
+		return bool(captures[player - 1] >= 10)
 
 	@staticmethod
 	def win_by_five(row: int, col: int, player: int, board: np.ndarray) -> bool:
