@@ -92,12 +92,12 @@ class Game(tk.Frame):
 			return
 		if self.gamestate.board.get(row, col) == 0:
 			if not Game.rules.is_legal_move(row, col, self.player, self.gamestate.board.get_board()):
-				print("Illegal move")
+				print(f'Illegal move', file = sys.stderr)
 				return
 			self.gamestate.place_stone(y = row, x = col, stone = self.player)
 			self.update_button(row, col)
 		else:
-			print("Position taken")
+			print(f'Position taken', file = sys.stderr)
 			return
 		# Check for captures/win
 		self.handle_captures(row, col)
