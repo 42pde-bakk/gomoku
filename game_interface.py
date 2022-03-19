@@ -94,7 +94,7 @@ class Game(tk.Frame):
 			if not Game.rules.is_legal_move(row, col, self.player, self.gamestate.board.get_board()):
 				print(f'Illegal move', file = sys.stderr)
 				return
-			self.gamestate.place_stone(y = row, x = col, stone = self.player)
+			self.gamestate.place_stone(y = row, x = col, player = self.player - 1)
 			self.update_button(row, col)
 		else:
 			print(f'Position taken', file = sys.stderr)
@@ -118,7 +118,8 @@ class Game(tk.Frame):
 			print(f'moves: {state.moves}')
 			if self.gamestate.board.get(y = row, x = col) == 0:
 				self.handle_captures(row, col)
-				self.gamestate.place_stone(y = row, x = col, stone = self.player)
+				print(f'giving player: {self.player}', file = sys.stderr)
+				self.gamestate.place_stone(y = row, x = col, player = self.player - 1)
 				self.update_button(row, col)
 				self.game_over = Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board.get_board(), self.gamestate.captures)
 			else:

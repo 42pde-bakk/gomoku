@@ -63,8 +63,10 @@ class Gamestate:
 	def __repr__(self):
 		return str(self.h)
 
-	# def player_check(self, y: int, x: int, player_to_check: int) -> bool:
-	# 	return y < 0 or y >= 19 or x < 0 or x >= 19 or self.board.get(y, x) != player_to_check
+	def player_check(self, y: int, x: int, player_to_check: int) -> bool:
+		if y < 0 or y <= 19 or x < 0 or x >= 19:
+			return False
+		return self.board.arr[y][x] == player_to_check
 
 	@staticmethod
 	def get_other_player(player):
@@ -77,28 +79,17 @@ class Gamestate:
 		pos1_y, pos1_x = pos1
 		pos2_y, pos2_x = pos2
 		self.captures[capturing_player - 1] += 2  # -1 because player 1 has index 0 in the captures array
+		if self.captures[capturing_player - 1] >= 10:
+			self.winner = capturing_player
 		self.board.set(pos1_y, pos1_x, Stone.EMPTY.value)
 		self.board.set(pos2_y, pos2_x, Stone.EMPTY.value)
 
 	def capture_check(self, y: int, x: int, player: Stone) -> bool:
 		other_player = player.get_other_player()
 		for dy, dx in [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]:
-			if self.player_check(y + dy, x + dx, other_player) and self.player_check(y + 2 * dy, x + 2 * dx, other_player) and self.player_check(y + 3 * dy, x + 3 * dx, player):
-				self.capture((y + dy, x + dx), (y + 2 * dy, x + 2 * dx), player)
+			if self.player_check(y + dy, x + dx, other_player.value) and self.player_check(y + 2 * dy, x + 2 * dx, other_player.value) and self.player_check(y + 3 * dy, x + 3 * dx, player.value):
+				self.capture((y + dy, x + dx), (y + 2 * dy, x + 2 * dx), player.value)
 		return True
-
-	# def game_over_check(self, y: int, x: int, player: Stone) -> bool:
-	# 	for dy, dx in [(1, 0), (0, 1), (1, 1), (-1, 1)]:
-	# 		n = m = 1
-	# 		while self.board.get(y + n * dy, x + n * dx) == player.value:
-	# 			n += 1
-	# 		while self.board.get(y + m * -dy, x + m * -dx) == player.value:
-	# 			m += 1
-	# 		if n + m + 1 >= 5:
-	# 			# self.winner = player
-	# 			self.captures[player.value - 1] += 10  # Win
-	# 			return True
-	# 	return False
 
 	def set_h(self) -> int:
 		p1, game_over1 = get_connects_of_player(self.board.arr, player = 1)
@@ -110,7 +101,7 @@ class Gamestate:
 			self.winner = 2
 		return self.h
 
-	def update_h(self, pos: tuple[int, int]) -> int:
+	def update_h(self, pos: tuple[int, int], player: int) -> int:
 		left = self.board.get_consecutive_stones(start = pos, direction = (0, -1))
 		right = self.board.get_consecutive_stones(start = pos, direction = (0, 1))
 		down = self.board.get_consecutive_stones(start = pos, direction = (1, 0))
@@ -128,18 +119,22 @@ class Gamestate:
 			newlength = (a - 1) + (b - 1) + 1
 			if newlength > 1:
 				h += pow(10, newlength - 1)
-		if self.turn % 2 == 0:
+			if newlength >= 5:  # this check needs to be more thorough
+				self.winner = player
+		if not player:
 			self.h += h
 		else:
 			self.h -= h
 		return self.h
 
-	def place_stone(self, y: int, x: int, stone: int) -> None:
+	def place_stone(self, y: int, x: int, player: int) -> None:
+		stone = player + 1
+		assert player < 2
 		self.board.set(y, x, stone)
-		# self.capture_check(y, x, stone)
+		self.capture_check(y, x, Stone(stone))
 		move = Move(y = y, x = x, player = stone)
 		self.moves.append(move)
-		self.update_h(pos = (y, x))
+		self.update_h(pos = (y, x), player = player)
 		self.turn += 1
 
 	def generate_children(self) -> list:
@@ -160,7 +155,7 @@ class Gamestate:
 		for (y, x), item in np.ndenumerate(self.board.arr):
 			if item == Stone.EMPTY and touches_occupied():
 				child = Gamestate(self)
-				child.place_stone(y = y, x = x, stone = player + 1)
+				child.place_stone(y = y, x = x, player = player)
 				self.children.append(child)
 
 		random.shuffle(self.children)
