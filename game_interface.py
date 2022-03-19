@@ -109,16 +109,15 @@ class Game(tk.Frame):
 	def ai_move(self):
 		self.gamestate.moves.clear()
 		if self.hotseat:
-			value, state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
+			state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
 		else:
 			time_start = time.time()
-			value, state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
+			state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
 			col, row = state.moves[0].x, state.moves[0].y
 			print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}, heur={state.h}')
 			print(f'moves: {state.moves}')
 			if self.gamestate.board.get(y = row, x = col) == 0:
 				self.handle_captures(row, col)
-				# self.buttons[row * self.size + col].destroy()
 				self.gamestate.place_stone(y = row, x = col, stone = self.player)
 				self.update_button(row, col)
 				self.game_over = Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board.get_board(), self.gamestate.captures)

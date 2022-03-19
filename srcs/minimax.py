@@ -20,51 +20,50 @@ class Minimax:
 			gamestate.generate_children()
 			Minimax.transposition_table[board_bytes] = gamestate
 
-	def minimax(self, state: Gamestate, depth: int, maximizing_player: bool) -> tuple[int, Gamestate]:
-		best_state = None
+	def minimax(self, state: Gamestate, depth: int, maximizing_player: bool) -> Gamestate:
+		best_state = Gamestate()
 		# Minimax.add_to_transp_table(gamestate, maximizing_player)
 		if depth == 0 or state.winner is not None:  # state is a terminal state
-			return state.h, state
-		state.generate_children()
+			return state
+		if not state.generate_children():
+			return state
 		if maximizing_player:
-			best_value = float(-inf)
+			best_state.h = -np.inf
 			for child in state.children:
-				value, state = self.minimax(child, depth - 1, maximizing_player = False)
-				if value > best_value:
-					best_value, best_state = value, state
+				state = self.minimax(child, depth - 1, maximizing_player = False)
+				if state > best_state:
+					best_state = state
 		else:
-			best_value = float(inf)
+			best_state.h = np.inf
 			for child in state.children:
-				value, state = self.minimax(child, depth - 1, maximizing_player = True)
-				if value < best_value:
-					best_value, best_state = value, state
-		assert best_state is not None
-		return best_value, best_state
+				state = self.minimax(child, depth - 1, maximizing_player = True)
+				if state < best_state:
+					best_state = state
+		return best_state
 
-	def alphabeta(self, state: Gamestate, depth: int, α: float, β: float, maximizing_player: bool) -> tuple[int, Gamestate]:
+	def alphabeta(self, state: Gamestate, depth: int, α: float, β: float, maximizing_player: bool) -> Gamestate:
 		# Minimax.add_to_transp_table(gamestate)
+		best_state = Gamestate()
 		if depth == 0 or state.winner is not None:
-			return state.h, state
-		state.generate_children()
+			return state
+		if not state.generate_children():
+			return state
 		if maximizing_player:
-			best_value, best_state = -np.inf, None
+			best_state.h = -np.inf
 			for child in state.children:
-				value, state = self.alphabeta(child, depth - 1, α, β, False)
-				if value > best_value:
-					best_value, best_state = value, state
-				if best_value >= β:
+				state = self.alphabeta(child, depth - 1, α, β, False)
+				if state > best_state:
+					best_state = state
+				if best_state.h >= β:
 					break  # β cutoff
-				α = max(α, value)
-			assert state is not None
-			return best_value, best_state
+				α = max(α, state.h)
 		else:
-			best_value, best_state = np.inf, None
+			best_state.h = np.inf
 			for child in state.children:
-				value, state = self.alphabeta(child, depth - 1, α, β, True)
-				if value < best_value:
-					best_value, best_state = value, state
-				if best_value <= α:
+				state = self.alphabeta(child, depth - 1, α, β, True)
+				if state < best_state:
+					best_state = state
+				if best_state.h <= α:
 					break  # α cutoff
-				β = min(β, value)
-			assert state is not None
-			return best_value, best_state
+				β = min(β, state.h)
+		return best_state
