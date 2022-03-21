@@ -10,53 +10,53 @@ class Rules:
 		self.opp = [Board.get_relative_position(direction, -1) for direction in self.dir]
 		self.opp_val = [Board.get_relative_position(direction, -2) for direction in self.dir]
 
-	def is_legal_move(self, row: int, col: int, player: int, board: Board):
-		if self.is_last_in_capture(row, col, player, board):
-			return False
-		if self.is_two_open_threes(row, col, player, board):
-			return False
+	def is_legal_move(self, row: int, col: int, player: int, board: Board) -> bool:
+		# if self.is_last_in_capture(row, col, player, board):
+		# 	return False
+		# if self.is_two_open_threes(row, col, player, board):
+		# 	return False
 		return True
 
-	def is_open_three(self, row: int, col: int, player: int, board: Board, d: tuple) -> bool:
-		inside_zero = False
-		stones = 0
-		for i in range(1, 5): # check given direction
-			rel = board.get_relative_position(d, i)
-			if stones == 2:
-				if board.get(row + rel[0], col + rel[1]): # if forms three and is not null
-					return False # cant be open three
-				break
-			if not self.is_not_player_check(row + rel[0], col + rel[1], player, board) or not board.get(row + rel[0], col + rel[1]):
-				if not board.get(row + rel[0], col + rel[1]):
-					if inside_zero:
-						break
-					inside_zero = True
-				else:
-					stones += 1
-		for i in range(-1, -4, -1): # check opposite direction
-			rel = board.get_relative_position(d, i)
-			if stones == 2:
-				if board.get(row + rel[0], col + rel[1]): # if forms three and is not null
-					return False # cant be open three
-				return True
-			if not self.is_not_player_check(row + rel[0], col + rel[1], player, board) or not board.get(row + rel[0], col + rel[1]):
-				if not board.get(row + rel[0], col + rel[1]):
-					if inside_zero:
-						return False
-					else:
-						inside_zero = True
-				else:
-					stones += 1
-		return False
+	# def is_open_three(self, row: int, col: int, player: int, board: Board, d: tuple) -> bool:
+	# 	inside_zero = False
+	# 	stones = 0
+	# 	for i in range(1, 5): # check given direction
+	# 		rel = board.get_relative_position(d, i)
+	# 		if stones == 2:
+	# 			if board.get(row + rel[0], col + rel[1]): # if forms three and is not null
+	# 				return False # cant be open three
+	# 			break
+	# 		if not self.is_not_player_check(row + rel[0], col + rel[1], player, board) or not board.get(row + rel[0], col + rel[1]):
+	# 			if not board.get(row + rel[0], col + rel[1]):
+	# 				if inside_zero:
+	# 					break
+	# 				inside_zero = True
+	# 			else:
+	# 				stones += 1
+	# 	for i in range(-1, -4, -1): # check opposite direction
+	# 		rel = board.get_relative_position(d, i)
+	# 		if stones == 2:
+	# 			if board.get(row + rel[0], col + rel[1]): # if forms three and is not null
+	# 				return False # cant be open three
+	# 			return True
+	# 		if not self.is_not_player_check(row + rel[0], col + rel[1], player, board) or not board.get(row + rel[0], col + rel[1]):
+	# 			if not board.get(row + rel[0], col + rel[1]):
+	# 				if inside_zero:
+	# 					return False
+	# 				else:
+	# 					inside_zero = True
+	# 			else:
+	# 				stones += 1
+	# 	return False
 
-	def is_two_open_threes(self, row: int, col: int, player: int, board: Board) -> bool:
-		second_three = False
-		for direction in self.dir[:4]:
-			if self.is_open_three(row, col, player, board, direction):
-				if second_three:
-					return True
-				second_three = True
-		return False
+	# def is_two_open_threes(self, row: int, col: int, player: int, board: Board) -> bool:
+	# 	second_three = False
+	# 	for direction in self.dir[:4]:
+	# 		if self.is_open_three(row, col, player, board, direction):
+	# 			if second_three:
+	# 				return True
+	# 			second_three = True
+	# 	return False
 
 	@staticmethod
 	def opponent_value(player: int) -> int:
@@ -64,18 +64,18 @@ class Rules:
 			return 1
 		return 2
 
-	def is_last_in_capture(self, row: int, col: int, player: int, board: Board) -> bool:
-		# Take care of sides of the board
-		opponent = self.opponent_value(player)
-		d = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1)]
-		opp = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
-		opp_plus = [(2, 0), (2, 2), (0, 2), (-2, 2), (-2, 0), (-2, -2), (0, -2), (2, -2)]
-		for i in range(8):
-			if not self.is_not_player_check(row + d[i][1], col + d[i][0], opponent, board):
-				if not self.is_not_player_check(row + opp[i][1], col + opp[i][0], player, board):
-					if not self.is_not_player_check(row + opp_plus[i][1], col + opp_plus[i][0], opponent, board):
-						return True
-		return False
+	# def is_last_in_capture(self, row: int, col: int, player: int, board: Board) -> bool:
+	# 	# Take care of sides of the board
+	# 	opponent = self.opponent_value(player)
+	# 	d = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1)]
+	# 	opp = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
+	# 	opp_plus = [(2, 0), (2, 2), (0, 2), (-2, 2), (-2, 0), (-2, -2), (0, -2), (2, -2)]
+	# 	for i in range(8):
+	# 		if not self.is_not_player_check(row + d[i][1], col + d[i][0], opponent, board):
+	# 			if not self.is_not_player_check(row + opp[i][1], col + opp[i][0], player, board):
+	# 				if not self.is_not_player_check(row + opp_plus[i][1], col + opp_plus[i][0], opponent, board):
+	# 					return True
+	# 	return False
 
 	def is_winning_condition(self, row: int, col: int, player: int, board: Board, captures: list) -> bool:
 		if self.win_by_five(row, col, player, board):

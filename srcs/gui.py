@@ -8,5 +8,5 @@ def congratulate_winner(player: int):
     else:
         return True
 
-def choose_game_type():
+def select_game_mode():
     pass
