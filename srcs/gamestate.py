@@ -1,4 +1,5 @@
 import enum
+import sys
 from copy import deepcopy
 import random
 
@@ -64,7 +65,7 @@ class Gamestate:
 		return str(self.h)
 
 	def player_check(self, y: int, x: int, player_to_check: int) -> bool:
-		if y < 0 or y <= 19 or x < 0 or x >= 19:
+		if y < 0 or y >= 19 or x < 0 or x >= 19:
 			return False
 		return self.board.arr[y][x] == player_to_check
 
@@ -84,12 +85,15 @@ class Gamestate:
 		self.board.set(pos1_y, pos1_x, Stone.EMPTY.value)
 		self.board.set(pos2_y, pos2_x, Stone.EMPTY.value)
 
-	def capture_check(self, y: int, x: int, player: Stone) -> bool:
-		other_player = player.get_other_player()
+	def capture_check(self, y: int, x: int, player: int) -> int:
+		"""Returns the amount of captured pairs"""
+		other_player = Stone(player).get_other_player().value
+		captured = 0
 		for dy, dx in [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]:
-			if self.player_check(y + dy, x + dx, other_player.value) and self.player_check(y + 2 * dy, x + 2 * dx, other_player.value) and self.player_check(y + 3 * dy, x + 3 * dx, player.value):
-				self.capture((y + dy, x + dx), (y + 2 * dy, x + 2 * dx), player.value)
-		return True
+			if self.player_check(y + dy, x + dx, other_player) and self.player_check(y + 2 * dy, x + 2 * dx, other_player) and self.player_check(y + 3 * dy, x + 3 * dx, player):
+				self.capture((y + dy, x + dx), (y + 2 * dy, x + 2 * dx), player)
+				captured += 1
+		return captured
 
 	def set_h(self) -> int:
 		p1, game_over1 = get_connects_of_player(self.board.arr, player = 1)
@@ -121,19 +125,16 @@ class Gamestate:
 				h += pow(10, newlength - 1)
 			if newlength >= 5:  # this check needs to be more thorough
 				self.winner = player
-		if not player:
-			self.h += h
-		else:
-			self.h -= h
+		self.h += h if not player else -h
 		return self.h
 
 	def place_stone(self, y: int, x: int, player: int) -> None:
 		stone = player + 1
 		assert player < 2
 		self.board.set(y, x, stone)
-		self.capture_check(y, x, Stone(stone))
-		move = Move(y = y, x = x, player = stone)
-		self.moves.append(move)
+		h_captures = self.capture_check(y, x, stone) * 100
+		self.h += h_captures if not h_captures else -h_captures
+		self.moves.append(Move(y = y, x = x, player = stone))
 		self.update_h(pos = (y, x), player = player)
 		self.turn += 1
 
@@ -158,6 +159,18 @@ class Gamestate:
 				child.place_stone(y = y, x = x, player = player)
 				self.children.append(child)
 
-		random.shuffle(self.children)
-		self.children.sort(reverse = bool(player == 1))
+		# random.shuffle(self.children)
+		# print(f'Player = {player+1}, generated {len(self.children)} nodes')
+		# for x in self.children:
+		# 	print(f'{x.moves} -> {x.h}')
+		# print()
+		self.children.sort(reverse = bool(player == 2))
+		# print(f'After sorting (reverse={player == 1}):')
+		# for x in self.children:
+		# 	print(f'{x.moves} -> {x.h}')
+		# print()
+		# print(f'Generated {len(self.children)} children')
+		if len(self.moves) > 1:
+			self.children = self.children[:10]  # only allow the 20 best states
+		# print(f'only keeping {len(self.children)}')
 		return self.children

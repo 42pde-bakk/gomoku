@@ -72,15 +72,22 @@ class Rules:
 
 	@staticmethod
 	def player_check(row: int, col: int, player_to_check: int, board: Board) -> bool:
-		return row < 0 or row >= 19 or col < 0 or col >= 19 or board.get(row, col) != player_to_check
+		if row < 0 or row >= 19 or col < 0 or col >= 19:
+			return False
+		return board.arr[row][col] == player_to_check
+		# return row < 0 or row >= 19 or col < 0 or col >= 19 or board.get(row, col) != player_to_check
 
 	# Add board to Rules class
 	def is_capturing(self, row: int, col: int, player: int, board: Board) -> Union[list, None]:
 		opponent = self.opponent_value(player)
 		for dy, dx in [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]:
-			if not self.player_check(row + dy, col + dx, opponent, board)\
-					and not self.player_check(row + 2 * dy, col + 2 * dx, opponent, board)\
-					and not self.player_check(row + 3 * dy, col + 3 * dx, player, board):
+			print(f'row={row}, col={col}, dy, dx={dy, dx}')
+			print(f'checking {self.player_check(row + dy, col + dx, opponent, board)}')
+			print(f'checking {self.player_check(row + 2 * dy, col + 2 * dx, opponent, board)}')
+			print(f'checking {self.player_check(row + 3 * dy, col + 3 * dx, player, board)}')
+			if self.player_check(row + dy, col + dx, opponent, board) \
+					and self.player_check(row + 2 * dy, col + 2 * dx, opponent, board) \
+					and self.player_check(row + 3 * dy, col + 3 * dx, player, board):
 				print("CAPTURED\n\n\n\n")
 				print(f'x1:{col + dx}, y1:{row + dy}\nx2:{row + 2 * dy}, y2:{col + 2 * dx}')
 				print('Player:', player)
