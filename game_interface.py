@@ -28,7 +28,8 @@ class Game(tk.Frame):
 		self.gray = tk.PhotoImage(file = 'assets/gray.png')
 
 	def print_board(self):
-		print(self.gamestate.board.get_board())
+		# print(self.gamestate.board.get_board())
+		pass
 
 	def create_window(self):
 		lbl_name = ttk.Label(self, text = "Go Go Gomoku")
@@ -108,14 +109,12 @@ class Game(tk.Frame):
 
 	def ai_move(self):
 		self.gamestate.moves.clear()
-		if self.hotseat:
-			state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
-		else:
-			time_start = time.time()
-			state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
-			col, row = state.moves[0].x, state.moves[0].y
-			print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}, heur={state.h}')
-			print(f'moves: {state.moves}')
+		time_start = time.time()
+		state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = bool(self.player == 1))
+		col, row = state.moves[0].x, state.moves[0].y
+		print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}, heur={state.h}')
+		print(f'moves: {state.moves}')
+		if not self.hotseat:
 			if self.gamestate.board.get(y = row, x = col) == 0:
 				self.handle_captures(row, col)
 				print(f'giving player: {self.player}', file = sys.stderr)
@@ -124,7 +123,10 @@ class Game(tk.Frame):
 				self.game_over = Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board.get_board(), self.gamestate.captures)
 			else:
 				raise ValueError()
-		self.change_player()
+		else:
+			# TODO: place a red circle outlining the AI's move suggestion
+			pass
+			self.change_player()
 
 	def reset_pieces(self):
 		button_img = self.gray
