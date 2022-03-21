@@ -41,6 +41,8 @@ class Minimax:
 					best_state = state
 		return best_state
 
+	# Player 0 (User) tries to maximize the score
+	# while Player 1 (bot) tries to minimize the score
 	def alphabeta(self, state: Gamestate, depth: int, α: float, β: float, maximizing_player: bool) -> Gamestate:
 		# Minimax.add_to_transp_table(gamestate)
 		best_state = Gamestate()
