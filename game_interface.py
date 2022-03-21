@@ -28,7 +28,7 @@ class Game(tk.Frame):
 		self.gray = tk.PhotoImage(file = 'assets/gray.png')
 
 	def print_board(self):
-		# print(self.gamestate.board.get_board())
+		print(self.gamestate.board.get_board())
 		pass
 
 	def create_window(self):
@@ -95,6 +95,7 @@ class Game(tk.Frame):
 			if not Game.rules.is_legal_move(row, col, self.player, self.gamestate.board.get_board()):
 				print(f'Illegal move', file = sys.stderr)
 				return
+			self.handle_captures(row, col)
 			self.gamestate.place_stone(y = row, x = col, player = self.player - 1)
 			self.update_button(row, col)
 		else:
@@ -117,16 +118,16 @@ class Game(tk.Frame):
 		if not self.hotseat:
 			if self.gamestate.board.get(y = row, x = col) == 0:
 				self.handle_captures(row, col)
-				print(f'giving player: {self.player}', file = sys.stderr)
 				self.gamestate.place_stone(y = row, x = col, player = self.player - 1)
+				print(f'giving player: {self.player}', file = sys.stderr)
 				self.update_button(row, col)
 				self.game_over = Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board.get_board(), self.gamestate.captures)
 			else:
 				raise ValueError()
+			self.change_player()
 		else:
 			# TODO: place a red circle outlining the AI's move suggestion
 			pass
-			self.change_player()
 
 	def reset_pieces(self):
 		button_img = self.gray
@@ -160,6 +161,7 @@ class Game(tk.Frame):
 
 	def handle_captures(self, row, col):
 		capture_check = Game.rules.is_capturing(row, col, self.player, self.gamestate.board)
+		print(f'capture_check = {capture_check}')
 		if capture_check is not None:
 			self.gamestate.capture(capture_check[0], capture_check[1], self.player)
 			self.update_captures(capture_check[0], capture_check[1])
