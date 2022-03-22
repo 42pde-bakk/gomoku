@@ -86,4 +86,12 @@ dkms.conf
 *.exe
 *.out
 *.app
+gomokubot
+
+# IDE's
+.vs/
+.vscode/
+.idea/
+cmake-build-debug/
+build/
 
