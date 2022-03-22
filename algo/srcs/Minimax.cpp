@@ -42,7 +42,7 @@ Move get_random_move(Gamestate *state) {
 	int y = random_integer / BOARDLENGTH;
 	int	x = random_integer % BOARDLENGTH;
 	int player = state->get_player();
-	if (state->board[random_integer] != 0)
+	if (state->boards[0][random_integer] || state->boards[1][random_integer])
 		return (get_random_move(state)); // RECURSION!!!
 
 	return Move(y, x, player);

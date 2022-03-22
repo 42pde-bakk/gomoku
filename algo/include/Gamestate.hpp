@@ -21,7 +21,8 @@ class Client;
 
 class Gamestate {
 public:
-	std::array<int, BOARDSIZE> board{};
+	std::bitset<BOARDSIZE>		boards[2];
+	std::array<int, BOARDSIZE>	board{};
 	std::array<int, 2>	captures{};
 	std::vector<Move>	moves;
 	Gamestate	*parent{};
@@ -33,14 +34,12 @@ public:
 	friend Client;
 
 public:
-	Gamestate() {}
+	Gamestate();
 
 	[[nodiscard]] bool	has_winner() const { return (this->winner != 0); }
 	void	set_heuristic(int heuristic) { this->h = heuristic; }
 
-	void	generate_children() {
-		// TODO
-	}
+	void	generate_children();
 	std::vector<Gamestate*>& get_children() { return this->children; }
 
 	bool	operator==(const Gamestate& rhs) const { return (this->h == rhs.h); }
