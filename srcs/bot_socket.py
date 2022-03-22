@@ -1,15 +1,15 @@
 import socket
 import struct
-from srcs.gamestate import Gamestate
+from srcs.gamestate import Gamestate, Move
 import numpy as np
 
 
 class BotSocket:
-	HOST, PORT = "localhost", 4242
+	HOST = "localhost"
 
-	def __init__(self):
+	def __init__(self, port):
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.s.connect((BotSocket.HOST, BotSocket.PORT))
+		self.s.connect((BotSocket.HOST, port))
 
 	def send_gamestate(self, gs: Gamestate) -> None:
 		print(f'gs.turn = {gs.turn}')
@@ -28,3 +28,4 @@ class BotSocket:
 		print(f'bytes: {bitches}')
 		y, x, stone = struct.unpack('iii', bitches)
 		print(f'unpacked = {y, x, stone}')
+		return Move(y, x, stone)

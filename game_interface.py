@@ -5,6 +5,8 @@ from tkinter import ttk
 from srcs.gamestate import Gamestate, Stone
 from srcs.rules import Rules
 from srcs.minimax import Minimax
+from srcs.bot_socket import BotSocket
+
 
 class Game(tk.Frame):
 	rules = Rules()
@@ -23,6 +25,7 @@ class Game(tk.Frame):
 		self.white = tk.PhotoImage(file = 'assets/white.png')
 		self.black = tk.PhotoImage(file = 'assets/black.png')
 		self.gray = tk.PhotoImage(file = 'assets/gray.png')
+		self.bot_socket = BotSocket(4242)
 
 	def print_board(self):
 		print(self.gamestate.board.get_board())
@@ -100,22 +103,20 @@ class Game(tk.Frame):
 	def ai_move(self):
 		self.gamestate.moves.clear()
 		if self.hotseat:
-			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
+			self.bot_socket.send_gamestate(self.gamestate)
+			move = self.bot_socket.receive_move()
 		else:
 			time_start = time.time()
-			value, state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
-			col, row = state.moves[0].x, state.moves[0].y
-			print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}, heur={state.h}')
-			print(f'moves: {state.moves}')
+			self.bot_socket.send_gamestate(self.gamestate)
+			move = self.bot_socket.receive_move()
+			col, row = move.x, move.y
+			print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}')
+			# print(f'moves: {state.moves}')
 			if self.gamestate.board.get(y = row, x = col) == 0:
 				self.handle_captures(row, col)
 				# self.buttons[row * self.size + col].destroy()
 				self.gamestate.place_stone(y = row, x = col, stone = self.player)
 				self.update_button(row, col)
-				while state.parent != self.gamestate:
-					state = state.parent
-				if state.winner:
-					exit(1)
 			else:
 				raise ValueError()
 			self.change_player()
