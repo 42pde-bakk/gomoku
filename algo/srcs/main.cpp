@@ -9,11 +9,11 @@
 
 int main() {
 	Server server;
+	Client	client(&server);
 
 	std::cerr << "Welcome to Gomokubot!\n";
 
 	while (true) {
-		Client	client(&server);
 		Gamestate* gs = client.receiveGamestate();
 		gs->print_board(std::cerr);
 		Move move = get_random_move(gs);
