@@ -4,9 +4,10 @@
 
 #ifndef CLUSTER_CLIENT_HPP
 #define CLUSTER_CLIENT_HPP
+
+#include "Gomoku.hpp"
 #include "Server.hpp"
 #include "Gamestate.hpp"
-#define BUFLEN 1000
 
 class Client {
 	Server* parent;

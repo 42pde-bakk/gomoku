@@ -18,6 +18,7 @@ Client::Client(Server *s) : parent(s) {
 	socklen_t size = sizeof(this->addr);
 	if ((this->fd = accept(this->parent->getsocketFd(), (struct sockaddr *)&this->addr, &size)) == -1)
 		error("Error accepting client");
+	std::cerr << "Accepted a client at fd " << this->fd << "\n";
 }
 
 Client::~Client() {
@@ -27,11 +28,11 @@ Client::~Client() {
 
 std::vector<int> Client::receive() const {
 	int		recvRet;
-	char	buf[BUFLEN + 1];
+	char	buf[BUFSIZ + 1];
 	std::vector<int> intArray;
 
 	bzero(&buf, sizeof(buf));
-	if ((recvRet = read(fd, buf, BUFLEN)) == -1)
+	if ((recvRet = read(fd, buf, BUFSIZ)) == -1)
 		error("Error reading from socket");
 	if (recvRet == 0)
 		error("Read returned 0.");
@@ -58,8 +59,7 @@ Gamestate *Client::receiveGamestate() const {
 		int y = arr[0],
 			x = arr[1],
 			colour = arr[2];
-		gs->boards[colour][y * 19 + x] = true;
-//		gs->board[y * 19 + x] = colour;
+		gs->boards[colour - 1][y * 19 + x] = true;
 #if LOG
 		dprintf(2, "y=%d, x=%d, colour=%d\n", y, x, colour);
 #endif
@@ -74,10 +74,10 @@ void Client::send_move(const Move &move) const {
 	memcpy(buff, (void *)&move.y, sizeof(int));
 	memcpy(buff + sizeof(int), (void *)&move.x, sizeof(int));
 	memcpy(buff + 2 * sizeof(int), (void *)&move.player, sizeof(int));
-	for (int i = 0; i < 12; i++) {
-		std::cerr << "\\x" << (int)(buff[i]) << ' ';
-	}
-	std::cerr << "\n";
+//	for (int i = 0; i < 12; i++) {
+//		std::cerr << "\\x" << (int)(buff[i]) << ' ';
+//	}
+//	std::cerr << "\n";
 	int sendRet = write(fd, buff, sizeof(int) * 3);
 	dprintf(2, "sendRet = %d\n", sendRet);
 	if (sendRet <= 0)
