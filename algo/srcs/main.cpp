@@ -7,6 +7,7 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Colours.hpp"
+#include <chrono>
 
 int main() {
 	try {
@@ -18,12 +19,19 @@ int main() {
 		while (true) {
 			std::cerr << "Lets receive a gamstate\n";
 			Gamestate* gs = client.receiveGamestate();
+			auto start_time = std::chrono::steady_clock::now();
 			std::cerr << "got the gamestate\n";
 			gs->print_board(std::cerr);
-			gs->generate_children();
-			Move move = get_random_move(gs);
+			Gamestate *result = minimax(gs, 1, false);
+//			gs->generate_children();
+//			Move move = get_random_move(gs);
+			Move move = result->moves[0];
 			std::cerr << "Move: " << move;
+			auto end_time = std::chrono::steady_clock::now();
+			auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+			std::cerr << _PURPLE "Calculating move took " << elapsed_time.count() << " ms\n" _END;
 			client.send_move(move);
+			delete gs;
 		}
 	}
 	catch (std::exception& e) {
