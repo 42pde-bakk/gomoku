@@ -31,6 +31,7 @@ class Game(tk.Frame):
 		self.black = tk.PhotoImage(file = 'assets/black.png')
 		self.gray = tk.PhotoImage(file = 'assets/gray.png')
 		self.bot_socket = BotSocket(get_portnb('algo/portnb.txt'))
+		self.busy = False
 
 	def print_board(self):
 		print(self.gamestate.board.get_board())
@@ -90,22 +91,26 @@ class Game(tk.Frame):
 			self.player = 1
 
 	def play_game(self, row: int, col: int) -> None:
-		if self.bot_socket.busy:
+		if self.busy:
 			return
+		self.busy = True
 		if self.gamestate.board.get(row, col) == 0:
 			if not Game.rules.is_legal_move(row, col, self.player, self.gamestate.board.get_board()):
 				print("Illegal move")
+				self.busy = False
 				return
 			self.gamestate.place_stone(y = row, x = col, stone = self.player)
 			self.update_button(row, col)
 		else:
 			print("Position taken")
+			self.busy = False
 			return
 		# Check for captures/win
 		self.handle_captures(row, col)
 		Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board.get_board(), self.gamestate.captures)
 		self.change_player()  # Changing player, so next move will be for the AI
 		self.ai_move()
+		self.busy = False
 
 	def ai_move(self):
 		self.gamestate.moves.clear()
