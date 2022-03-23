@@ -95,3 +95,5 @@ gomokubot
 cmake-build-debug/
 build/
 
+# File to save our portnb (for the python prog to read)
+portnb.txt
