@@ -4,12 +4,24 @@
 
 #ifndef CLUSTER_GAMESTATE_HPP
 #define CLUSTER_GAMESTATE_HPP
+
+#include "Gomoku.hpp"
 #include <array>
 #include <vector>
 #include <Move.hpp>
 #define BOARDLENGTH 19
 #define BOARDSIZE BOARDLENGTH * BOARDLENGTH
+#define SHIFT_N(arg) (arg << BOARDLENGTH)
+#define SHIFT_S(arg) (arg >> BOARDLENGTH)
+#define SHIFT_W(arg) (arg << 1)
+#define SHIFT_E(arg) (arg >> 1)
 
+#define SHIFT_NE(arg) (arg << (BOARDLENGTH - 1))
+#define SHIFT_SE(arg) (arg >> (BOARDLENGTH + 1))
+#define SHIFT_NW(arg) (arg << (BOARDLENGTH + 1))
+#define SHIFT_SW(arg) (arg >> (BOARDLENGTH - 1))
+
+using bitboard = std::bitset<BOARDSIZE>;
 
 enum class STONE {
 	EMPTY,
@@ -17,12 +29,12 @@ enum class STONE {
 	PLAYER2
 };
 
+
 class Client;
 
 class Gamestate {
 public:
-	std::bitset<BOARDSIZE>		boards[2];
-	std::array<int, BOARDSIZE>	board{};
+	bitboard		boards[2];
 	std::array<int, 2>	captures{};
 	std::vector<Move>	moves;
 	Gamestate	*parent{};
@@ -32,7 +44,6 @@ public:
 		winner{};
 
 	friend Client;
-
 public:
 	Gamestate();
 
