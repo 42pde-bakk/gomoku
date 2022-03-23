@@ -9,19 +9,22 @@
 #include <array>
 #include <vector>
 #include <Move.hpp>
-#define BOARDLENGTH 19
-#define BOARDSIZE BOARDLENGTH * BOARDLENGTH
-#define SHIFT_N(arg) (arg << BOARDLENGTH)
-#define SHIFT_S(arg) (arg >> BOARDLENGTH)
+
+#define BOARDHEIGHT 19
+#define BOARDWIDTH 20 // 1 for a seperating bit
+#define BOARDSIZE BOARDHEIGHT * BOARDWIDTH
+#define SHIFT_N(arg) (arg << BOARDWIDTH)
+#define SHIFT_S(arg) (arg >> BOARDWIDTH)
 #define SHIFT_W(arg) (arg << 1)
 #define SHIFT_E(arg) (arg >> 1)
 
-#define SHIFT_NE(arg) (arg << (BOARDLENGTH - 1))
-#define SHIFT_SE(arg) (arg >> (BOARDLENGTH + 1))
-#define SHIFT_NW(arg) (arg << (BOARDLENGTH + 1))
-#define SHIFT_SW(arg) (arg >> (BOARDLENGTH - 1))
+#define SHIFT_NE(arg) (arg << (BOARDWIDTH - 1))
+#define SHIFT_SE(arg) (arg >> (BOARDWIDTH + 1))
+#define SHIFT_NW(arg) (arg << (BOARDWIDTH + 1))
+#define SHIFT_SW(arg) (arg >> (BOARDWIDTH - 1))
 
-using bitboard = std::bitset<BOARDSIZE>;
+//using bitboard = std::bitset<BOARDSIZE>;
+typedef std::bitset<BOARDSIZE> bitboard;
 
 enum class STONE {
 	EMPTY,
@@ -34,10 +37,10 @@ class Client;
 
 class Gamestate {
 public:
-	bitboard		boards[2];
+	std::array<bitboard, 2>	boards;
 	std::array<int, 2>	captures{};
 	std::vector<Move>	moves;
-	Gamestate	*parent{};
+	const Gamestate	*parent{};
 	std::vector<Gamestate*> children;
 	int turn{},
 		h{},
@@ -46,11 +49,14 @@ public:
 	friend Client;
 public:
 	Gamestate();
+	Gamestate& operator=(const Gamestate& x);
+	Gamestate(const Gamestate& x);
+	~Gamestate();
 
 	[[nodiscard]] bool	has_winner() const { return (this->winner != 0); }
 	void	set_heuristic(int heuristic) { this->h = heuristic; }
 
-	void	generate_children();
+	void generate_children();
 	std::vector<Gamestate*>& get_children() { return this->children; }
 
 	bool	operator==(const Gamestate& rhs) const { return (this->h == rhs.h); }
@@ -64,6 +70,8 @@ public:
 	void	print_board(std::ostream& o) const;
 	[[nodiscard]] int		get_player() const;
 
+private:
+	void	place_stone(int move_idx);
 };
 
 
