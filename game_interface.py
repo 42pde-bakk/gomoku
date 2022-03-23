@@ -8,6 +8,11 @@ from srcs.minimax import Minimax
 from srcs.bot_socket import BotSocket
 
 
+def get_portnb(fname: str) -> int:
+	with open(fname, 'r') as f:
+		return int(f.read())
+
+
 class Game(tk.Frame):
 	rules = Rules()
 
@@ -25,7 +30,7 @@ class Game(tk.Frame):
 		self.white = tk.PhotoImage(file = 'assets/white.png')
 		self.black = tk.PhotoImage(file = 'assets/black.png')
 		self.gray = tk.PhotoImage(file = 'assets/gray.png')
-		self.bot_socket = BotSocket(4242)
+		self.bot_socket = BotSocket(get_portnb('algo/portnb.txt'))
 
 	def print_board(self):
 		print(self.gamestate.board.get_board())
@@ -85,6 +90,8 @@ class Game(tk.Frame):
 			self.player = 1
 
 	def play_game(self, row: int, col: int) -> None:
+		if self.bot_socket.busy:
+			return
 		if self.gamestate.board.get(row, col) == 0:
 			if not Game.rules.is_legal_move(row, col, self.player, self.gamestate.board.get_board()):
 				print("Illegal move")

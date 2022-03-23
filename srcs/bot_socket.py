@@ -10,8 +10,10 @@ class BotSocket:
 	def __init__(self, port):
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.s.connect((BotSocket.HOST, port))
+		self.busy = False
 
 	def send_gamestate(self, gs: Gamestate) -> None:
+		self.busy = True
 		print(f'gs.turn = {gs.turn}')
 		self.s.sendall(struct.pack('i', gs.turn))  # Turn number
 		stones = np.argwhere(gs.board.arr != 0)
@@ -28,4 +30,5 @@ class BotSocket:
 		print(f'bytes: {bitches}')
 		y, x, stone = struct.unpack('iii', bitches)
 		print(f'unpacked = {y, x, stone}')
+		self.busy = False
 		return Move(y, x, stone)
