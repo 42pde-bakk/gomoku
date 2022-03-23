@@ -4,6 +4,8 @@
 
 #ifndef CLUSTER_MOVE_HPP
 #define CLUSTER_MOVE_HPP
+
+#include "Gomoku.hpp"
 #include <iostream>
 
 class Move {

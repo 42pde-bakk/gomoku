@@ -5,6 +5,7 @@
 #ifndef ALGO_MINIMAX_HPP
 #define ALGO_MINIMAX_HPP
 
+#include "Gomoku.hpp"
 #include <Gamestate.hpp>
 
 Gamestate * minimax(Gamestate *state, int depth, bool maximizing_player);
