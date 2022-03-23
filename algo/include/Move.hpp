@@ -10,13 +10,12 @@
 
 class Move {
 public:
-	int		y,
-			x,
-			player;
+	int	move_idx,
+		player;
 
 	// Allows the operator<< to access the private vars
 	friend std::ostream&	operator<<(std::ostream& o, const Move& m);
-	Move(int y, int x, int player);
+	Move(int idx, int player);
 };
 
 

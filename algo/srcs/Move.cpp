@@ -3,12 +3,13 @@
 //
 
 #include "Move.hpp"
+#include "Gamestate.hpp"
 
-Move::Move(int y, int x, int player) : y(y), x(x), player(player) {
+Move::Move(int idx, int player) : move_idx(idx), player(player) {
 }
 
 std::ostream&	operator<<(std::ostream& o, const Move& m) {
-	o << "Move (p" << m.player << "), y: " << m.y << ", x: " << m.x << "\n";
+	o << "Move (p" << m.player << "), y: " << m.move_idx / BOARDHEIGHT << ", x: " << m.move_idx % BOARDHEIGHT << "\n";
 	return (o);
 }
 
