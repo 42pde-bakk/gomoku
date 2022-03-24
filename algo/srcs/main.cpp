@@ -22,9 +22,7 @@ int main() {
 			auto start_time = std::chrono::steady_clock::now();
 			std::cerr << "got the gamestate\n";
 			gs->print_board(std::cerr);
-			Gamestate *result = minimax(gs, 1, false);
-//			gs->generate_children();
-//			Move move = get_random_move(gs);
+			Gamestate *result = minimax(gs, 2, static_cast<bool>(gs->get_player()));
 			Move move = result->moves[0];
 			std::cerr << "Move: " << move;
 			auto end_time = std::chrono::steady_clock::now();

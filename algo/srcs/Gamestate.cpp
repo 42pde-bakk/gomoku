@@ -79,8 +79,8 @@ void Gamestate::generate_children() {
 	bitboard	neighbours = all_stones | SHIFT_N(all_stones) | SHIFT_W(all_stones) | SHIFT_S(all_stones) | SHIFT_E(all_stones) \
 										| SHIFT_NE(all_stones) | SHIFT_NW(all_stones) | SHIFT_SE(all_stones) | SHIFT_SW(all_stones);
 	bitboard	empty_neighbours = neighbours & empty_cells;
-	std::cerr << "Empty neighbours:" << '\n';
-	print_bitboard(empty_neighbours, std::cerr);
+//	std::cerr << "Empty neighbours:" << '\n';
+//	print_bitboard(empty_neighbours, std::cerr);
 	if (empty_neighbours.none())
 		throw std::runtime_error("Error. No more empty tiles");
 	for (int i = 0; i < BOARDSIZE; i++) {
@@ -105,7 +105,7 @@ int	get_random_h() {
 
 void Gamestate::place_stone(int move_idx) {
 	int player = this->turn % 2;
-	std::cerr << "move_idx = " << move_idx << '\n';
+//	std::cerr << "move_idx = " << move_idx << '\n';
 	assert(this->boards[0][move_idx] == false);
 	assert(this->boards[1][move_idx] == false);
 	this->boards[player][move_idx] = true;
