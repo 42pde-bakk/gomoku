@@ -32,10 +32,10 @@ class Game(tk.Frame):
         self.minimax = Minimax()
         self.game_mode = game_mode
         self.frm_board = None
-        self.white = tk.PhotoImage(file='/Users/abumbier/gomoku/assets/white.png')
-        self.black = tk.PhotoImage(file='/Users/abumbier/gomoku/assets/black.png')
-        self.gray = tk.PhotoImage(file='/Users/abumbier/gomoku/assets/gray.png')
-        self.red = tk.PhotoImage(file="/Users/abumbier/gomoku/assets/red.png")
+        self.white = tk.PhotoImage(file='assets/white.png')
+        self.black = tk.PhotoImage(file='assets/black.png')
+        self.gray = tk.PhotoImage(file='assets/gray.png')
+        self.red = tk.PhotoImage(file="assets/red.png")
 
     def print_board(self):
         print(self.gamestate.board.get_board())
@@ -152,39 +152,12 @@ class Game(tk.Frame):
             self.gamestate.place_stone(y=row, x=col, stone=self.player)
             self.update_button(row, col)
             self.after_move_check(row, col)
-            while state.parent != self.gamestate:
-                state = state.parent
-            if state.winner:
-                exit(1)
         else:
             raise ValueError()
         self.change_player()
 
     def play_bot_pot(self):
         print("Playing bot pot")
-
-    # def ai_move(self):
-    # 	self.gamestate.moves.clear()
-    # 	if self.hotseat:
-    # 		value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
-    # 		col, row = state.moves[0].x, state.moves[0].y
-    # 	else:
-    # 		time_start = time.time()
-    # 		value, state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
-    # 		col, row = state.moves[0].x, state.moves[0].y
-    # 		print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}, heur={state.h}')
-    # 		print(f'moves: {state.moves}')
-    # 		if self.gamestate.board.get(y = row, x = col) == 0:
-    # 			self.handle_captures(row, col)
-    # 			self.gamestate.place_stone(y = row, x = col, stone = self.player)
-    # 			self.update_button(row, col)
-    # 			while state.parent != self.gamestate:
-    # 				state = state.parent
-    # 			if state.winner:
-    # 				exit(1)
-    # 		else:
-    # 			raise ValueError()
-    # 		self.change_player()
 
     def reset_pieces(self):
         button_img = self.gray
