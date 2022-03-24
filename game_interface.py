@@ -47,10 +47,10 @@ class Game(tk.Frame):
         self.frm_board.pack(padx=25, pady=25)
 
     def create_options_window(self):
-        frm_options = ttk.Frame(self, relief=tk.RIDGE, borderwidth=10).pack()
+        frm_options = ttk.Frame(self, relief=tk.RIDGE, borderwidth=10).pack(padx=25, pady=25)
         self.display_captures(frm_options)
-        self.choose_different_game_om(frm_options)
         self.new_game_bt(frm_options)
+        self.choose_different_game_om(frm_options)
         # self.display_board()
 
     def create_game(self):
@@ -199,22 +199,22 @@ class Game(tk.Frame):
         self.update_captures()
 
     def new_game_bt(self, frm_options):
-        bt_new_game = tk.Button(
+        bt_new_game = ttk.Button(
             master=frm_options,
             text="NEW GAME",
             command=self.reset_board,
             width=15,
-            height=3,
-            bg="gray",
-            fg="red"
+            # height=3,
+            # bg="gray",
+            # fg="red"
         )
         bt_new_game.pack()
 
-    def change_game_mode(self):
+    def change_game_mode(self, choice):
         # 1. Pick game_mode
         # 2. change game_mode
         # 3. reset board
-        print("executed")
+        print("executed: " + choice)
         pass
 
     def choose_different_game_om(self, frm_options):
@@ -222,7 +222,7 @@ class Game(tk.Frame):
         options = {'Versus ai', 'Hotseat', 'Bot pot'}
         clicked = tk.StringVar()
         clicked.set('Versus ai')
-        om_choose_game = tk.OptionMenu(
+        om_choose_game = ttk.OptionMenu(
             frm_options,
             clicked,
             *options,
@@ -230,18 +230,19 @@ class Game(tk.Frame):
             # variable=clicked,
             # value='Versus ai',
             # # values=options,
-            # command=self.change_game_mode,
+            command=self.change_game_mode,
             # width=25,
             # height=5,
             # bg="gray"
             # fg="red"
         )
+        # om_choose_game.config("")
         om_choose_game.pack()
 
     def handle_captures(self, row, col):
         capture_check = Game.rules.is_capturing(row, col, self.player, self.gamestate.board)
         if capture_check is not None:
-            for i in range(int(len(capture_check) / 2)):
+            for i in range(int(len(capture_check) // 2)):
                 i = i * 2
                 self.gamestate.capture(capture_check[i], capture_check[i + 1], self.player)
                 self.remove_captured(capture_check[i], capture_check[i + 1])

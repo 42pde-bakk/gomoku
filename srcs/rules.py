@@ -11,8 +11,6 @@ class Rules:
 		self.opp_val = [Board.get_relative_position(direction, -2) for direction in self.dir]
 
 	def is_legal_move(self, row: int, col: int, player: int, board: Board) -> bool:
-		# if self.is_last_in_capture(row, col, player, board):
-		# 	return False
 		# if self.is_two_open_threes(row, col, player, board):
 		# 	return False
 		return True
@@ -63,19 +61,6 @@ class Rules:
 		if player == 2:
 			return 1
 		return 2
-
-	# def is_last_in_capture(self, row: int, col: int, player: int, board: Board) -> bool:
-	# 	# Take care of sides of the board
-	# 	opponent = self.opponent_value(player)
-	# 	d = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1)]
-	# 	opp = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
-	# 	opp_plus = [(2, 0), (2, 2), (0, 2), (-2, 2), (-2, 0), (-2, -2), (0, -2), (2, -2)]
-	# 	for i in range(8):
-	# 		if not self.is_not_player_check(row + d[i][1], col + d[i][0], opponent, board):
-	# 			if not self.is_not_player_check(row + opp[i][1], col + opp[i][0], player, board):
-	# 				if not self.is_not_player_check(row + opp_plus[i][1], col + opp_plus[i][0], opponent, board):
-	# 					return True
-	# 	return False
 
 	def is_winning_condition(self, row: int, col: int, player: int, board: Board, captures: list) -> bool:
 		if self.win_by_five(row, col, player, board):
