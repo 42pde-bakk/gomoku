@@ -1,178 +1,249 @@
 import time
+import enum
 import numpy as np
 import tkinter as tk
 from tkinter import ttk
 from srcs.gamestate import Gamestate, Stone
 from srcs.rules import Rules
 from srcs.minimax import Minimax
+from srcs.gui import congratulate_winner
+
+
+class GameMode(enum.IntEnum):
+    VERSUS_AI = 1
+    HOTSEAT = 2
+    BOT_POT = 3
+
+    def __str__(self):
+        return f"{self.name.capitalize().replace('_', ' ')}"
+
 
 class Game(tk.Frame):
-	rules = Rules()
+    rules = Rules()
 
-	def __init__(self, size, hotseat: bool, master = None):
-		super().__init__(master)
-		self.pack()
-		self.gamestate = Gamestate()
-		self.buttons = []
-		self.frm_position = []
-		self.size = size
-		self.player = 1
-		self.minimax = Minimax()
-		self.hotseat = hotseat
-		self.frm_board = None
-		self.white = tk.PhotoImage(file = 'assets/white.png')
-		self.black = tk.PhotoImage(file = 'assets/black.png')
-		self.gray = tk.PhotoImage(file = 'assets/gray.png')
+    def __init__(self, size, game_mode: GameMode, master=None): #change game_mode to int
+        super().__init__(master)
+        self.pack()
+        self.gamestate = Gamestate()
+        self.buttons = []
+        self.frm_position = []
+        self.size = size
+        self.player = 1
+        self.minimax = Minimax()
+        self.game_mode = game_mode
+        self.frm_board = None
+        self.white = tk.PhotoImage(file='assets/white.png')
+        self.black = tk.PhotoImage(file='assets/black.png')
+        self.gray = tk.PhotoImage(file='assets/gray.png')
+        self.red = tk.PhotoImage(file="assets/red.png")
 
-	def print_board(self):
-		print(self.gamestate.board.get_board())
+    def print_board(self):
+        print(self.gamestate.board.get_board())
 
-	def create_window(self):
-		lbl_name = ttk.Label(self, text = "Go Go Gomoku")
-		lbl_name.pack()
-		self.frm_board = ttk.Frame(self, relief = tk.RAISED, borderwidth = 10, height = 500, width = 500)
-		self.frm_board.pack(padx = 25, pady = 25)
-		self.new_game_bt()
-		self.display_board()
-		self.display_captures()
-		self.mainloop()
+    def create_game_window(self):
+        lbl_name = ttk.Label(self, text=f"Go Go Gomoku\nGame Mode: {self.game_mode}")
+        lbl_name.pack()
+        self.frm_board = ttk.Frame(self, relief=tk.RAISED, borderwidth=10, height=500, width=500)
+        self.frm_board.pack(padx=25, pady=25)
 
-	def handle_click(self, args):
-		row, col = args
-		print(f"Clicked on row: {row}, col: {col}")
-		self.play_game(row, col)
+    def create_options_window(self):
+        frm_options = ttk.Frame(self, relief=tk.RIDGE, borderwidth=10).pack(padx=25, pady=25)
+        self.display_captures(frm_options)
+        self.new_game_bt(frm_options)
+        self.choose_different_game_om(frm_options)
+        # self.display_board()
 
-	def pick_color(self, row: int, col: int):
-		if self.gamestate.board.get(row, col) == 0:
-			button_img = self.gray
-		elif self.gamestate.board.get(row, col) == 1:
-			button_img = self.white
-		else:
-			button_img = self.black
-		return button_img
+    def create_game(self):
+        self.create_game_window()
+        self.create_options_window()
+        self.display_board()
+        self.mainloop()
 
-	def display_board(self) -> None:
-		for row in range(self.size):
-			for col in range(self.size):
-				self.frm_position.append(ttk.Frame(
-					master = self.frm_board
-					, relief = tk.RIDGE
-					, borderwidth = 1
-					))
-				button_img = self.pick_color(row, col)
-				self.frm_position[row * self.size + col].grid(row = row, column = col, padx = 5, pady = 5)
-				self.buttons.append(tk.Button(
-					master = self.frm_position[row * self.size + col],
-					image = button_img,
-					command = lambda row = row, column = col: self.handle_click((row, column)),
-					height = 26,
-					width = 26
-				))
-				self.buttons[row * self.size + col].pack()
+    def handle_click(self, args):
+        row, col = args
+        print(f"Clicked on row: {row}, col: {col}")
+        self.play_game(row, col)
 
-	def update_button(self, row: int, col: int) -> None:
-		button_img = self.pick_color(row, col)
-		self.buttons[row * self.size + col].config(image=button_img)
-		self.print_board()
+    def pick_color(self, row: int, col: int):
+        if self.gamestate.board.get(row, col) == 0:
+            button_img = self.gray
+        elif self.gamestate.board.get(row, col) == 1:
+            button_img = self.white
+        else:
+            button_img = self.black
+        return button_img
 
-	def change_player(self) -> None:
-		if self.player == 1:
-			self.player = 2
-		else:
-			self.player = 1
+    def display_board(self) -> None:
+        for row in range(self.size):
+            for col in range(self.size):
+                self.frm_position.append(ttk.Frame(
+                    master=self.frm_board
+                    , relief=tk.RIDGE
+                    , borderwidth=1
+                ))
+                button_img = self.pick_color(row, col)
+                self.frm_position[row * self.size + col].grid(row=row, column=col, padx=1, pady=1)
+                self.buttons.append(tk.Button(
+                    master=self.frm_position[row * self.size + col],
+                    image=button_img,
+                    command=lambda row=row, column=col: self.handle_click((row, column)),
+                    height=26,
+                    width=26
+                ))
+                self.buttons[row * self.size + col].pack()
 
-	def play_game(self, row: int, col: int) -> None:
-		if self.gamestate.board.get(row, col) == 0:
-			if not Game.rules.is_legal_move(row, col, self.player, self.gamestate.board.get_board()):
-				print("Illegal move")
-				return
-			self.gamestate.place_stone(y = row, x = col, stone = self.player)
-			self.update_button(row, col)
-		else:
-			print("Position taken")
-			return
-		# Check for captures/win
-		self.handle_captures(row, col)
-		Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board.get_board(), self.gamestate.captures)
-		self.change_player()  # Changing player, so next move will be for the AI
-		self.ai_move()
+    def update_button(self, row: int, col: int) -> None:
+        button_img = self.pick_color(row, col)
+        self.buttons[row * self.size + col].config(image=button_img)
+        self.print_board()
+        self.update()
 
-	def ai_move(self):
-		self.gamestate.moves.clear()
-		if self.hotseat:
-			value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
-		else:
-			time_start = time.time()
-			value, state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
-			col, row = state.moves[0].x, state.moves[0].y
-			print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}, heur={state.h}')
-			print(f'moves: {state.moves}')
-			if self.gamestate.board.get(y = row, x = col) == 0:
-				self.handle_captures(row, col)
-				# self.buttons[row * self.size + col].destroy()
-				self.gamestate.place_stone(y = row, x = col, stone = self.player)
-				self.update_button(row, col)
-				while state.parent != self.gamestate:
-					state = state.parent
-				if state.winner:
-					exit(1)
-			else:
-				raise ValueError()
-			self.change_player()
+    def change_player(self) -> None:
+        if self.player == 1:
+            self.player = 2
+        else:
+            self.player = 1
 
-	def reset_pieces(self):
-		button_img = self.gray
-		for row in range(self.size):
-			for col in range(self.size):
-				self.buttons[row * self.size + col].config(image=button_img)
+    def play_game(self, row: int, col: int) -> None:
+        if self.gamestate.board.get(row, col) == 0:
+            if not Game.rules.is_legal_move(row, col, self.player, self.gamestate.board):
+                print("Illegal move")
+                return
+            self.gamestate.place_stone(y=row, x=col, stone=self.player)
+            self.update_button(row, col)
+        else:
+            print("Position taken")
+            return
+        self.after_move_check(row, col)
+        self.change_player()
+        self.select_next_move()
 
-	def delete_buttons(self):
-		for row in range(len(self.buttons)):
-			self.buttons[row].destroy()
-			self.frm_position[row].destroy()  # Could there be different lengths here? Empty positions
-		self.buttons = []
-		self.frm_position = []
+    def after_move_check(self, row, col):
+        """ Check for captures and wins"""
+        self.handle_captures(row, col)
+        if Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board, self.gamestate.captures):
+            if congratulate_winner(self.player):
+                self.reset_board()
+                return
 
-	def reset_board(self):
-		self.player = 1
-		self.gamestate = Gamestate()
-		self.reset_pieces()
+    def select_next_move(self):
+        self.gamestate.moves.clear()
+        if self.game_mode == GameMode.HOTSEAT:
+            self.play_hotseat()
+        elif self.game_mode == GameMode.BOT_POT:
+            self.play_bot_pot()
+        else:
+            self.play_vs_ai()
 
-	def new_game_bt(self):
-		bt_new_game = tk.Button(
-			text = "NEW GAME",
-			command = self.reset_board,
-			width = 25,
-			height = 5,
-			bg = "gray",
-			fg = "red"
-		)
-		bt_new_game.pack()
+    def play_hotseat(self):
+        value, state = self.minimax.minimax(state=self.gamestate, depth=self.minimax.maxdepth,
+                                            maximizing_player=bool(self.player == 1))
+        col, row = state.moves[0].x, state.moves[0].y
 
-	def handle_captures(self, row, col):
-		capture_check = Game.rules.is_capturing(row, col, self.player, self.gamestate.board)
-		if capture_check is not None:
-			self.gamestate.capture(capture_check[0], capture_check[1], self.player)
-			self.update_captures(capture_check[0], capture_check[1])
+    def play_vs_ai(self):
+        time_start = time.time()
+        value, state = self.minimax.alphabeta(state=self.gamestate, depth=2, α=-np.inf, β=np.inf,
+                                              maximizing_player=False)
+        col, row = state.moves[0].x, state.moves[0].y
+        print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}, heur={state.h}')
+        print(f'moves: {state.moves}')
+        if self.gamestate.board.get(y=row, x=col) == 0:
+            # Handle rules here -> not Game.rules.is_legal_move
+            self.gamestate.place_stone(y=row, x=col, stone=self.player)
+            self.update_button(row, col)
+            self.after_move_check(row, col)
+        else:
+            raise ValueError()
+        self.change_player()
 
-	def remove_captured(self, pos1: tuple, pos2: tuple):
-		pos1_row, pos1_col = pos1
-		pos2_row, pos2_col = pos2
-		self.buttons[pos1_row * self.size + pos1_col].config(image=self.gray)
-		self.buttons[pos2_row * self.size + pos2_col].config(image=self.gray)
+    def play_bot_pot(self):
+        print("Playing bot pot")
 
-	def update_captures(self, pos1: tuple, pos2: tuple):
-		self.remove_captured(pos1, pos2)
-		self.lbl_captures1.configure(text=f"Player {self.player} has {self.gamestate.captures[self.player - 1]} captures")
-		self.lbl_captures2.configure(text=f"Player {self.player - 1} has {self.gamestate.captures[self.player - 1]} captures")
+    def reset_pieces(self):
+        button_img = self.gray
+        for row in range(self.size):
+            for col in range(self.size):
+                self.buttons[row * self.size + col].config(image=button_img)
 
-	def display_captures(self):
-		self.lbl_captures1 = ttk.Label(self,
-								text=f"Player {self.player} has {self.gamestate.captures[self.player - 1]} captures")
-		self.lbl_captures1.pack()
-		self.lbl_captures2 = ttk.Label(self,
-								text=f"Player {self.player - 1} has {self.gamestate.captures[self.player - 1]} captures")
-		self.lbl_captures2.pack()
+    def reset_board(self):
+        self.player = 1
+        self.gamestate = Gamestate()
+        self.reset_pieces()
+        self.update_captures()
 
-	def update_board(self, row, col):
-		print(f'updating board, row={row}, h={col}')
+    def new_game_bt(self, frm_options):
+        bt_new_game = ttk.Button(
+            master=frm_options,
+            text="NEW GAME",
+            command=self.reset_board,
+            width=15,
+            # height=3,
+            # bg="gray",
+            # fg="red"
+        )
+        bt_new_game.pack()
+
+    def change_game_mode(self, choice):
+        # 1. Pick game_mode
+        # 2. change game_mode
+        # 3. reset board
+        print("executed: " + choice)
+        pass
+
+    def choose_different_game_om(self, frm_options):
+        lbl_choose_game_mode = ttk.Label(frm_options, text=f"Change Game Mode").pack()
+        options = {'Versus ai', 'Hotseat', 'Bot pot'}
+        clicked = tk.StringVar()
+        clicked.set('Versus ai')
+        om_choose_game = ttk.OptionMenu(
+            frm_options,
+            clicked,
+            *options,
+            # master=self,
+            # variable=clicked,
+            # value='Versus ai',
+            # # values=options,
+            command=self.change_game_mode,
+            # width=25,
+            # height=5,
+            # bg="gray"
+            # fg="red"
+        )
+        # om_choose_game.config("")
+        om_choose_game.pack()
+
+    def handle_captures(self, row, col):
+        capture_check = Game.rules.is_capturing(row, col, self.player, self.gamestate.board)
+        if capture_check is not None:
+            for i in range(int(len(capture_check) // 2)):
+                i = i * 2
+                self.gamestate.capture(capture_check[i], capture_check[i + 1], self.player)
+                self.remove_captured(capture_check[i], capture_check[i + 1])
+                self.update_captures()
+                self.update()
+
+    def remove_captured(self, pos1: tuple, pos2: tuple):
+        pos1_row, pos1_col = pos1
+        pos2_row, pos2_col = pos2
+        self.buttons[pos1_row * self.size + pos1_col].config(image=self.gray)
+        self.buttons[pos2_row * self.size + pos2_col].config(image=self.gray)
+
+    def update_captures(self):
+        text = '''
+        Player {} has {} captures
+        Player {} has {} captures
+        '''.format(1, self.gamestate.captures[0], 2, self.gamestate.captures[1])
+        self.lbl_captures1.configure(text=text)
+        self.update()
+
+    def display_captures(self, frm_options):
+        text = '''
+        Player {} has {} captures
+        Player {} has {} captures
+        '''.format(1, self.gamestate.captures[0], 2, self.gamestate.captures[1])
+        self.lbl_captures1 = ttk.Label(frm_options,
+                                       text=text)
+        self.lbl_captures1.pack(side='left')
+
+    def update_board(self, row, col):
+        print(f'updating board, row={row}, h={col}')
