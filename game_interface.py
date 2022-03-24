@@ -51,7 +51,6 @@ class Game(tk.Frame):
         self.display_captures(frm_options)
         self.new_game_bt(frm_options)
         self.choose_different_game_om(frm_options)
-        # self.display_board()
 
     def create_game(self):
         self.create_game_window()
@@ -204,39 +203,30 @@ class Game(tk.Frame):
             text="NEW GAME",
             command=self.reset_board,
             width=15,
-            # height=3,
-            # bg="gray",
-            # fg="red"
         )
         bt_new_game.pack()
 
     def change_game_mode(self, choice):
-        # 1. Pick game_mode
-        # 2. change game_mode
-        # 3. reset board
-        print("executed: " + choice)
-        pass
+        if choice == GameMode.BOT_POT.__str__():
+            self.game_mode = GameMode.BOT_POT
+        elif choice == GameMode.HOTSEAT.__str__():
+            self.game_mode = GameMode.HOTSEAT
+        else:
+            self.game_mode = GameMode.VERSUS_AI
+        # 3. reset board ?
+        # print(self.game_mode)
 
     def choose_different_game_om(self, frm_options):
         lbl_choose_game_mode = ttk.Label(frm_options, text=f"Change Game Mode").pack()
         options = {'Versus ai', 'Hotseat', 'Bot pot'}
         clicked = tk.StringVar()
-        clicked.set('Versus ai')
+        # clicked.set('Versus ai')
         om_choose_game = ttk.OptionMenu(
             frm_options,
             clicked,
             *options,
-            # master=self,
-            # variable=clicked,
-            # value='Versus ai',
-            # # values=options,
             command=self.change_game_mode,
-            # width=25,
-            # height=5,
-            # bg="gray"
-            # fg="red"
         )
-        # om_choose_game.config("")
         om_choose_game.pack()
 
     def handle_captures(self, row, col):
