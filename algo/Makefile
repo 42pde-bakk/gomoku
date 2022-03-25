@@ -1,5 +1,5 @@
 NAME = gomokubot
-INCLUDE = -Iinclude
+INCLUDE = -Iinclude -Iinclude/Gamerules -Iinclude/IO
 HEADER = $(shell find "include" -type f -name "*.hpp")
 
 SRC_DIR = srcs

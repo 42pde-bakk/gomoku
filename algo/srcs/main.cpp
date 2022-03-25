@@ -4,8 +4,8 @@
 
 #include "Minimax.hpp"
 #include "Gamestate.hpp"
-#include "Server.hpp"
-#include "Client.hpp"
+#include "IO/Server.hpp"
+#include "IO/Client.hpp"
 #include "Colours.hpp"
 #include <chrono>
 
@@ -22,9 +22,11 @@ int main() {
 			auto start_time = std::chrono::steady_clock::now();
 			std::cerr << "got the gamestate\n";
 			gs->print_board(std::cerr);
-			Gamestate *result = minimax(gs, 2, static_cast<bool>(gs->get_player()));
+			Gamestate *result = minimax(gs, 4, static_cast<bool>(gs->get_player()));
 			Move move = result->moves[0];
 			std::cerr << "Move: " << move;
+			std::cerr << "Result gamestate: h=" << result->h << ".\n";
+			result->print_board(std::cerr);
 			auto end_time = std::chrono::steady_clock::now();
 			auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 			std::cerr << _PURPLE "Calculating move took " << elapsed_time.count() << " ms\n" _END;
