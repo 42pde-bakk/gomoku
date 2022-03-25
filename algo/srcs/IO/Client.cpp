@@ -2,7 +2,7 @@
 // Created by Peer De bakker on 3/22/22.
 //
 
-#include "Client.hpp"
+#include "IO/Client.hpp"
 #include "Colours.hpp"
 #include <iostream>
 #include <unistd.h>
@@ -49,6 +49,7 @@ Gamestate *Client::receiveGamestate() const {
 	int 	stones_amount;
 
 	gs->turn = this->receive()[0];
+	gs->player = gs->turn % 2;
 #if LOG
 	dprintf(2, "Turn: %d\n", gs->turn);
 #endif

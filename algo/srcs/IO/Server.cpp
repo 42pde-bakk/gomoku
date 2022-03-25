@@ -2,7 +2,7 @@
 // Created by Peer De bakker on 3/22/22.
 //
 
-#include "Server.hpp"
+#include "IO/Server.hpp"
 #include "Colours.hpp"
 #include <iostream>
 #include <cstring>
