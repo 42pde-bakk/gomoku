@@ -32,7 +32,6 @@ enum class STONE {
 	PLAYER2
 };
 
-
 class Client;
 
 class Gamestate {
@@ -44,7 +43,8 @@ public:
 	std::vector<Gamestate*> children;
 	int turn{},
 		h{},
-		winner{};
+		winner{},
+		player{};
 
 	friend Client;
 public:
@@ -54,7 +54,8 @@ public:
 	~Gamestate();
 
 	[[nodiscard]] bool	has_winner() const { return (this->winner != 0); }
-	void	set_heuristic(int heuristic) { this->h = heuristic; }
+	[[nodiscard]] int		get_h_value_player(int player_id) const;
+	void	set_heuristic();
 
 	void generate_children();
 	std::vector<Gamestate*>& get_children() { return this->children; }
@@ -70,8 +71,13 @@ public:
 	void	print_board(std::ostream& o) const;
 	[[nodiscard]] int		get_player() const;
 
-private:
+protected:
 	void	place_stone(int move_idx);
+	int		change_player();
+
+	// Captures.cpp
+	int perform_captures(int pos);
+	int capture_check_dir(int idx, int dir, int p);
 };
 
 
