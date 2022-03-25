@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 
 # Testing source code
-file(GLOB test_srcs "*.cpp")
+file(GLOB test_srcs "srcs/*.cpp")
 
 # Source code
 file(GLOB includes "../include/*.hpp")

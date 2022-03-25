@@ -21,18 +21,18 @@ Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 		best_state_value = std::numeric_limits<int>::min();
 		for (auto& child : state->get_children()) {
 			new_state = minimax(child, depth - 1, false);
-			if (new_state->h > best_state_value) {
+			if (new_state->get_heuristic() > best_state_value) {
 				best_state = new_state;
-				best_state_value = new_state->h;
+				best_state_value = new_state->get_heuristic();
 			}
 		}
 	} else {
 		best_state_value = std::numeric_limits<int>::max();
 		for (auto& child : state->get_children()) {
 			new_state = minimax(child, depth - 1, true);
-			if (new_state->h < best_state_value) {
+			if (new_state->get_heuristic() < best_state_value) {
 				best_state = new_state;
-				best_state_value = new_state->h;
+				best_state_value = new_state->get_heuristic();
 			}
 		}
 	}
@@ -52,25 +52,25 @@ Gamestate *alphabeta(Gamestate *state, int depth, int α, int β, bool maximizin
 		best_state_value = std::numeric_limits<int>::min();
 		for (auto& child : state->get_children()) {
 			new_state = alphabeta(child, depth - 1, α, β, false);
-			if (new_state->h > best_state_value) {
+			if (new_state->get_heuristic() > best_state_value) {
 				best_state = new_state;
-				best_state_value = new_state->h;
+				best_state_value = new_state->get_heuristic();
 			}
 			if (best_state_value >= β)
 				break ; // β cutoff
-			α = std::max(α, new_state->h);
+			α = std::max(α, new_state->get_heuristic());
 		}
 	} else {
 		best_state_value = std::numeric_limits<int>::max();
 		for (auto& child : state->get_children()) {
 			new_state = alphabeta(child, depth - 1, α, β,true);
-			if (new_state->h < best_state_value) {
+			if (new_state->get_heuristic() < best_state_value) {
 				best_state = new_state;
-				best_state_value = new_state->h;
+				best_state_value = new_state->get_heuristic();
 			}
 			if (best_state_value <= α)
 				break ; // α cutoff
-			β = std::min(β, new_state->h);
+			β = std::min(β, new_state->get_heuristic());
 		}
 	}
 	return (best_state);

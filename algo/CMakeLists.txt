@@ -14,5 +14,5 @@ target_include_directories(Cluster PRIVATE include)
 target_include_directories(Cluster PRIVATE include/Gamerules)
 target_include_directories(Cluster PRIVATE include/IO)
 
-#add_subdirectory(tests)
+add_subdirectory(tests)
 

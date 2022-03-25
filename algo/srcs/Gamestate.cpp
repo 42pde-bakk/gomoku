@@ -7,6 +7,10 @@
 #include "Directions.hpp"
 #include <unordered_map>
 
+bool is_seperating_bit(const int idx) {
+	return ((idx + 1) % 20 == 0);
+}
+
 Gamestate &Gamestate::operator=(const Gamestate& x) {
 	for (auto child : this->children)
 		delete child;
@@ -38,19 +42,27 @@ Gamestate::~Gamestate() {
 	this->children.clear();
 }
 
-void Gamestate::print_board(std::ostream& o) const {
+static void	print_legend(std::ostream& o, bool print_colours) {
 	static char legend[] = "0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 S\n";
-	o << _YELLOW << legend << _END;
+	if (print_colours)
+		o << _YELLOW;
+	o << legend;
+	if (print_colours)
+		o << _END;
+}
+
+void Gamestate::print_board(std::ostream& o, bool print_colours) const {
+	print_legend(o, print_colours);
 	for (int i = 0; i < BOARDSIZE; i++) {
 		if (this->boards[0][i])
-			o << _BLUE _BOLD "1" _END;
+			o << (print_colours ? _BLUE _BOLD "1" _END : "1");
 		else if (this->boards[1][i])
-			o << _RED _BOLD "2" _END;
+			o << (print_colours ? _RED _BOLD "2" _END : "2");
 		else
 			o << 0;
 		o << ((i + 1) % BOARDWIDTH == 0 ? '\n' : ' ');
 	}
-	o << _YELLOW << legend << "\n" _END;
+	print_legend(o, print_colours);
 }
 
 void print_bitboard(bitboard &b, std::ostream &o) {
@@ -73,7 +85,7 @@ void Gamestate::generate_children() {
 	bitboard	all_stones = boards[0] | boards[1];
 	bitboard	empty_cells = ~all_stones;
 	if (all_stones.none()) {
-		int idx = 9 * 9;
+		int idx = 20 * 9 + 9;
 		auto	*middle = new Gamestate(*this);
 		middle->place_stone(idx);
 		this->children.emplace_back(middle);
@@ -103,7 +115,11 @@ void Gamestate::place_stone(int move_idx) {
 	assert(this->boards[1][move_idx] == false);
 	this->boards[player][move_idx] = true;
 	this->moves.emplace_back(move_idx, player);
-	this->perform_captures(move_idx);
+	if (!this->perform_captures(move_idx)) {
+		// check double threes
+		// It is important to note that it is not forbidden to introduce
+		// a double-three by capturing a pair.
+	}
 	// TODO: update heuristic value
 	this->set_heuristic();
 	this->turn++;
@@ -118,22 +134,23 @@ int collect_open_things(const std::array<bitboard, 2>& boards, int idx, int play
 	for (unsigned int d = 0; d < 4; d++) {
 		if (checked[idx] >> d) // Have I already checked this tile in this direction?
 			continue;
-		int i = idx;
 		int len = 1;
-		while (i < BOARDSIZE && (i % 19 != 0) && boards[player_id][i]) {
+		int i = idx + dirs[d];
+		while (i < BOARDSIZE && !is_seperating_bit(i) && boards[player_id][i]) {
 			++len;
-			i += dirs[0];
+			i += dirs[d];
 			checked[i] <<= d; // Save that I already checked this tile in this direction
 		}
 		if (len > 1) {
-			h += values[len];
+			int open_sides = 0;
 
 			// Add extra value if the tiles surrounding this streak are empty
-			if (i < BOARDSIZE && (i % 19 == 0))
-				h += values[len] / 10; // opportunity value
+			if (i < BOARDSIZE && !is_seperating_bit(i))
+				open_sides += 1; // opportunity value
 			int prev = i - dirs[0];
-			if (prev >= 0 && (i % 19 == 0))
-				h += values[len] / 10; // opportunity value
+			if (prev >= 0 && !is_seperating_bit(prev))
+				open_sides += 1; // opportunity value
+			h += open_sides * values[len] / 2;
 		}
 	}
 	return (h);
@@ -158,4 +175,12 @@ int Gamestate::get_h_value_player(int player_id) const {
 int Gamestate::change_player() {
 	this->player = !this->player;
 	return (this->player);
+}
+
+const Move &Gamestate::get_first_move() const {
+	return this->moves.front();
+}
+
+int Gamestate::get_heuristic() const {
+	return (this->h);
 }
