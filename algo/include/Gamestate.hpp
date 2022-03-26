@@ -47,7 +47,7 @@ public:
 	void generate_children();
 	std::vector<Gamestate*>& get_children() { return this->children; }
 
-	bool	operator==(const Gamestate& rhs) const { return (this->h == rhs.h); }
+	bool	operator==(const Gamestate& rhs) const { return (this->boards[0] == rhs.boards[0] && this->boards[1] == rhs.boards[1]); }
 	bool	operator!=(const Gamestate& rhs) const { return !(*this == rhs); }
 
 	bool	operator<(const Gamestate& rhs) const { return (this->h < rhs.h); }
@@ -60,8 +60,8 @@ public:
 
 	[[nodiscard]] const Move& get_first_move() const;
 
-protected:
 	void	place_stone(int move_idx);
+protected:
 	int		change_player();
 
 	// Captures.cpp
