@@ -6,6 +6,7 @@
 #include "Colours.hpp"
 #include "Directions.hpp"
 #include <unordered_map>
+#include <cassert>
 
 bool is_seperating_bit(const int idx) {
 	return ((idx + 1) % 20 == 0);
@@ -126,34 +127,42 @@ void Gamestate::place_stone(int move_idx) {
 	this->change_player();
 }
 
-int collect_open_things(const std::array<bitboard, 2>& boards, int idx, int player_id, std::unordered_map<int, unsigned int>& checked) {
+int Gamestate::collect_open_things(int idx, int player_id, std::unordered_map<int, unsigned int>& checked) const {
 	static const std::array<int, 4> dirs = setup_dirs();
 	static const int values[] = {0, 0, 10, 100, 1000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000};
-	int h = 0;
+	int _h = 0;
+
+	dprintf(2, "p: %d, idx: %d\n", player_id, idx);
 
 	for (unsigned int d = 0; d < 4; d++) {
-		if (checked[idx] >> d) // Have I already checked this tile in this direction?
+		dprintf(2, "dirs[%d] = %d\n", d, dirs[d]);
+		if (checked[idx] & (1UL << (d + 1)))
 			continue;
 		int len = 1;
 		int i = idx + dirs[d];
 		while (i < BOARDSIZE && !is_seperating_bit(i) && boards[player_id][i]) {
 			++len;
+			checked[i] |= 1UL << (d + 1); // Save that I already checked this tile in this direction
 			i += dirs[d];
-			checked[i] <<= d; // Save that I already checked this tile in this direction
 		}
 		if (len > 1) {
 			int open_sides = 0;
 
 			// Add extra value if the tiles surrounding this streak are empty
-			if (i < BOARDSIZE && !is_seperating_bit(i))
+			if (i < BOARDSIZE && !is_seperating_bit(i) && tile_is_empty(i)) {
 				open_sides += 1; // opportunity value
-			int prev = i - dirs[0];
-			if (prev >= 0 && !is_seperating_bit(prev))
+				dprintf(2, "1. side is open at idx=%d\n", i);
+			}
+			int prev = idx - dirs[d];
+			dprintf(2, "prev = %d\n", prev);
+			if (prev >= 0 && !is_seperating_bit(prev) && tile_is_empty(prev)) {
 				open_sides += 1; // opportunity value
-			h += open_sides * values[len] / 2;
+				dprintf(2, "2. side is open at idx %d\n", prev);
+			}
+			_h += open_sides * values[len] / 2;
 		}
 	}
-	return (h);
+	return (_h);
 }
 
 void Gamestate::set_heuristic() {
@@ -166,8 +175,10 @@ int Gamestate::get_h_value_player(int player_id) const {
 	std::unordered_map<int, unsigned int> checked;
 	int _h = 0;
 	for (int i = 0; i < BOARDSIZE; i++) {
-		if (this->boards[player_id][i])
-			_h += collect_open_things(this->boards, i, player_id, checked);
+		if (this->boards[player_id][i]) {
+			dprintf(2, "lets collect h for player %d at i=%d\n", player_id, i);
+			_h += collect_open_things(i, player_id, checked);
+		}
 	}
 	return (_h);
 }
@@ -183,4 +194,8 @@ const Move &Gamestate::get_first_move() const {
 
 int Gamestate::get_heuristic() const {
 	return (this->h);
+}
+
+bool Gamestate::tile_is_empty(int idx) const {
+	return (!this->boards[0][idx] && !this->boards[1][idx]);
 }

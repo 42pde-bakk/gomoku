@@ -9,6 +9,8 @@
 # include <array>
 # include <vector>
 # include <Move.hpp>
+# include <unordered_map>
+# include <bitset>
 
 # define BOARDHEIGHT 19
 # define BOARDWIDTH 20 // 1 for a seperating bit
@@ -65,6 +67,8 @@ protected:
 	// Captures.cpp
 	unsigned int perform_captures(int pos);
 	unsigned int capture_check_dir(int idx, int dir, int p);
+	[[nodiscard]] bool		tile_is_empty(int idx) const;
+	int collect_open_things(int idx, int player_id, std::unordered_map<int, unsigned int>& checked) const;
 };
 
 bool	is_seperating_bit(int idx);

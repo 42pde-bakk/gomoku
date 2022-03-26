@@ -5,6 +5,7 @@
 #include <Minimax.hpp>
 
 #include "Gamestate.hpp"
+#include <limits>
 
 // Player 1 is the maximizing player
 // Player 0 is the minimizing player
