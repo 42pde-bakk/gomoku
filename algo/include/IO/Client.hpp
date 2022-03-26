@@ -14,7 +14,7 @@ class Client {
 	int	fd{};
 	struct sockaddr_in	addr{};
 
-	[[nodiscard]] std::vector<int> receive() const;
+	[[nodiscard]] std::vector<int> receive(size_t bufsize) const;
 
 public:
 	explicit Client(Server *s);

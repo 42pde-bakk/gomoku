@@ -26,13 +26,13 @@ Client::~Client() {
 	fd = -1;
 }
 
-std::vector<int> Client::receive() const {
+std::vector<int> Client::receive(size_t bufsize) const {
 	int		recvRet;
-	char	buf[BUFSIZ + 1];
+	char	buf[bufsize + 1];
 	std::vector<int> intArray;
 
 	bzero(&buf, sizeof(buf));
-	if ((recvRet = read(fd, buf, BUFSIZ)) == -1)
+	if ((recvRet = read(fd, buf, bufsize)) == -1)
 		error("Error reading from socket");
 	if (recvRet == 0) {
 		std::cerr << "Read returned 0.\n";
@@ -48,17 +48,17 @@ Gamestate *Client::receiveGamestate() const {
 	auto	*gs = new Gamestate();
 	int 	stones_amount;
 
-	gs->turn = this->receive()[0];
+	gs->turn = this->receive(4)[0];
 	gs->player = gs->turn % 2;
 #if LOG
 	dprintf(2, "Turn: %d\n", gs->turn);
 #endif
-	stones_amount = this->receive()[0];
+	stones_amount = this->receive(4)[0];
 #if LOG
 	dprintf(2, "Stones_amount: %d\n", stones_amount);
 #endif
 	for (int i = 0; i < stones_amount; i++) {
-		std::vector<int> arr = this->receive();
+		std::vector<int> arr = this->receive(12);
 		int y = arr[0],
 			x = arr[1],
 			colour = arr[2];
