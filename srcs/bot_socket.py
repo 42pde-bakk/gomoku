@@ -18,8 +18,8 @@ class BotSocket:
 		print(f'stones_amount = {len(stones)}')
 		self.s.sendall(struct.pack('i', len(stones)))  # Amount of stones on the board
 
-		for idx in stones:
-			print(f'stone: {idx} => {gs.board.arr[tuple(idx)]}')
+		for i, idx in enumerate(stones):
+			print(f'{i}, stone: {idx} => {gs.board.arr[tuple(idx)]}')
 			# self.s.sendall(struct.pack('iii', int(idx[0]), int(idx[1]), int(gs.board.arr[tuple(idx)])))
 			self.s.sendall(struct.pack('iii', idx[0], idx[1], gs.board.arr[tuple(idx)]))
 
