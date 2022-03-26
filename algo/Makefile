@@ -29,13 +29,12 @@ ifdef LEAKS
  CFLAGS += -g3 -fsanitize=address
 endif
 ifdef PROFILING
- CFLAGS += -g3 -fprofile-instr-generate
+ CFLAGS += -g3 -pg
 endif
 
 SHELL := /bin/bash
 export SHELL
 export DEBUG
-#CXX := ~/.brew/bin/g++-10
 
 all: directories $(NAME)
 
