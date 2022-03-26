@@ -95,8 +95,6 @@ void Gamestate::generate_children() {
 	bitboard	neighbours = all_stones | SHIFT_N(all_stones) | SHIFT_W(all_stones) | SHIFT_S(all_stones) | SHIFT_E(all_stones) \
 										| SHIFT_NE(all_stones) | SHIFT_NW(all_stones) | SHIFT_SE(all_stones) | SHIFT_SW(all_stones);
 	bitboard	empty_neighbours = neighbours & empty_cells;
-//	std::cerr << "Empty neighbours:" << '\n';
-//	print_bitboard(empty_neighbours, std::cerr);
 	if (empty_neighbours.none())
 		throw std::runtime_error("Error. No more empty tiles");
 	for (int i = 0; i < BOARDSIZE; i++) {
@@ -132,10 +130,7 @@ int Gamestate::collect_open_things(int idx, int player_id, std::unordered_map<in
 	static const int values[] = {0, 0, 10, 100, 1000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000};
 	int _h = 0;
 
-	dprintf(2, "p: %d, idx: %d\n", player_id, idx);
-
 	for (unsigned int d = 0; d < 4; d++) {
-		dprintf(2, "dirs[%d] = %d\n", d, dirs[d]);
 		if (checked[idx] & (1UL << (d + 1)))
 			continue;
 		int len = 1;
@@ -151,13 +146,10 @@ int Gamestate::collect_open_things(int idx, int player_id, std::unordered_map<in
 			// Add extra value if the tiles surrounding this streak are empty
 			if (i < BOARDSIZE && !is_seperating_bit(i) && tile_is_empty(i)) {
 				open_sides += 1; // opportunity value
-				dprintf(2, "1. side is open at idx=%d\n", i);
 			}
 			int prev = idx - dirs[d];
-			dprintf(2, "prev = %d\n", prev);
 			if (prev >= 0 && !is_seperating_bit(prev) && tile_is_empty(prev)) {
 				open_sides += 1; // opportunity value
-				dprintf(2, "2. side is open at idx %d\n", prev);
 			}
 			_h += open_sides * values[len] / 2;
 		}
@@ -176,7 +168,6 @@ int Gamestate::get_h_value_player(int player_id) const {
 	int _h = 0;
 	for (int i = 0; i < BOARDSIZE; i++) {
 		if (this->boards[player_id][i]) {
-			dprintf(2, "lets collect h for player %d at i=%d\n", player_id, i);
 			_h += collect_open_things(i, player_id, checked);
 		}
 	}
