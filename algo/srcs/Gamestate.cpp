@@ -83,6 +83,8 @@ int Gamestate::get_player() const {
 	return (this->player);
 }
 
+bool compareGamestates(Gamestate* a, Gamestate* b) { return (*a < *b); }
+
 // https://core.ac.uk/download/pdf/33500946.pdf
 void Gamestate::generate_children() {
 	bitboard	all_stones = boards[0] | boards[1];
@@ -105,6 +107,7 @@ void Gamestate::generate_children() {
 		auto	*child = new Gamestate(*this);
 		child->place_stone(i);
 		this->children.emplace_back(child);
+		std::sort(children.begin(), children.end(), compareGamestates);
 	}
 }
 
