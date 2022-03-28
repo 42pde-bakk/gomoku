@@ -40,3 +40,11 @@ class Board:
 			length += 1
 			newpos = tuple(map(operator.add, newpos, direction))
 		return length
+
+	@staticmethod
+	def get_relative_position(direction: tuple, multiplier: int):
+		"""
+		Retrieve a relative position from a direction
+		multiplier == -1 being opposite direction
+		"""
+		return tuple([i * multiplier for i in direction])
