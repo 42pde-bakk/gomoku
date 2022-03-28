@@ -162,8 +162,9 @@ int Gamestate::collect_open_things(int idx, int player_id, std::unordered_map<in
 	return (_h);
 }
 
+#ifdef __clang__
 template <size_t N1, size_t N2 >
-std::bitset<N1 + N2> concat( const std::bitset<N1>& b1, const std::bitset<N2>& b2 ) {
+std::bitset<N1 + N2> concat(const std::bitset<N1>& b1, const std::bitset<N2>& b2 ) {
 	std::bitset<N1 + N2> res;
 	for (size_t i = 0; i < N1; ++i) {
 		res[i] = b1[i];
@@ -171,6 +172,14 @@ std::bitset<N1 + N2> concat( const std::bitset<N1>& b1, const std::bitset<N2>& b
 	}
 	return res;
 }
+#else
+template <size_t N1, size_t N2 >
+std::bitset<N1 + N2> concat(const std::bitset<N1>& b1, const std::bitset<N2>& b2 ) {
+	std::string first(b1.to_string());
+	std::string second(b2.to_string());
+	return (first + second);
+}
+#endif
 
 void Gamestate::set_heuristic() {
 	int p0_h = this->get_h_value_player(0);
