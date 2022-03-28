@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <cassert>
 
+std::unordered_map<std::bitset<BOARDSIZE * 2>, int> Gamestate::tt;
+
 bool is_seperating_bit(const int idx) {
 	return ((idx + 1) % 20 == 0);
 }
@@ -155,6 +157,16 @@ int Gamestate::collect_open_things(int idx, int player_id, std::unordered_map<in
 		}
 	}
 	return (_h);
+}
+
+template <size_t N1, size_t N2 >
+std::bitset<N1 + N2> concat( const std::bitset<N1>& b1, const std::bitset<N2>& b2 ) {
+	std::bitset<N1 + N2> res;
+	for (size_t i = 0; i < N1; ++i) {
+		res[i] = b1[i];
+		res[N1 + i] = b2[i];
+	}
+	return res;
 }
 
 void Gamestate::set_heuristic() {

@@ -31,7 +31,7 @@ TEST_CASE("Alphabeta pruning", "[MinimaxTests]") {
 	std::cerr << _PURPLE "Minimax took " << elapsed_time.count() << " ms\n" _END;
 
 	start_time = std::chrono::steady_clock::now();
-	Gamestate *ab_res = alphabeta(gs, 4, std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), gs->get_player());
+	Gamestate *ab_res = alphabeta(gs2, 4, std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), gs->get_player());
 	end_time = std::chrono::steady_clock::now();
 	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 	std::cerr << _PURPLE "Alpha-Beta pruning took " << elapsed_time.count() << " ms\n" _END;

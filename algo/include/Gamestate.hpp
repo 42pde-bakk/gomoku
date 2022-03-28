@@ -22,6 +22,7 @@ class Client;
 
 class Gamestate {
 protected:
+	static std::unordered_map<std::bitset<BOARDSIZE * 2>, int> tt;
 	std::array<bitboard, 2>	boards;
 	std::array<int, 2>	captures{};
 	std::vector<Move>	moves;
