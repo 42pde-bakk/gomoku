@@ -36,6 +36,7 @@ class Game(tk.Frame):
         self.black = tk.PhotoImage(file='/Users/abumbier/gomoku/assets/black.png')
         self.gray = tk.PhotoImage(file='/Users/abumbier/gomoku/assets/gray.png')
         self.red = tk.PhotoImage(file="/Users/abumbier/gomoku/assets/red.png")
+        self.hotseat_move = [-1, -1]
 
     def print_board(self):
         print(self.gamestate.board.get_board())
@@ -58,20 +59,6 @@ class Game(tk.Frame):
         self.display_board()
         self.mainloop()
 
-    def handle_click(self, args):
-        row, col = args
-        print(f"Clicked on row: {row}, col: {col}")
-        self.play_game(row, col)
-
-    def pick_color(self, row: int, col: int):
-        if self.gamestate.board.get(row, col) == 0:
-            button_img = self.gray
-        elif self.gamestate.board.get(row, col) == 1:
-            button_img = self.white
-        else:
-            button_img = self.black
-        return button_img
-
     def display_board(self) -> None:
         for row in range(self.size):
             for col in range(self.size):
@@ -91,10 +78,23 @@ class Game(tk.Frame):
                 ))
                 self.buttons[row * self.size + col].pack()
 
+    def handle_click(self, args):
+        row, col = args
+        print(f"Clicked on row: {row}, col: {col}")
+        self.play_game(row, col)
+
+    def pick_color(self, row: int, col: int):
+        if self.gamestate.board.get(row, col) == 0:
+            button_img = self.gray
+        elif self.gamestate.board.get(row, col) == 1:
+            button_img = self.white
+        else:
+            button_img = self.black
+        return button_img
+
     def update_button(self, row: int, col: int) -> None:
         button_img = self.pick_color(row, col)
         self.buttons[row * self.size + col].config(image=button_img)
-        self.print_board()
         self.update()
 
     def change_player(self) -> None:
@@ -102,6 +102,7 @@ class Game(tk.Frame):
             self.player = 2
         else:
             self.player = 1
+        self.print_board()
 
     def play_game(self, row: int, col: int) -> None:
         if self.gamestate.board.get(row, col) == 0:
@@ -113,17 +114,20 @@ class Game(tk.Frame):
         else:
             print("Position taken")
             return
-        self.after_move_check(row, col)
-        self.change_player()
-        self.select_next_move()
+        if not self.after_move_check(row, col):
+            self.change_player()
+            self.select_next_move()
 
     def after_move_check(self, row, col):
         """ Check for captures and wins"""
+        if self.game_mode == GameMode.HOTSEAT:
+            self.update_button(self.hotseat_move[0], self.hotseat_move[1])
         self.handle_captures(row, col)
         if Game.rules.is_winning_condition(row, col, self.player, self.gamestate.board, self.gamestate.captures):
             if congratulate_winner(self.player):
                 self.reset_board()
-                return
+                return True
+        return False
 
     def select_next_move(self):
         self.gamestate.moves.clear()
@@ -135,9 +139,16 @@ class Game(tk.Frame):
             self.play_vs_ai()
 
     def play_hotseat(self):
-        value, state = self.minimax.minimax(state=self.gamestate, depth=self.minimax.maxdepth,
-                                            maximizing_player=bool(self.player == 1))
+        value, state = self.minimax.alphabeta(state=self.gamestate, depth=2, α=-np.inf, β=np.inf,
+                                              maximizing_player=False)
         col, row = state.moves[0].x, state.moves[0].y
+        self.hotseat_move[0], self.hotseat_move[1] = row, col
+        print(f"Suggested row: {self.hotseat_move[0]}, col: {self.hotseat_move[1]}")
+        self.display_suggested_move(row, col)
+
+    def display_suggested_move(self, row, col):
+        self.buttons[row * self.size + col].config(image=self.red)
+        self.update()
 
     def play_vs_ai(self):
         time_start = time.time()
@@ -150,7 +161,8 @@ class Game(tk.Frame):
             # Handle rules here -> not Game.rules.is_legal_move
             self.gamestate.place_stone(y=row, x=col, stone=self.player)
             self.update_button(row, col)
-            self.after_move_check(row, col)
+            if self.after_move_check(row, col):
+                return
             while state.parent != self.gamestate:
                 state = state.parent
             if state.winner:
@@ -160,30 +172,12 @@ class Game(tk.Frame):
         self.change_player()
 
     def play_bot_pot(self):
-        print("Playing bot pot")
-
-    # def ai_move(self):
-    # 	self.gamestate.moves.clear()
-    # 	if self.hotseat:
-    # 		value, state = self.minimax.minimax(state = self.gamestate, depth = self.minimax.maxdepth, maximizing_player = bool(self.player == 1))
-    # 		col, row = state.moves[0].x, state.moves[0].y
-    # 	else:
-    # 		time_start = time.time()
-    # 		value, state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf, maximizing_player = False)
-    # 		col, row = state.moves[0].x, state.moves[0].y
-    # 		print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}, heur={state.h}')
-    # 		print(f'moves: {state.moves}')
-    # 		if self.gamestate.board.get(y = row, x = col) == 0:
-    # 			self.handle_captures(row, col)
-    # 			self.gamestate.place_stone(y = row, x = col, stone = self.player)
-    # 			self.update_button(row, col)
-    # 			while state.parent != self.gamestate:
-    # 				state = state.parent
-    # 			if state.winner:
-    # 				exit(1)
-    # 		else:
-    # 			raise ValueError()
-    # 		self.change_player()
+        pass
+        self.gamestate.place_stone(y=0, x=0, stone=self.player)
+        self.update_button(0, 0)
+        self.change_player()
+        while self.game_mode == GameMode.BOT_POT:
+            self.play_vs_ai()
 
     def reset_pieces(self):
         button_img = self.gray
@@ -214,13 +208,12 @@ class Game(tk.Frame):
         else:
             self.game_mode = GameMode.VERSUS_AI
         # 3. reset board ?
-        # print(self.game_mode)
 
     def choose_different_game_om(self, frm_options):
         lbl_choose_game_mode = ttk.Label(frm_options, text=f"Change Game Mode").pack()
-        options = {'Versus ai', 'Hotseat', 'Bot pot'}
+        options = ['Versus ai', 'Hotseat', 'Bot pot']
         clicked = tk.StringVar()
-        # clicked.set('Versus ai')
+        clicked.set(options[0])
         om_choose_game = ttk.OptionMenu(
             frm_options,
             clicked,

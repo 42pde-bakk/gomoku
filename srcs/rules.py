@@ -19,39 +19,39 @@ class Rules:
 		inside_zero = False
 		first_zero = False
 		stones = 0
-		for i in range(1, 5): # check given direction
+		for i in range(1, 5):
 			rel = board.get_relative_position(d, i)
-			if stones == 2: # if forms two
-				if board.get(row + rel[0], col + rel[1]): # if forms three and next is not empty
-					return False # cant be open three
+			if stones == 2:
+				if board.get(row + rel[0], col + rel[1]):
+					return False
 				break
-			if not board.get(row + rel[0], col + rel[1]): # is empty
-				if inside_zero: # already had an inside empty
+			if not board.get(row + rel[0], col + rel[1]):
+				if inside_zero:
 					break
 				if first_zero:
 					break
 				first_zero = True
-			elif not self.is_not_player_check(row + rel[0], col + rel[1], player, board): # is player
+			elif not self.is_not_player_check(row + rel[0], col + rel[1], player, board):
 				stones += 1
 				if first_zero:
 					inside_zero = True
 				first_zero = False
 			else:
-				break
+				return False
 		first_zero = False
-		for i in range(-1, -5, -1): # check opposite direction
+		for i in range(-1, -5, -1):
 			rel = board.get_relative_position(d, i)
 			if stones == 2:
-				if board.get(row + rel[0], col + rel[1]): # if forms three and is not null
-					return False # cant be open three
+				if board.get(row + rel[0], col + rel[1]):
+					return False
 				return True
-			if not board.get(row + rel[0], col + rel[1]): # is empty
-				if inside_zero: # already had an inside empty
+			if not board.get(row + rel[0], col + rel[1]):
+				if inside_zero:
 					return False
 				if first_zero:
 					return False
 				first_zero = True
-			elif not self.is_not_player_check(row + rel[0], col + rel[1], player, board): # is player
+			elif not self.is_not_player_check(row + rel[0], col + rel[1], player, board):
 				stones += 1
 				if first_zero:
 					inside_zero = True
@@ -63,7 +63,6 @@ class Rules:
 		second_three = False
 		for direction in self.dir[:4]:
 			if self.is_open_three(row, col, player, board, direction):
-				print("Got one")
 				if second_three:
 					return True
 				second_three = True
