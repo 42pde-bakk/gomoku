@@ -6,10 +6,11 @@
 #define GOMOKUBOT_BITBOARD_HPP
 #include <bitset>
 
-# define BOARDHEIGHT 19 * 2
-# define BOARDWIDTH 20 * 2 // 1 for a seperating bit
+# define BOARDHEIGHT 19
+# define BOARDWIDTH 40 // +1 for a seperating bit
 # define BOARDSIZE BOARDHEIGHT * BOARDWIDTH
-# define REALBOARDSIZE 20 * 19
+# define REALBOARDWIDTH 20
+# define REALBOARDSIZE REALBOARDWIDTH * BOARDHEIGHT
 
 typedef std::bitset<BOARDSIZE> bitboard;
 
@@ -25,7 +26,7 @@ public:
 
 	[[nodiscard]] unsigned int bitboard_get(unsigned int idx) const;
 	[[nodiscard]] bool	tile_is_empty(unsigned int idx) const;
-	[[nodiscard]] static bool	is_seperating_bit(unsigned int idx) ;
+	[[nodiscard]] static bool	isSeperatingBitIndex(unsigned int idx) ;
 	[[nodiscard]] unsigned int	at(size_t n) const; // just a getter
 	unsigned int	operator[](size_t n) const; // just a getter
 	void	set(unsigned int idx, unsigned int player);
@@ -42,6 +43,8 @@ public:
 
 	void	print_board(std::ostream& o, bool colours) const;
 	friend std::ostream&	operator<<(std::ostream& o, const Bitboard& b);
+
+	bool none() const;
 };
 
 

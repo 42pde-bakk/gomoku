@@ -56,7 +56,10 @@ static void	print_item(std::ostream& o, bool print_colours, unsigned int item) {
 std::ostream &operator<<(std::ostream &o, const Bitboard &b) {
 	for (int i = 0; i < REALBOARDSIZE; i++) {
 		print_item(o, false, b.bitboard_get(i));
-		o << ((i + 1) % BOARDWIDTH == 0 ? '\n' : ' ');
+		if (Bitboard::isSeperatingBitIndex(i))
+			o << '\n';
+		else
+			o << ' ';
 	}
 	return (o);
 }
@@ -64,7 +67,10 @@ std::ostream &operator<<(std::ostream &o, const Bitboard &b) {
 void	Bitboard::print_board(std::ostream& o, bool colours) const {
 	for (int i = 0; i < REALBOARDSIZE; i++) {
 		print_item(o, colours, bitboard_get(i));
-		o << ((i + 1) % BOARDWIDTH == 0 ? '\n' : ' ');
+		if (Bitboard::isSeperatingBitIndex(i))
+			o << '\n';
+		else
+			o << ' ';
 	}
 }
 
@@ -110,11 +116,15 @@ void Bitboard::set(unsigned int idx, unsigned int player) {
 bitboard	Bitboard::get_empty_neighbours() const {
 	bitboard	empty_cells = ~this->board;
 	bitboard	neighbours = SHIFT_N(board) | SHIFT_W(board) | SHIFT_S(board) | SHIFT_E(board) \
-									| SHIFT_NE(board) | SHIFT_NW(board) | SHIFT_SE(board) | SHIFT_SW(board);
+							| SHIFT_NE(board) | SHIFT_NW(board) | SHIFT_SE(board) | SHIFT_SW(board);
 	bitboard	empty_neighbours = neighbours & empty_cells;
 	return (empty_neighbours);
 }
 
-bool Bitboard::is_seperating_bit(unsigned int idx) {
-	return ((idx + 1) % BOARDWIDTH == 0);
+bool Bitboard::isSeperatingBitIndex(unsigned int idx) {
+	return ((idx + 1) % REALBOARDWIDTH == 0);
+}
+
+bool Bitboard::none() const {
+	return (this->board.none());
 }
