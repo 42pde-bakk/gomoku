@@ -5,7 +5,7 @@
 #include "Gamestate.hpp"
 #include "Directions.hpp"
 
-unsigned int Gamestate::capture_check_dir(int idx, int dir, int p) {
+unsigned int Gamestate::capture_check_dir(int idx, int dir) {
 	const unsigned int player_stone = this->get_player() + 1;
 	const unsigned int opp_stone = !this->get_player() + 1;
 	const int	pos[3] = {idx + dir, idx + 2 * dir, idx + 3 * dir };
@@ -33,7 +33,7 @@ unsigned int Gamestate::perform_captures(int pos) {
 	assert(pos < REALBOARDSIZE);
 
 	for (int dir = 0; dir < 8; dir++) {
-		ret |= this->capture_check_dir(pos, dirs[dir], get_player());
+		ret |= this->capture_check_dir(pos, dirs[dir]);
 	}
 	return (ret);
 }

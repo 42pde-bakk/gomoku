@@ -62,7 +62,7 @@ protected:
 
 	// Captures.cpp
 	unsigned int perform_captures(int pos);
-	unsigned int capture_check_dir(int idx, int dir, int p);
+	unsigned int capture_check_dir(int idx, int dir);
 //	int collect_open_things(unsigned int start_idx, unsigned int player_id, std::unordered_map<int, unsigned int>& checked) const;
 };
 
