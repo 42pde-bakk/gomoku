@@ -16,6 +16,8 @@ TEST_CASE_METHOD(Gamestate, "open 2", "[HeuristicTests]") {
 	place_stone(start_idx + 20); // p1
 	REQUIRE(get_heuristic() == 0);
 	place_stone(start_idx + 1); // p0
+	std::cerr << *this << "\n";
+//	print_board(std::cerr, true);
 	REQUIRE(get_heuristic() == -10);
 	place_stone(start_idx + 22); // p1
 	REQUIRE(h == -10);

@@ -62,7 +62,9 @@ Gamestate *Client::receiveGamestate() const {
 		int y = arr[0],
 			x = arr[1],
 			colour = arr[2];
-		gs->boards[colour - 1][y * 20 + x] = true;
+		assert(colour < 2);
+		gs->set(y * 20 + x, colour - 1);
+//		gs->boards[colour - 1][y * 20 + x] = true;
 #if LOG
 		dprintf(2, "i=%d,\ty=%d, x=%d, colour=%d\n", i, y, x, colour);
 #endif

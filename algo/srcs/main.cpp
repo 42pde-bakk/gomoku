@@ -19,14 +19,14 @@ int main() {
 		while (true) {
 			std::cerr << "Lets receive a gamestate\n";
 			Gamestate* gs = client.receiveGamestate();
-			auto start_time = std::chrono::steady_clock::now();
 			std::cerr << "got the gamestate\n";
+			auto start_time = std::chrono::steady_clock::now();
 //			gs->print_board(std::cerr, true);
 			Gamestate *result = minimax(gs, 2, static_cast<bool>(gs->get_player()));
 			Move move = result->get_first_move();
 			std::cerr << "Move: " << move;
 			std::cerr << "Result gamestate: h=" << result->get_heuristic() << ".\n";
-//			result->print_board(std::cerr, true);
+			result->print_board(std::cout, true);
 			auto end_time = std::chrono::steady_clock::now();
 			auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 			std::cerr << _PURPLE "Calculating move took " << elapsed_time.count() << " ms\n" _END;

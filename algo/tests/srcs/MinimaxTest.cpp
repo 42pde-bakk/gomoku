@@ -13,6 +13,7 @@ const int middle_idx = 9 * 20 + 9;
 void	place_stones(Gamestate *gs) {
 	int indices[] = {middle_idx, middle_idx + 1, middle_idx + 2};
 	for (int index : indices) {
+		std::cerr << "index = " << index << std::endl;
 		gs->place_stone(index);
 	}
 }
@@ -21,8 +22,10 @@ TEST_CASE("Alphabeta pruning", "[MinimaxTests]") {
 	auto *gs = new Gamestate();
 	auto *gs2 = new Gamestate();
 
+	std::cerr << "here\n";
 	place_stones(gs);
 	place_stones(gs2);
+	std::cerr << "After place_stones() calls\n";
 
 	auto start_time = std::chrono::steady_clock::now();
 	Gamestate *minimax_res = minimax(gs, 4, gs->get_player());
@@ -36,7 +39,7 @@ TEST_CASE("Alphabeta pruning", "[MinimaxTests]") {
 	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 	std::cerr << _PURPLE "Alpha-Beta pruning took " << elapsed_time.count() << " ms\n" _END;
 
-	REQUIRE(minimax_res == ab_res);
+	REQUIRE(*minimax_res == *ab_res);
 
 	delete gs; delete gs2;
 }

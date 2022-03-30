@@ -30,6 +30,7 @@ public:
 	[[nodiscard]] unsigned int	at(size_t n) const; // just a getter
 	unsigned int	operator[](size_t n) const; // just a getter
 	void	set(unsigned int idx, unsigned int player);
+	void	clear_tile(unsigned int idx);
 
 	// relational operators
 	bool	operator==(const Bitboard& rhs) const;
@@ -44,7 +45,7 @@ public:
 	void	print_board(std::ostream& o, bool colours) const;
 	friend std::ostream&	operator<<(std::ostream& o, const Bitboard& b);
 
-	bool none() const;
+	[[nodiscard]] bool none() const;
 };
 
 

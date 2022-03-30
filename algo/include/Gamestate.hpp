@@ -11,19 +11,15 @@
 # include <Move.hpp>
 # include <unordered_map>
 # include <bitset>
+# include "Bitboard.hpp"
 
-# define BOARDHEIGHT 19
-# define BOARDWIDTH 20 // 1 for a seperating bit
-# define BOARDSIZE BOARDHEIGHT * BOARDWIDTH
 
-typedef std::bitset<BOARDSIZE> bitboard;
 
 class Client;
 
-class Gamestate {
+class Gamestate : public Bitboard {
 protected:
-	static std::unordered_map<std::bitset<BOARDSIZE * 2>, int> tt;
-	std::array<bitboard, 2>	boards;
+	static std::unordered_map<std::bitset<BOARDSIZE>, int> tt;
 	std::array<int, 2>	captures{};
 	std::vector<Move>	moves;
 	const Gamestate	*parent{};
@@ -41,14 +37,14 @@ public:
 	~Gamestate();
 
 	[[nodiscard]] bool	has_winner() const { return (this->winner != 0); }
-	[[nodiscard]] int		get_h_value_player(int player_id) const;
-	void	set_heuristic();
+	void	update_heuristic(unsigned int move_idx);
+//	void	set_heuristic();
 	[[nodiscard]] int		get_heuristic() const;
 
 	void generate_children();
 	std::vector<Gamestate*>& get_children() { return this->children; }
 
-	bool	operator==(const Gamestate& rhs) const { return (this->boards[0] == rhs.boards[0] && this->boards[1] == rhs.boards[1]); }
+	bool	operator==(const Gamestate& rhs) const { return (this->board == rhs.board); }
 	bool	operator!=(const Gamestate& rhs) const { return !(*this == rhs); }
 
 	bool	operator<(const Gamestate& rhs) const { return (this->h < rhs.h); }
@@ -56,7 +52,6 @@ public:
 	bool	operator<=(const Gamestate& rhs) const { return !(rhs < *this); }
 	bool	operator>=(const Gamestate& rhs) const { return !(*this < rhs); }
 
-	void	print_board(std::ostream& o, bool print_colours) const;
 	[[nodiscard]] int		get_player() const;
 
 	[[nodiscard]] const Move& get_first_move() const;
@@ -68,10 +63,9 @@ protected:
 	// Captures.cpp
 	unsigned int perform_captures(int pos);
 	unsigned int capture_check_dir(int idx, int dir, int p);
-	[[nodiscard]] bool		tile_is_empty(int idx) const;
-	int collect_open_things(int idx, int player_id, std::unordered_map<int, unsigned int>& checked) const;
+//	int collect_open_things(unsigned int start_idx, unsigned int player_id, std::unordered_map<int, unsigned int>& checked) const;
 };
 
-bool	is_seperating_bit(int idx);
+typedef bool (*compareFunc)(const Gamestate* a, const Gamestate* b);
 
 #endif //CLUSTER_GAMESTATE_HPP

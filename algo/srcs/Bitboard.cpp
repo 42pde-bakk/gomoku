@@ -54,6 +54,7 @@ static void	print_item(std::ostream& o, bool print_colours, unsigned int item) {
 }
 
 std::ostream &operator<<(std::ostream &o, const Bitboard &b) {
+	print_legend(o, false);
 	for (int i = 0; i < REALBOARDSIZE; i++) {
 		print_item(o, false, b.bitboard_get(i));
 		if (Bitboard::isSeperatingBitIndex(i))
@@ -61,6 +62,7 @@ std::ostream &operator<<(std::ostream &o, const Bitboard &b) {
 		else
 			o << ' ';
 	}
+	print_legend(o, false);
 	return (o);
 }
 
@@ -102,16 +104,17 @@ void Bitboard::set(unsigned int idx, unsigned int player) {
 	assert(idx <= BOARDSIZE / 2);
 	assert(player < 2);
 	const unsigned int real_idx = idx * 2;
-	if (player) {
-		this->board[real_idx] = true;
-		this->board[real_idx + 1] = false; // probably not needed in production since you can't place a stone on another stone
-		std::cerr << "Player2 set bitboard[" << real_idx << "] to true\n";
-	} else {
-		this->board[real_idx] = false;
-		this->board[real_idx + 1] = true;
-		std::cerr << "Player 1 set bitboard[" << real_idx+1 << "] to true\n";
-	}
+	this->board[real_idx] = player;
+	this->board[real_idx + 1] = !player;
 }
+
+
+void Bitboard::clear_tile(unsigned int idx) {
+	const unsigned int real_idx = idx * 2;
+	this->board[real_idx] = false;
+	this->board[real_idx + 1] = false;
+}
+
 
 bitboard	Bitboard::get_empty_neighbours() const {
 	bitboard	empty_cells = ~this->board;
