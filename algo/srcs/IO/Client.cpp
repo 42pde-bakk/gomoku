@@ -62,7 +62,7 @@ Gamestate *Client::receiveGamestate() const {
 		int y = arr[0],
 			x = arr[1],
 			colour = arr[2];
-		assert(colour < 2);
+		assert(colour == 1 || colour == 2);
 		gs->set(y * 20 + x, colour - 1);
 //		gs->boards[colour - 1][y * 20 + x] = true;
 #if LOG
@@ -74,18 +74,20 @@ Gamestate *Client::receiveGamestate() const {
 
 void Client::send_move(const Move &move) const {
 	char buff[BUFSIZ];
-	const int y = move.move_idx / BOARDWIDTH;
-	const int x = move.move_idx % BOARDWIDTH;
+	const int y = move.move_idx / (REALBOARDWIDTH - 1); // -1 to account for the seperating bit
+	const int x = move.move_idx % REALBOARDWIDTH;
 	const int player = move.player + 1;
+
+	dprintf(2, "move_idx = %d, y,x=[%d, %d], player=%d\n", move.move_idx, y, x, player);
 
 	bzero(buff, sizeof(buff));
 	memcpy(buff, (void *)&y, sizeof(int));
 	memcpy(buff + sizeof(int), (void *)&x, sizeof(int));
 	memcpy(buff + 2 * sizeof(int), (void *)&player, sizeof(int));
-//	for (int i = 0; i < 12; i++) {
-//		std::cerr << "\\x" << (int)(buff[i]) << ' ';
-//	}
-//	std::cerr << "\n";
+	for (int i = 0; i < 12; i++) {
+		std::cerr << "\\x" << (int)(buff[i]) << ' ';
+	}
+	std::cerr << "\n";
 	int sendRet = write(fd, buff, sizeof(int) * 3);
 	if (sendRet <= 0)
 		error("Error sending move");
