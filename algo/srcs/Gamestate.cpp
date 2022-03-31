@@ -63,18 +63,17 @@ void Gamestate::generate_children() {
 	Bitboard	empty_neighbours = this->get_empty_neighbours();
 	if (empty_neighbours.none())
 		throw std::runtime_error("Error. No more empty tiles");
-	for (int i = 0; i < BOARDSIZE / 2; i++) {
+	for (int i = 0; i < REALBOARDSIZE; i++) {
 		if (!empty_neighbours.bitboard_get(i) || Bitboard::isSeperatingBitIndex(i))
 			continue;
 		auto	*child = new Gamestate(*this);
 		child->place_stone(i);
 		this->children.emplace_back(child);
-		std::sort(children.begin(), children.end(), compareFuncs[this->get_player()]);
 	}
+	std::sort(children.begin(), children.end(), compareFuncs[this->get_player()]);
 }
 
 Gamestate::Gamestate() { }
-
 void Gamestate::place_stone(int move_idx) {
 	assert(move_idx >= 0 && move_idx < BOARDSIZE);
 	assert (this->tile_is_empty(move_idx));
