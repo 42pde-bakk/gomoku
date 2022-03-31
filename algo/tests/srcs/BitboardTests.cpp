@@ -49,4 +49,5 @@ TEST_CASE("Bitboard empty neighbours", "[BitboardTests]") {
 	Bitboard empty_neighbours(bb.get_empty_neighbours());
 	REQUIRE(empty_neighbours == bb2);
 	std::cerr << empty_neighbours;
+
 }
