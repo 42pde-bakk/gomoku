@@ -6,6 +6,18 @@
 
 #include "Gamestate.hpp"
 #include <limits>
+#include <chrono>
+
+std::chrono::time_point<std::chrono::steady_clock> start_time;
+std::chrono::time_point<std::chrono::steady_clock> current_time;
+long long int elapsed_time;
+
+long long int times_up() {
+	current_time = std::chrono::steady_clock::now();
+
+	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+	return (elapsed_time >= 450);
+}
 
 // Player 1 is the maximizing player
 // Player 0 is the minimizing player
@@ -75,4 +87,26 @@ Gamestate *alphabeta(Gamestate *state, int depth, int α, int β, bool maximizin
 		}
 	}
 	return (best_state);
+}
+
+Gamestate	*iterative_deepening(Gamestate *gs, int player) {
+	start_time = std::chrono::steady_clock::now();
+	int	intmax = std::numeric_limits<int>::max(),
+		intmin = std::numeric_limits<int>::min();
+	int depth = 1;
+	Gamestate *result = nullptr;
+
+
+	while (!times_up() && depth < 3) {
+		std::cerr << "Start loop, depth: " << depth << ", elapsed time: " << elapsed_time << '\n';
+		gs->clear_children();
+		result = alphabeta(gs, depth, intmin, intmax, bool(player));
+
+//		if (result->get_heuristic() >= winCutoff) {
+//			return (result);
+//		}
+		std::cerr << "End of loop, elapsed time: " << elapsed_time << '\n';
+		depth++;
+	}
+	return (result);
 }
