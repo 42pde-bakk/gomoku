@@ -10,7 +10,7 @@
 
 const int middle_idx = 9 * 20 + 9;
 
-TEST_CASE("Gamestate:: generate children", "[MinimaxTests]") {
+TEST_CASE("Gamestate:: generate children", "[GamestateTests]") {
 	auto *gs = new Gamestate();
 
 	gs->place_stone(0);
@@ -23,7 +23,7 @@ TEST_CASE("Gamestate:: generate children", "[MinimaxTests]") {
 	delete gs;
 }
 
-TEST_CASE("Gamestate:: test move generation", "[MinimaxTests]") {
+TEST_CASE("Gamestate:: test move generation", "[GamestateTests]") {
 	auto *gs = new Gamestate();
 
 	gs->place_stone(2);
@@ -36,7 +36,7 @@ TEST_CASE("Gamestate:: test move generation", "[MinimaxTests]") {
 	delete gs;
 }
 
-TEST_CASE_METHOD(Gamestate, "Gamestate:: test empty neighbours generation", "[MinimaxTests]") {
+TEST_CASE_METHOD(Gamestate, "Gamestate:: test empty neighbours generation", "[GamestateTests]") {
 	this->place_stone(2);
 	Bitboard empty_neighbours(this->get_empty_neighbours());
 
@@ -45,4 +45,11 @@ TEST_CASE_METHOD(Gamestate, "Gamestate:: test empty neighbours generation", "[Mi
 	Bitboard empty_neighbours2(this->get_empty_neighbours());
 
 	REQUIRE(empty_neighbours2.count() == 6);
+}
+
+TEST_CASE("Gamestate::get_opponent_stone()", "[GamestateTests]") {
+	REQUIRE(Gamestate::get_opponent_stone(1) == 2);
+	REQUIRE(Gamestate::get_opponent_stone(2) == 1);
+	REQUIRE(Gamestate::get_opponent_stone(0) == 3);
+	REQUIRE(Gamestate::get_opponent_stone(3) == 0);
 }
