@@ -21,9 +21,9 @@ std::array<int, 8>	all_dirs() {
 std::array<int, 4> setup_dirs() {
 	static const std::array<int, 4> southside = {
 			1, // E
-			19, // SW
+			21, // SE
 			20, // S
-			21  // SW
+			19  // SW
 	};
 	return (southside);
 }

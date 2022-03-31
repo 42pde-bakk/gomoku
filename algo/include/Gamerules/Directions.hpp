@@ -18,7 +18,7 @@
 #define SHIFT_SW(arg) (arg >> (BOARDWIDTH - 2))
 
 //std::array<int, 8>	all_dirs();
-//std::array<int, 4>	setup_dirs();
+std::array<int, 4>	setup_dirs();
 //std::array<int, 4>	setup_dirs_opposite();
 std::array<int, 8>	setup_all_dirs();
 std::array<int, 8>	setup_all_dirs_singular();
