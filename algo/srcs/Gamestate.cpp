@@ -85,73 +85,105 @@ void Gamestate::place_stone(int move_idx) {
 		// a double-three by capturing a pair.
 	}
 	// TODO: update heuristic value
-	this->update_heuristic(move_idx);
+	this->set_heuristic();
 	this->turn++;
 	this->change_player();
 }
 
-//int Gamestate::collect_open_things(unsigned int start_idx, unsigned int player_id, std::unordered_map<int, unsigned int>& checked) const {
-//	static const std::array<int, 4> dirs = setup_dirs();
-//	(void)player_id;
-//	unsigned int player_value = player_id + 1;
-////	unsigned int opponent_value = !player_id + 1;
-//	static const int values[] = {0, 0, 10, 100, 1000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000};
-//	int _h = 0;
-//
-//	for (unsigned int d = 0; d < 4; d++) {
-//		if (checked[start_idx] & (1u << (d + 1)))
-//			continue;
-//		int len = 1;
-//		unsigned int i = start_idx + dirs[d];
-//		unsigned int res = this->bitboard_get(i);
-//		while (i < BOARDSIZE && !isSeperatingBitIndex(i) && res == player_value) { // && boards[player_id][i]) {
-//			++len;
-//			checked[i] |= 1UL << (d + 1); // Save that I already checked this tile in this direction
-//			i += dirs[d];
-//		}
-//		if (len > 1) {
-//			int open_sides = 0;
-//
-//			// Add extra value if the tiles surrounding this streak are empty
-//			if (i < BOARDSIZE && !isSeperatingBitIndex(i) && tile_is_empty(i)) {
-//				open_sides += 1; // opportunity value
-//			}
-//			int prev = start_idx - dirs[d];
-//			if (prev >= 0 && !isSeperatingBitIndex(prev) && tile_is_empty(prev)) {
-//				open_sides += 1; // opportunity value
-//			}
-//			_h += open_sides * values[len] / 2;
-//		}
-//	}
-//	return (_h);
-//}
-
-void Gamestate::update_heuristic(unsigned int move_idx) {
+unsigned int Gamestate::h_for_tile(unsigned int start_idx, unsigned int stone_p, unsigned int stone_opp, std::unordered_map<int, unsigned int> &checked_tiles) const {
+	static const std::array<int, 4> dirs = setup_dirs();
 	static const int values[] = {0, 0, 10, 100, 1000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000};
-	static const std::array<int, 8>	all_dirs = setup_all_dirs();
-
-	const unsigned int player_id = this->get_player();
-	const unsigned int player_stone = player_id + 1;
-	const unsigned int opp_stone = !player_id + 1;
-	std::array<unsigned int, 8>		lines{};
-	int h_diff = 0;
-
-	(void)opp_stone;
-
-	for (int i = 0; i < 8; i++) {
-		int dir = all_dirs[i];
-		unsigned int neighbour_idx = move_idx + dir;
-		while (neighbour_idx < BOARDSIZE && this->bitboard_get(neighbour_idx) == player_stone) {
-			lines[i] += 1;
-			neighbour_idx += dir;
+	unsigned int heur = 0;
+	if (g_log)
+		dprintf(2, "start_idx: %u, stones: p=%u, opp=%u\n", start_idx, stone_p, stone_opp);
+	for (unsigned int d = 0; d < dirs.size(); d++) {
+		if (g_log)
+			dprintf(2, "dirs[%u] = %d\n", d, dirs[d]);
+		if (checked_tiles[start_idx] & (1u << d)) {
+			if (g_log)
+				dprintf(2, "already checked %u in direction %d\n", start_idx, dirs[d]);
+			continue ;
 		}
-		h_diff -= values[lines[i]];
+
+		unsigned int length = 1;
+		unsigned int i = start_idx + dirs[d];
+//		unsigned int stone_value = this->bitboard_get(i);
+		while (i < REALBOARDSIZE && !isSeperatingBitIndex(i) && this->bitboard_get(i) == stone_p) {
+			length++;
+			checked_tiles[i] |= 1u << d;
+			if (g_log)
+				dprintf(2, "checked_tiles[%u] now is %d, Unioned this into it: (%u)\n", i, checked_tiles[i], 1u << (d + 1));
+			i += dirs[d];
+		}
+		if (g_log)
+			dprintf(2, "start_idx=%u, dir=%d, length=%u\n", start_idx, dirs[d], length);
+		if (length > 1) {
+			unsigned int open_sides = 0;
+			unsigned int prev = start_idx - dirs[d];
+			if (prev < REALBOARDSIZE && !isSeperatingBitIndex(prev) && tile_is_empty(prev)) {
+				if (g_log)
+					dprintf(2, "prev (%u) is empty! So extra value!\n", prev);
+				open_sides += 1u;
+			}
+			if (i < REALBOARDSIZE && !isSeperatingBitIndex(i) && tile_is_empty(i)) {
+				if (g_log)
+					dprintf(2, "next (%u) is empty! So extra value!\n", i);
+				open_sides += 1u;
+			}
+			unsigned int extra_heur = open_sides / 2 * values[length];
+			if (g_log)
+				dprintf(2, "adding extra heuristic value of %u\n", extra_heur);
+			heur += extra_heur;
+		}
 	}
-	for (int i = 0; i < 4; i++) {
-		h_diff += (values[lines[i] + lines[i + 4]]);
-	}
-	this->h += (-1 * !player_id) * h_diff;
+	return (heur);
 }
+
+void	Gamestate::set_heuristic() {
+	std::unordered_map<int, unsigned int> checked_tiles;
+	this->h = 0;
+
+	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
+		unsigned int stone = this->bitboard_get(i);
+		if (!stone)
+			continue;
+		assert(stone == 1 || stone == 2);
+		unsigned int opponent_stone = Gamestate::get_opponent_stone(stone);
+		if (stone == 1)
+			this->h -= (int)h_for_tile(i, stone, opponent_stone, checked_tiles);
+		else
+			this->h += (int)h_for_tile(i, stone, opponent_stone, checked_tiles);
+	}
+	if (g_log)
+		dprintf(2, "final heuristic value is %d\n", this->h);
+}
+
+//void Gamestate::update_heuristic(unsigned int move_idx) {
+//	static const int values[] = {0, 0, 10, 100, 1000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000};
+//	static const std::array<int, 8>	all_dirs = setup_all_dirs();
+//
+//	const unsigned int player_id = this->get_player();
+//	const unsigned int player_stone = player_id + 1;
+//	const unsigned int opp_stone = !player_id + 1;
+//	std::array<unsigned int, 8>		lines{};
+//	int h_diff = 0;
+//
+//	(void)opp_stone;
+//
+//	for (int i = 0; i < 8; i++) {
+//		int dir = all_dirs[i];
+//		unsigned int neighbour_idx = move_idx + dir;
+//		while (neighbour_idx < BOARDSIZE && this->bitboard_get(neighbour_idx) == player_stone) {
+//			lines[i] += 1;
+//			neighbour_idx += dir;
+//		}
+//		h_diff -= values[lines[i]];
+//	}
+//	for (int i = 0; i < 4; i++) {
+//		h_diff += (values[lines[i] + lines[i + 4]]);
+//	}
+//	this->h += (-1 * !player_id) * h_diff;
+//}
 
 
 int Gamestate::change_player() {
@@ -165,4 +197,8 @@ const Move &Gamestate::get_first_move() const {
 
 int Gamestate::get_heuristic() const {
 	return (this->h);
+}
+
+unsigned int Gamestate::get_opponent_stone(unsigned int stone) {
+	return (stone ^ 3u);
 }

@@ -37,9 +37,10 @@ public:
 	~Gamestate();
 
 	[[nodiscard]] bool	has_winner() const { return (this->winner != 0); }
-	void	update_heuristic(unsigned int move_idx);
-//	void	set_heuristic();
+//	void	update_heuristic(unsigned int move_idx);
+	void	set_heuristic();
 	[[nodiscard]] int		get_heuristic() const;
+	static unsigned int get_opponent_stone(unsigned int stone);
 
 	void generate_children();
 	std::vector<Gamestate*>& get_children() { return this->children; }
@@ -63,7 +64,8 @@ protected:
 	// Captures.cpp
 	unsigned int perform_captures(int pos);
 	unsigned int capture_check_dir(int idx, int dir);
-//	int collect_open_things(unsigned int start_idx, unsigned int player_id, std::unordered_map<int, unsigned int>& checked) const;
+
+	unsigned int	h_for_tile(unsigned int start_idx, unsigned int stone_p, unsigned int stone_opp, std::unordered_map<int, unsigned int>& checked_tiles) const;
 };
 
 typedef bool (*compareFunc)(const Gamestate* a, const Gamestate* b);
