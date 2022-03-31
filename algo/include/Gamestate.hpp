@@ -58,6 +58,7 @@ public:
 	[[nodiscard]] const Move& get_first_move() const;
 
 	void	place_stone(int move_idx);
+	void	clear_children();
 protected:
 	int		change_player();
 

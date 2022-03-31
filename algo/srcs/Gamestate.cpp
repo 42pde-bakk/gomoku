@@ -11,6 +11,7 @@
 
 bool g_log = false;
 std::unordered_map<std::bitset<BOARDSIZE>, int> Gamestate::tt;
+std::hash<bitboard> hash_fn;
 
 Gamestate &Gamestate::operator=(const Gamestate& x) {
 	for (auto child : this->children)
@@ -140,6 +141,11 @@ unsigned int Gamestate::h_for_tile(unsigned int start_idx, unsigned int stone_p,
 }
 
 void	Gamestate::set_heuristic() {
+	auto hash = hash_fn(this->board);
+	if (tt.find(hash) != tt.end()) {
+		this->h = tt[hash];
+		return ;
+	}
 	std::unordered_map<int, unsigned int> checked_tiles;
 	this->h = 0;
 
@@ -156,6 +162,7 @@ void	Gamestate::set_heuristic() {
 	}
 	if (g_log)
 		dprintf(2, "final heuristic value is %d\n", this->h);
+	tt[hash] = this->h;
 }
 
 //void Gamestate::update_heuristic(unsigned int move_idx) {
@@ -201,4 +208,11 @@ int Gamestate::get_heuristic() const {
 
 unsigned int Gamestate::get_opponent_stone(unsigned int stone) {
 	return (stone ^ 3u);
+}
+
+void Gamestate::clear_children() {
+	for (auto child : this->children) {
+		delete child;
+	}
+	this->children.clear();
 }
