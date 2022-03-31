@@ -46,6 +46,8 @@ public:
 	friend std::ostream&	operator<<(std::ostream& o, const Bitboard& b);
 
 	[[nodiscard]] bool none() const;
+	[[nodiscard]] const bitboard& get() const;
+	[[nodiscard]] unsigned int count() const;
 };
 
 
