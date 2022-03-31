@@ -72,9 +72,11 @@ Gamestate *Client::receiveGamestate() const {
 	return (gs);
 }
 
+
 void Client::send_move(const Move &move) const {
 	char buff[BUFSIZ];
-	const int y = move.move_idx / (REALBOARDWIDTH - 1); // -1 to account for the seperating bit
+	// We have to translate the move to Pythons X,Y system (no seperating bit)
+	const int y = move.move_idx / REALBOARDWIDTH; // -1 to account for the seperating bit
 	const int x = move.move_idx % REALBOARDWIDTH;
 	const int player = move.player + 1;
 
