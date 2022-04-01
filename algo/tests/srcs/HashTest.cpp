@@ -18,7 +18,7 @@ void	place_random_stone(Gamestate *gs) {
 	while (true) {
 		unsigned int random = dist6(rng);
 		if (gs->tile_is_empty(random) && !Bitboard::isSeperatingBitIndex(random)) {
-			std::cerr << "placed stone on idx " << random << '\n';
+//			std::cerr << "placed stone on idx " << random << '\n';
 			gs->place_stone(random);
 			break;
 		}
@@ -33,7 +33,7 @@ TEST_CASE("Bitset hash", "[HashingTests]") {
 	for (int i = 0; i < 720; i++) {
 		place_random_stone(gs);
 		auto hash = hash_fn(gs->get());
-		std::cerr << "hash = " << hash << std::endl;
+//		std::cerr << "hash = " << hash << std::endl;
 	}
 	auto end_time = std::chrono::steady_clock::now();
 	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
