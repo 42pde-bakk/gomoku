@@ -20,6 +20,8 @@ TEST_CASE("Gamestate:: generate children", "[GamestateTests]") {
 
 	assert(gs->get_children().size() == 11);
 
+	std::cerr << "heyooo\n";
+
 	delete gs;
 }
 

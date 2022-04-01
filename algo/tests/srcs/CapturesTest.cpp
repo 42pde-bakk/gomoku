@@ -15,7 +15,7 @@ TEST_CASE_METHOD(Gamestate, "Capture-W", "[CaptureTests]") { // p1 captures p0
 	place_stone(start_idx); // p0
 	place_stone(start_idx - direction); // p1
 	place_stone(start_idx + direction); // p0
-	g_log = true;
+	// g_log = true;
 	place_stone(start_idx + 2 * direction); // p1
 	std::cerr << *this << std::endl;
 
@@ -146,7 +146,7 @@ TEST_CASE_METHOD(Gamestate, "Capture-19-false", "[CaptureTests]") { // p1 captur
 	place_stone(start_idx); // p0
 	place_stone(start_idx - direction); // p1
 	place_stone(start_idx + direction); // p0
-	g_log = true;
+	// g_log = true;
 	place_stone(start_idx + 3 * direction); // p1
 
 	std::cerr << *this << '\n';

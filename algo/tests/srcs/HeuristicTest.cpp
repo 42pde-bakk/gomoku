@@ -15,11 +15,7 @@ TEST_CASE_METHOD(Gamestate, "open 2", "[HeuristicTests]") {
 	REQUIRE(get_heuristic() == 0);
 	place_stone(start_idx + 20); // p1
 	REQUIRE(get_heuristic() == 0);
-	g_log = true;
 	place_stone(start_idx + 1); // p0
-	g_log = false;
-	std::cerr << *this << "\n";
-//	print_board(std::cerr, true);
 	REQUIRE(get_heuristic() == -10);
 	place_stone(start_idx + 22); // p1
 	REQUIRE(h == -10);
@@ -35,8 +31,9 @@ TEST_CASE_METHOD(Gamestate, "half open 2", "[HeuristicTests]") {
 	REQUIRE(get_heuristic() == 0);
 	place_stone(start_idx + 1); // p0
 	REQUIRE(get_heuristic() == -10);
-	dprintf(2, "\n\n\n\n\n\n\nyalalalallala\n");
+//	g_log = true;
 	place_stone(start_idx - 1); // p1
+//	g_log = false;
 	print_board(std::cerr, false);
-	REQUIRE(h == -5);
+	REQUIRE(h == 5);
 }
