@@ -53,7 +53,7 @@ jobs:
       run: make
 
     - name: Configure CMake
-      run: cmake -B tests
+      run: cd tests; cmake -B .; cd -
 
     - name: Build Tests
       run: cmake --build tests
