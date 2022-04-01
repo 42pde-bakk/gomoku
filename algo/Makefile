@@ -21,7 +21,7 @@ RED = \x1b[31;01m
 WHITE = \x1b[31;37m
 RESET = \x1b[0m
 
-CFLAGS = -Wall -Werror -Wextra --std=c++17 -fextended-identifiers
+CFLAGS = -Wall -Werror -Wextra --std=c++17
 
 ifdef DEBUG
  CFLAGS += -g3

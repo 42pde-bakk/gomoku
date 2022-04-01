@@ -52,7 +52,7 @@ Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 	return (best_state);
 }
 
-Gamestate *alphabeta(Gamestate *state, int depth, int α, int β, bool maximizing_player) {
+Gamestate *alphabeta(Gamestate *state, int depth, int alpha, int beta, bool maximizing_player) {
 	if (depth == 0 || state->has_winner()) // Terminal gamestate
 		return (state);
 
@@ -64,26 +64,26 @@ Gamestate *alphabeta(Gamestate *state, int depth, int α, int β, bool maximizin
 	if (maximizing_player) {
 		best_state_value = std::numeric_limits<int>::min();
 		for (auto& child : state->get_children()) {
-			new_state = alphabeta(child, depth - 1, α, β, false);
+			new_state = alphabeta(child, depth - 1, alpha, beta, false);
 			if (new_state->get_heuristic() > best_state_value) {
 				best_state = new_state;
 				best_state_value = new_state->get_heuristic();
 			}
-			if (best_state_value >= β)
+			if (best_state_value >= beta)
 				break ; // β cutoff
-			α = std::max(α, new_state->get_heuristic());
+			alpha = std::max(alpha, new_state->get_heuristic());
 		}
 	} else {
 		best_state_value = std::numeric_limits<int>::max();
 		for (auto& child : state->get_children()) {
-			new_state = alphabeta(child, depth - 1, α, β,true);
+			new_state = alphabeta(child, depth - 1, alpha, beta, true);
 			if (new_state->get_heuristic() < best_state_value) {
 				best_state = new_state;
 				best_state_value = new_state->get_heuristic();
 			}
-			if (best_state_value <= α)
+			if (best_state_value <= alpha)
 				break ; // α cutoff
-			β = std::min(β, new_state->get_heuristic());
+			beta = std::min(beta, new_state->get_heuristic());
 		}
 	}
 	return (best_state);

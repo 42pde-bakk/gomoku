@@ -10,7 +10,7 @@
 #include <chrono>
 
 Gamestate	*minimax(Gamestate *state, int depth, bool maximizing_player);
-Gamestate	*alphabeta(Gamestate *state, int depth, int α, int β, bool maximizing_player);
+Gamestate	*alphabeta(Gamestate *state, int depth, int alpha, int beta, bool maximizing_player);
 Gamestate	*iterative_deepening(Gamestate *gs, int player);
 
 
