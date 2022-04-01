@@ -149,12 +149,12 @@ class Game(tk.Frame):
 	def play_vs_ai(self):
 		time_start = time.time()
 		self.bot_socket.send_gamestate(self.gamestate)
-		state = self.bot_socket.receive_move()
+		move = self.bot_socket.receive_move()
 		# value, state = self.minimax.alphabeta(state = self.gamestate, depth = 2, α = -np.inf, β = np.inf,
 		# 									  maximizing_player = False)
-		col, row = state.moves[0].x, state.moves[0].y
-		print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}, heur={state.h}')
-		print(f'moves: {state.moves}')
+		row, col = move.y, move.x
+		print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}')
+		# print(f'moves: {state.moves}')
 		if self.gamestate.board.get(y = row, x = col) == 0:
 			# Handle rules here -> not Game.rules.is_legal_move
 			self.gamestate.place_stone(y = row, x = col, stone = self.player)
