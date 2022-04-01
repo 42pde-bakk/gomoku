@@ -23,16 +23,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Build gomokubot
       run: make
-      
+
+    - name: Configure CMake
+      run: cmake --configure tests
+
     - name: Build Tests
       run: cmake --build tests
-    
+
     - name: Run tests
       run: ./tests/Catch_tests_run
-    
+
   macos:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
@@ -45,12 +48,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Build gomokubot
       run: make
-      
+
+    - name: Configure CMake
+      run: cmake --configure tests
+
     - name: Build Tests
       run: cmake --build tests
-    
+
     - name: Run tests
       run: ./tests/Catch_tests_run
