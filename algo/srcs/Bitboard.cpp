@@ -6,6 +6,7 @@
 #include "Bitboard.hpp"
 #include "Colours.hpp"
 #include "Directions.hpp"
+#include <cassert>
 
 Bitboard::Bitboard() : board() {
 }

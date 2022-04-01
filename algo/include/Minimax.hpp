@@ -7,6 +7,7 @@
 
 #include "Gomoku.hpp"
 #include <Gamestate.hpp>
+#include <chrono>
 
 Gamestate	*minimax(Gamestate *state, int depth, bool maximizing_player);
 Gamestate	*alphabeta(Gamestate *state, int depth, int α, int β, bool maximizing_player);

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <cstring>
+#include <cassert>
 
 static void	error(const char* str) {
 	std::cerr << _RED _BOLD << str << "\n" _END;

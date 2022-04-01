@@ -7,6 +7,7 @@
 #include "Directions.hpp"
 #include <unordered_map>
 #include <cassert>
+#include <algorithm>
 #include "Utils.hpp"
 
 bool g_log = false;
@@ -131,7 +132,7 @@ unsigned int Gamestate::h_for_tile(unsigned int start_idx, unsigned int stone_p,
 					dprintf(2, "next (%u) is empty! So extra value!\n", i);
 				open_sides += 1u;
 			}
-			unsigned int extra_heur = open_sides / 2 * values[length];
+			unsigned int extra_heur = open_sides * values[length] / 2;
 			if (g_log)
 				dprintf(2, "adding extra heuristic value of %u\n", extra_heur);
 			heur += extra_heur;

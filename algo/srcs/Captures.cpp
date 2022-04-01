@@ -4,6 +4,7 @@
 
 #include "Gamestate.hpp"
 #include "Directions.hpp"
+#include <cassert>
 
 unsigned int Gamestate::capture_check_dir(int idx, int dir) {
 	const unsigned int player_stone = this->get_player() + 1;
