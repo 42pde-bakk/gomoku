@@ -2,8 +2,8 @@
 // Created by Peer De bakker on 3/22/22.
 //
 
-#ifndef CLUSTER_GAMESTATE_HPP
-#define CLUSTER_GAMESTATE_HPP
+#ifndef GOMOKUBOT_GAMESTATE_HPP
+#define GOMOKUBOT_GAMESTATE_HPP
 
 # include "Gomoku.hpp"
 # include <array>
@@ -71,4 +71,4 @@ protected:
 
 typedef bool (*compareFunc)(const Gamestate* a, const Gamestate* b);
 
-#endif //CLUSTER_GAMESTATE_HPP
+#endif //GOMOKUBOT_GAMESTATE_HPP

@@ -2,8 +2,8 @@
 // Created by Peer De bakker on 3/22/22.
 //
 
-#ifndef CLUSTER_COLOURS_HPP
-#define CLUSTER_COLOURS_HPP
+#ifndef GOMOKUBOT_COLOURS_HPP
+#define GOMOKUBOT_COLOURS_HPP
 
 /*
 ** This is a minimal set of ANSI/VT100 color codes
@@ -37,4 +37,4 @@
 # define _ICYAN			"\x1b[46m"
 # define _IWHITE		"\x1b[47m"
 
-#endif //CLUSTER_COLOURS_HPP
+#endif //GOMOKUBOT_COLOURS_HPP

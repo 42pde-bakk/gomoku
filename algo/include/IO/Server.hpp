@@ -2,8 +2,8 @@
 // Created by Peer De bakker on 3/22/22.
 //
 
-#ifndef CLUSTER_SERVER_HPP
-#define CLUSTER_SERVER_HPP
+#ifndef GOMOKUBOT_SERVER_HPP
+#define GOMOKUBOT_SERVER_HPP
 
 #include "Gomoku.hpp"
 #include <arpa/inet.h>
@@ -29,4 +29,4 @@ private:
 };
 
 
-#endif //CLUSTER_SERVER_HPP
+#endif //GOMOKUBOT_SERVER_HPP

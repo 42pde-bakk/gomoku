@@ -8,11 +8,11 @@ file(GLOB srcs "srcs/*.cpp")
 file(GLOB IO "srcs/IO/*.cpp" "include/IO/*hpp")
 file(GLOB Gamerules "srcs/Gamerules/*.cpp" "include/Gamerules/*.hpp")
 
-add_executable(Cluster ${includes} ${srcs} ${IO} ${Gamerules})
+add_executable(Gomokubot ${includes} ${srcs} ${IO} ${Gamerules})
 
-target_include_directories(Cluster PRIVATE include)
-target_include_directories(Cluster PRIVATE include/Gamerules)
-target_include_directories(Cluster PRIVATE include/IO)
+target_include_directories(Gomokubot PRIVATE include)
+target_include_directories(Gomokubot PRIVATE include/Gamerules)
+target_include_directories(Gomokubot PRIVATE include/IO)
 
 add_subdirectory(tests)
 

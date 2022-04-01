@@ -2,8 +2,8 @@
 // Created by Peer De bakker on 3/22/22.
 //
 
-#ifndef CLUSTER_CLIENT_HPP
-#define CLUSTER_CLIENT_HPP
+#ifndef GOMOKUBOT_CLIENT_HPP
+#define GOMOKUBOT_CLIENT_HPP
 
 #include "Gomoku.hpp"
 #include "Server.hpp"
@@ -24,4 +24,4 @@ public:
 };
 
 
-#endif //CLUSTER_CLIENT_HPP
+#endif //GOMOKUBOT_CLIENT_HPP

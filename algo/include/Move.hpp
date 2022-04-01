@@ -2,8 +2,8 @@
 // Created by Peer De bakker on 3/22/22.
 //
 
-#ifndef CLUSTER_MOVE_HPP
-#define CLUSTER_MOVE_HPP
+#ifndef GOMOKUBOT_MOVE_HPP
+#define GOMOKUBOT_MOVE_HPP
 
 #include "Gomoku.hpp"
 #include <iostream>
@@ -19,4 +19,4 @@ public:
 };
 
 
-#endif //CLUSTER_MOVE_HPP
+#endif //GOMOKUBOT_MOVE_HPP
