@@ -28,7 +28,7 @@ jobs:
       run: make
 
     - name: Configure CMake
-      run: cmake -B tests
+      run: cd tests; cmake -B .;cd -
 
     - name: Build Tests
       run: cmake --build tests
@@ -56,7 +56,7 @@ jobs:
       run: cd tests; cmake -B .;cd -
 
     - name: Build Tests
-      run: cd tests; cmake --build .; cd -;
+      run: cmake --build .
 
     - name: Run tests
       run: ./tests/Catch_tests_run
