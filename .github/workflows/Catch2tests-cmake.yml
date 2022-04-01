@@ -56,7 +56,7 @@ jobs:
       run: cd tests; cmake -B .;cd -
 
     - name: Build Tests
-      run: cmake --build .
+      run: cmake --build tests
 
     - name: Run tests
       run: ./tests/Catch_tests_run
