@@ -53,10 +53,10 @@ jobs:
       run: make
 
     - name: Configure CMake
-      run: cd tests; cmake -B .; cd -
+      run: cd tests; cmake -B .;cd -
 
     - name: Build Tests
-      run: cmake --build tests
+      run: cmake --build tests; pwd && ls tests
 
     - name: Run tests
       run: ./tests/Catch_tests_run
