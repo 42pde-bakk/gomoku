@@ -93,7 +93,6 @@ gomokubot
 .vscode/
 .idea/
 build/
-log
 
 # File to save our portnb (for the python prog to read)
 portnb.txt
