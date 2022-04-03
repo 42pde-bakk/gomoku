@@ -55,6 +55,9 @@ void Gamestate::generate_children() {
 	static compareFunc compareFuncs[] = {
 		compareGamestates, compareGamestatesReverse
 	};
+	if (!this->children.empty() || this->has_winner()) {
+		return ;
+	}
 	if (this->board.none()) {
 		int idx = 20 * 9 + 9;
 		auto	*middle = new Gamestate(*this);
@@ -62,9 +65,10 @@ void Gamestate::generate_children() {
 		this->children.emplace_back(middle);
 		return ;
 	}
-	Bitboard	empty_neighbours = this->get_empty_neighbours();
-	if (empty_neighbours.none())
+	Bitboard	empty_neighbours(this->get_empty_neighbours());
+	if (empty_neighbours.none()) {
 		throw std::runtime_error("Error. No more empty tiles");
+	}
 	for (int i = 0; i < REALBOARDSIZE; i++) {
 		if (!empty_neighbours.bitboard_get(i) || Bitboard::isSeperatingBitIndex(i))
 			continue;
@@ -104,7 +108,7 @@ void Gamestate::place_stone(int move_idx) {
 	}
 	// TODO: update heuristic value
 	this->set_heuristic();
-	this->write_to_file();
+//	this->write_to_file();
 	this->turn++;
 	this->change_player();
 }
@@ -149,7 +153,10 @@ unsigned int Gamestate::h_for_tile(unsigned int start_idx, unsigned int stone_p,
 					dprintf(2, "next (%u) is empty! So extra value!\n", i);
 				open_sides += 1u;
 			}
-			unsigned int extra_heur = open_sides * values[length] / 2;
+			unsigned int extra_heur;
+			if (length >= 5 && open_sides != 0)
+				open_sides += 1;
+			extra_heur = open_sides * values[length] / 2;
 			if (g_log)
 				dprintf(2, "adding extra heuristic value of %u\n", extra_heur);
 			heur += extra_heur;
