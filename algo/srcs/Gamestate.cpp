@@ -108,6 +108,7 @@ void Gamestate::place_stone(int move_idx) {
 	}
 	// TODO: update heuristic value
 	this->set_heuristic();
+	this->h += 10 * (this->captures[1] - this->captures[0]); // adding a little extra value for captures in case of a tie between gamestates
 //	this->write_to_file();
 	this->turn++;
 	this->change_player();
@@ -127,7 +128,6 @@ unsigned int Gamestate::h_for_tile(unsigned int start_idx, unsigned int stone_p,
 				dprintf(2, "already checked %u in direction %d\n", start_idx, dirs[d]);
 			continue ;
 		}
-
 		unsigned int length = 1;
 		unsigned int i = start_idx + dirs[d];
 //		unsigned int stone_value = this->bitboard_get(i);
@@ -140,6 +140,7 @@ unsigned int Gamestate::h_for_tile(unsigned int start_idx, unsigned int stone_p,
 		}
 		if (g_log)
 			dprintf(2, "start_idx=%u, dir=%d, length=%u\n", start_idx, dirs[d], length);
+
 		if (length > 1) {
 			unsigned int open_sides = 0;
 			unsigned int prev = start_idx - dirs[d];
@@ -163,6 +164,44 @@ unsigned int Gamestate::h_for_tile(unsigned int start_idx, unsigned int stone_p,
 		}
 	}
 	return (heur);
+}
+
+bool Gamestate::canGetCaptured(unsigned int start_idx, int dir) const {
+	const unsigned int stone_p = this->bitboard_get(start_idx);
+	const int dir_opp = -dir;
+	unsigned int length = 1;
+	unsigned int idx = start_idx + dir;
+	while (idx < REALBOARDSIZE && !isSeperatingBitIndex(idx) && this->bitboard_get(idx) == stone_p) {
+		++length;
+		idx += dir;
+	}
+	unsigned int back_idx = start_idx + dir_opp;
+	while (back_idx < REALBOARDSIZE && !isSeperatingBitIndex(back_idx) && this->bitboard_get(back_idx) == stone_p) {
+		++length;
+		back_idx += dir_opp;
+	}
+	if (length != 2 || idx >= REALBOARDSIZE || isSeperatingBitIndex(idx) || back_idx >= REALBOARDSIZE || isSeperatingBitIndex(back_idx))
+		return (false);
+	return (tile_is_empty(idx) ^ tile_is_empty(back_idx));
+//	return ((int)tile_is_empty(idx) + (int)tile_is_empty(back_idx) == 1);
+}
+
+bool Gamestate::isUnbreakable(unsigned int start_idx, unsigned int end_idx, unsigned int dir) {
+	static const std::array<int, 4> dirs = setup_dirs();
+	unsigned int unbroken_length = 0;
+
+	for (; start_idx <= end_idx; start_idx += dir) {
+		for (int d = 0; d < 4; d++) {
+			if (d == dir)
+				continue ;
+			if (canGetCaptured(start_idx, dirs[d]))
+				unbroken_length = -1;
+		}
+		++unbroken_length;
+		if (unbroken_length == 5)
+			break ;
+	}
+	return (unbroken_length == 5);
 }
 
 void	Gamestate::set_heuristic() {
@@ -189,34 +228,6 @@ void	Gamestate::set_heuristic() {
 		dprintf(2, "final heuristic value is %d\n", this->h);
 	tt[hash] = this->h;
 }
-
-//void Gamestate::update_heuristic(unsigned int move_idx) {
-//	static const int values[] = {0, 0, 10, 100, 1000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000};
-//	static const std::array<int, 8>	all_dirs = setup_all_dirs();
-//
-//	const unsigned int player_id = this->get_player();
-//	const unsigned int player_stone = player_id + 1;
-//	const unsigned int opp_stone = !player_id + 1;
-//	std::array<unsigned int, 8>		lines{};
-//	int h_diff = 0;
-//
-//	(void)opp_stone;
-//
-//	for (int i = 0; i < 8; i++) {
-//		int dir = all_dirs[i];
-//		unsigned int neighbour_idx = move_idx + dir;
-//		while (neighbour_idx < BOARDSIZE && this->bitboard_get(neighbour_idx) == player_stone) {
-//			lines[i] += 1;
-//			neighbour_idx += dir;
-//		}
-//		h_diff -= values[lines[i]];
-//	}
-//	for (int i = 0; i < 4; i++) {
-//		h_diff += (values[lines[i] + lines[i + 4]]);
-//	}
-//	this->h += (-1 * !player_id) * h_diff;
-//}
-
 
 int Gamestate::change_player() {
 	this->player = !this->player;

@@ -82,6 +82,8 @@ void	Bitboard::print_board(std::ostream& o, bool colours) const {
 }
 
 unsigned int Bitboard::bitboard_get(unsigned int idx) const {
+	if (idx >= REALBOARDSIZE)
+		return (-1);
 	const unsigned int real_idx = idx * 2;
 	unsigned int ret = this->board[real_idx];
 

@@ -160,3 +160,103 @@ TEST_CASE("Test_seperating_bit") {
 		REQUIRE(Bitboard::isSeperatingBitIndex(bit));
 	REQUIRE_FALSE(Bitboard::isSeperatingBitIndex(0));
 }
+
+TEST_CASE_METHOD(Gamestate, "CanGetCapturedTest East", "[CanGetCapturedTests]") {
+	const int start_idx = 16;
+	const int direction = 1;
+
+	place_stone(start_idx); // p0
+	place_stone(start_idx + direction); // p1
+	// A single stone can't be captured
+	REQUIRE_FALSE(canGetCaptured(start_idx, direction));
+	place_stone(start_idx - direction); //p0
+
+	// Verify that both stones will trigger True in both directions
+	REQUIRE(canGetCaptured(start_idx, direction));
+	REQUIRE(canGetCaptured(start_idx, -direction));
+	REQUIRE(canGetCaptured(start_idx - direction, direction));
+	REQUIRE(canGetCaptured(start_idx - direction, -direction));
+
+	// Make sure there are no false positives
+	REQUIRE_FALSE(canGetCaptured(start_idx, 19));
+	REQUIRE_FALSE(canGetCaptured(start_idx, 20));
+	REQUIRE_FALSE(canGetCaptured(start_idx, 21));
+	REQUIRE_FALSE(canGetCaptured(start_idx - direction, 19));
+	REQUIRE_FALSE(canGetCaptured(start_idx - direction, 20));
+	REQUIRE_FALSE(canGetCaptured(start_idx - direction, 21));
+}
+
+TEST_CASE_METHOD(Gamestate, "CanGetCapturedTest West", "[CanGetCapturedTests]") {
+	const int start_idx = 25;
+	const int direction = -1;
+
+	place_stone(start_idx); // p0
+	place_stone(start_idx + direction); // p1
+	// A single stone can't be captured
+	REQUIRE_FALSE(canGetCaptured(start_idx, direction));
+	place_stone(start_idx - direction); //p0
+
+	// Verify that both stones will trigger True in both directions
+	REQUIRE(canGetCaptured(start_idx, direction));
+	REQUIRE(canGetCaptured(start_idx, -direction));
+	REQUIRE(canGetCaptured(start_idx - direction, direction));
+	REQUIRE(canGetCaptured(start_idx - direction, -direction));
+
+	// Make sure there are no false positives
+	REQUIRE_FALSE(canGetCaptured(start_idx, 19));
+	REQUIRE_FALSE(canGetCaptured(start_idx, 20));
+	REQUIRE_FALSE(canGetCaptured(start_idx, 21));
+	REQUIRE_FALSE(canGetCaptured(start_idx - direction, 19));
+	REQUIRE_FALSE(canGetCaptured(start_idx - direction, 20));
+	REQUIRE_FALSE(canGetCaptured(start_idx - direction, 21));
+}
+
+TEST_CASE_METHOD(Gamestate, "CanGetCapturedTest North", "[CanGetCapturedTests]") {
+	const int start_idx = 47;
+	const int direction = -20;
+
+	place_stone(start_idx); // p0
+	place_stone(start_idx + direction); // p1
+	// A single stone can't be captured
+	REQUIRE_FALSE(canGetCaptured(start_idx, direction));
+	place_stone(start_idx - direction); //p0
+
+	// Verify that both stones will trigger True in both directions
+	REQUIRE(canGetCaptured(start_idx, direction));
+	REQUIRE(canGetCaptured(start_idx, -direction));
+	REQUIRE(canGetCaptured(start_idx - direction, direction));
+	REQUIRE(canGetCaptured(start_idx - direction, -direction));
+
+	// Make sure there are no false positives
+	REQUIRE_FALSE(canGetCaptured(start_idx, 19));
+	REQUIRE_FALSE(canGetCaptured(start_idx, 1));
+	REQUIRE_FALSE(canGetCaptured(start_idx, 21));
+	REQUIRE_FALSE(canGetCaptured(start_idx - direction, 19));
+	REQUIRE_FALSE(canGetCaptured(start_idx - direction, 1));
+	REQUIRE_FALSE(canGetCaptured(start_idx - direction, 21));
+}
+
+TEST_CASE_METHOD(Gamestate, "CanGetCapturedTest South", "[CanGetCapturedTests]") {
+	const int start_idx = 47;
+	const int direction = 20;
+
+	place_stone(start_idx); // p0
+	place_stone(start_idx + direction); // p1
+	// A single stone can't be captured
+	REQUIRE_FALSE(canGetCaptured(start_idx, direction));
+	place_stone(start_idx - direction); //p0
+
+	// Verify that both stones will trigger True in both directions
+	REQUIRE(canGetCaptured(start_idx, direction));
+	REQUIRE(canGetCaptured(start_idx, -direction));
+	REQUIRE(canGetCaptured(start_idx - direction, direction));
+	REQUIRE(canGetCaptured(start_idx - direction, -direction));
+
+	// Make sure there are no false positives
+	REQUIRE_FALSE(canGetCaptured(start_idx, 19));
+	REQUIRE_FALSE(canGetCaptured(start_idx, 1));
+	REQUIRE_FALSE(canGetCaptured(start_idx, 21));
+	REQUIRE_FALSE(canGetCaptured(start_idx - direction, 19));
+	REQUIRE_FALSE(canGetCaptured(start_idx - direction, 1));
+	REQUIRE_FALSE(canGetCaptured(start_idx - direction, 21));
+}

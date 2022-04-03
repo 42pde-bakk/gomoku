@@ -55,3 +55,31 @@ TEST_CASE("Gamestate::get_opponent_stone()", "[GamestateTests]") {
 	REQUIRE(Gamestate::get_opponent_stone(0) == 3);
 	REQUIRE(Gamestate::get_opponent_stone(3) == 0);
 }
+
+TEST_CASE_METHOD(Gamestate, "Gamestate::isUnbreakable", "[GamestateTests]") {
+	const int start = 15;
+	const int dir = 19;
+	this->place_stone(start); // p0
+	this->place_stone(start + 20); // p1
+	this->place_stone(start + dir); // p0
+	this->place_stone(start + 40); // p1
+	REQUIRE(this->canGetCaptured(start + 20, 20));
+	REQUIRE(this->canGetCaptured(start + 40, 20));
+	REQUIRE(this->canGetCaptured(start + 20, -20));
+	REQUIRE(this->canGetCaptured(start + 40, -20));
+
+//	std::cerr << *this << "\n";
+	this->place_stone(start + 2 * dir); // p0
+	this->place_stone(start + 60); // p1
+	this->place_stone(start + 3 * dir); // p0
+	this->place_stone(start - 1); // p1
+	this->place_stone(start + 4 * dir); // p0
+	this->place_stone(start + 80); // p1
+//
+	std::cerr << *this << "\n";
+	REQUIRE(isUnbreakable(start, start + 4 * dir, dir));
+	this->place_stone(start + 39); // p0
+	this->place_stone(start - 2); // p1
+	std::cerr << *this << "\n";
+	REQUIRE_FALSE(isUnbreakable(start, start + 4 * dir, dir));
+}

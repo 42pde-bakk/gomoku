@@ -67,6 +67,8 @@ protected:
 	unsigned int capture_check_dir(int idx, int dir);
 
 	unsigned int	h_for_tile(unsigned int start_idx, unsigned int stone_p, unsigned int stone_opp, std::unordered_map<int, unsigned int>& checked_tiles) const;
+	bool isUnbreakable(unsigned int start_idx, unsigned int end_idx, unsigned int dir);
+	bool canGetCaptured(unsigned int start_idx, int dir) const;
 };
 
 typedef bool (*compareFunc)(const Gamestate* a, const Gamestate* b);
