@@ -48,11 +48,14 @@ std::vector<int> Client::receive(size_t bufsize) const {
 Gamestate *Client::receiveGamestate() const {
 	auto	*gs = new Gamestate();
 	int 	stones_amount;
+	int		turn;
 
-	gs->turn = this->receive(4)[0];
-	gs->player = gs->turn % 2;
+	turn = this->receive(4)[0];
+	gs->player = turn % 2;
+	gs->depth = 0;
+
 #if LOG
-	dprintf(2, "Turn: %d\n", gs->turn);
+	dprintf(2, "Turn: %d\n", turn);
 #endif
 	stones_amount = this->receive(4)[0];
 #if LOG
