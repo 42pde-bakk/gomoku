@@ -19,7 +19,7 @@ protected:
 	bitboard board;
 public:
 	Bitboard();
-	Bitboard(const bitboard& b);
+	explicit Bitboard(const bitboard& b);
 	~Bitboard();
 	Bitboard(const Bitboard& x);
 	Bitboard& operator=(const Bitboard& x);

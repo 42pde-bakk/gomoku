@@ -23,6 +23,8 @@ unsigned int Gamestate::capture_check_dir(int idx, int dir) {
 		this->clear_tile(pos[0]);
 		this->clear_tile(pos[1]);
 		this->captures[this->get_player()] += 2;
+		if (this->captures[this->get_player()] >= 10)
+			this->winner = this->get_player() + 1; // 1 or 2
 		return (1);
 	}
 	return (0);
