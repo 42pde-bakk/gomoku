@@ -8,6 +8,7 @@
 #include "IO/Client.hpp"
 #include "Colours.hpp"
 #include <chrono>
+#include <exception>
 
 int main() {
 	try {
@@ -20,9 +21,7 @@ int main() {
 			std::cerr << "Lets receive a gamestate\n";
 			Gamestate* gs = client.receiveGamestate();
 			std::cerr << "got the gamestate\n";
-//			gs->print_board(std::cerr, true);
-//			Gamestate *result = iterative_deepening(gs, gs->get_player());
-			Gamestate *result = alphabeta(gs, 2, std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), static_cast<bool>(gs->get_player()));
+			Gamestate *result = iterative_deepening(gs, gs->get_player());
 			Move move = result->get_first_move();
 			std::cerr << "Move: " << move;
 			std::cerr << "Result gamestate: h=" << result->get_heuristic() << ".\n";

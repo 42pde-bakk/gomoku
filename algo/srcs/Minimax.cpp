@@ -2,8 +2,7 @@
 // Created by Peer De bakker on 3/22/22.
 //
 
-#include <Minimax.hpp>
-
+#include "Minimax.hpp"
 #include "Gamestate.hpp"
 #include <limits>
 #include <chrono>
@@ -12,11 +11,14 @@ std::chrono::time_point<std::chrono::steady_clock> start_time;
 std::chrono::time_point<std::chrono::steady_clock> current_time;
 long long int elapsed_time;
 
-long long int times_up() {
+void check_time_limit() {
 	current_time = std::chrono::steady_clock::now();
 
 	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
-	return (elapsed_time >= 450);
+	if (elapsed_time >= MAX_THINK_TIME) {
+		dprintf(2, "elapsed_time = %llu, LETS THROW THIS BITCH\n", elapsed_time);
+		throw std::logic_error("Timeout value reached");
+	}
 }
 
 // Player 1 is the maximizing player
@@ -53,6 +55,7 @@ Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 }
 
 Gamestate *alphabeta(Gamestate *state, int depth, int alpha, int beta, bool maximizing_player) {
+	check_time_limit();
 	if (depth == 0 || state->has_winner()) // Terminal gamestate
 		return (state);
 
@@ -91,22 +94,27 @@ Gamestate *alphabeta(Gamestate *state, int depth, int alpha, int beta, bool maxi
 
 Gamestate	*iterative_deepening(Gamestate *gs, int player) {
 	start_time = std::chrono::steady_clock::now();
-	int	intmax = std::numeric_limits<int>::max(),
-		intmin = std::numeric_limits<int>::min();
+	static int	intmax = std::numeric_limits<int>::max();
+	static int	intmin = std::numeric_limits<int>::min();
 	int depth = 1;
 	Gamestate *result = nullptr;
 
+	try {
+		while (true) {
+			std::cerr << "Start loop, depth: " << depth << ", elapsed time: " << elapsed_time << '\n';
+//			gs->clear_children();
+			result = alphabeta(gs, depth, intmin, intmax, bool(player));
 
-	while (!times_up() && depth < 3) {
-		std::cerr << "Start loop, depth: " << depth << ", elapsed time: " << elapsed_time << '\n';
-		gs->clear_children();
-		result = alphabeta(gs, depth, intmin, intmax, bool(player));
-
-//		if (result->get_heuristic() >= winCutoff) {
-//			return (result);
-//		}
-		std::cerr << "End of loop, elapsed time: " << elapsed_time << '\n';
-		depth++;
+	//		if (result->get_heuristic() >= winCutoff) {
+	//			return (result);
+	//		}
+			std::cerr << "End of loop, elapsed time: " << elapsed_time << '\n';
+			depth++;
+			check_time_limit();
+		}
+	} catch (std::logic_error& e) {
+		std::cerr << "Caught: " << e.what() << std::endl;
 	}
 	return (result);
 }
+
