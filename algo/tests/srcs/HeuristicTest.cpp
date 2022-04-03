@@ -5,6 +5,7 @@
 #define CATCH_CONFIG_MAIN
 #include "../catch.hpp"
 #include "Gamestate.hpp"
+#include "Minimax.hpp"
 
 const int middle_idx = 9 * 20 + 9;
 
@@ -36,4 +37,97 @@ TEST_CASE_METHOD(Gamestate, "half open 2", "[HeuristicTests]") {
 //	g_log = false;
 	print_board(std::cerr, false);
 	REQUIRE(h == 5);
+}
+
+TEST_CASE_METHOD(Gamestate, "four", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+
+	this->set(start_idx, 0);
+	this->set(start_idx - 21, 0);
+	this->set(start_idx - 42, 0);
+	this->set_heuristic();
+	REQUIRE(this->h == -100);
+	this->set(start_idx - 63, 0);
+	this->set_heuristic();
+	REQUIRE(this->h == -1000);
+}
+
+TEST_CASE_METHOD(Gamestate, "five", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+
+	this->set(start_idx, 0);
+	this->set(start_idx - 21, 0);
+	this->set(start_idx - 42, 0);
+	this->set_heuristic();
+	REQUIRE(this->h == -100);
+	this->set(start_idx - 63, 0);
+	this->set_heuristic();
+	REQUIRE(this->h == -1000);
+	this->set(start_idx + 21, 0);
+	this->set_heuristic();
+	REQUIRE(this->h == -2000000);
+}
+
+TEST_CASE_METHOD(Gamestate, "2 fours", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+
+	this->set(start_idx, 0);
+	for (int i = 1; i < 4; i++) {
+		this->set(start_idx - i * 21, 0);
+		this->set(start_idx - i * 19, 0);
+	}
+	this->set_heuristic();
+	std::cerr << *this;
+	REQUIRE(this->h == -2000);
+}
+
+TEST_CASE_METHOD(Gamestate, "MinimaxHeuristicReturn", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+
+	this->set(start_idx, 0);
+	for (int i = 1; i < 4; i++) {
+		this->set(start_idx - i * 21, 0);
+		this->set(start_idx - i * 19, 0);
+	}
+	this->set_heuristic();
+	REQUIRE(this->h == -2000);
+	this->player = 1;
+	Gamestate *result = minimax(this, 2, true);
+	std::cerr << *result;
+	REQUIRE(result->get_heuristic() == -2000000);
+}
+
+TEST_CASE_METHOD(Gamestate, "Block", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+
+	this->set(start_idx, 0);
+	for (int i = 1; i < 4; i++) {
+		this->set(start_idx - i * 21, 0);
+		this->set(start_idx - i * 19, 0);
+	}
+	this->set_heuristic();
+	REQUIRE(this->h == -2000);
+	this->set(105, 1);
+	this->set_heuristic();
+	std::cerr << h << '\n' << *this << "\n";
+	REQUIRE(this->get_heuristic() == -1500);
+	this->clear_tile(105);
+
+	this->set(113, 1);
+	this->set_heuristic();
+	std::cerr << h << '\n' << *this << "\n";
+	REQUIRE(this->get_heuristic() == -1500);
+	this->clear_tile(113);
+
+	this->set(start_idx + 19, 1);
+	this->set_heuristic();
+	std::cerr << h << '\n' << *this << "\n";
+	REQUIRE(this->get_heuristic() == -1500);
+	this->clear_tile(start_idx + 19);
+
+	this->set(start_idx + 21, 1);
+	this->set_heuristic();
+	std::cerr << h << '\n' << *this << "\n";
+	REQUIRE(this->get_heuristic() == -1500);
+	this->clear_tile(start_idx + 21);
 }

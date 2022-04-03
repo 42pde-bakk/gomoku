@@ -23,7 +23,7 @@ Gamestate &Gamestate::operator=(const Gamestate& x) {
 		this->moves = x.moves;
 		this->parent = x.parent;
 		this->children = x.children;
-		this->turn = x.turn;
+		this->depth = x.depth;
 		this->h = x.h;
 		this->winner = x.winner;
 		this->player = x.player;
@@ -32,9 +32,9 @@ Gamestate &Gamestate::operator=(const Gamestate& x) {
 }
 
 Gamestate::Gamestate(const Gamestate &x) :
-	Bitboard(x), captures(x.captures), moves(x.moves),
-	parent(&x), children(),
-	turn(x.turn), h(x.h), winner(x.winner), player(x.player) {
+		Bitboard(x), captures(x.captures), moves(x.moves),
+		parent(&x), children(),
+		depth(x.depth), h(x.h), winner(x.winner), player(x.player) {
 }
 
 Gamestate::~Gamestate() {
@@ -85,10 +85,11 @@ void	Gamestate::write_to_file() const {
 	static int idx = 1;
 	std::fstream fs;
 	std::stringstream ss;
-	ss << "tests/log/gamestate_" << idx++;
+//	ss << "tests/log/gamestate_" << idx++;
+	ss << "/Users/pde-bakk/PycharmProjects/gomoku/algo/tests/log/gamestate_" << idx++;
 	fs.open(ss.str(), std::fstream::out | std::fstream::trunc);
 	if (!fs.is_open())
-		exit(1);
+		throw std::runtime_error("Couldn't write to logfile");
 	fs << hash_fn(this->board) << '\n';
 	fs << "Heuristic value: " << this->h << '\n';
 	print_board(fs, false);
@@ -108,13 +109,12 @@ void Gamestate::place_stone(int move_idx) {
 	}
 	// TODO: update heuristic value
 	this->set_heuristic();
-	this->h += 10 * (this->captures[1] - this->captures[0]); // adding a little extra value for captures in case of a tie between gamestates
 //	this->write_to_file();
-	this->turn++;
+	this->depth++;
 	this->change_player();
 }
 
-unsigned int Gamestate::h_for_tile(unsigned int start_idx, unsigned int stone_p, unsigned int stone_opp, std::unordered_map<int, unsigned int> &checked_tiles) const {
+unsigned int Gamestate::h_for_tile(unsigned int start_idx, unsigned int stone_p, unsigned int stone_opp, std::unordered_map<int, unsigned int> &checked_tiles) {
 	static const std::array<int, 4> dirs = setup_dirs();
 	static const int values[] = {0, 0, 10, 100, 1000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000};
 	unsigned int heur = 0;
@@ -155,12 +155,19 @@ unsigned int Gamestate::h_for_tile(unsigned int start_idx, unsigned int stone_p,
 				open_sides += 1u;
 			}
 			unsigned int extra_heur;
-			if (length >= 5 && open_sides != 0)
-				open_sides += 1;
-			extra_heur = open_sides * values[length] / 2;
-			if (g_log)
-				dprintf(2, "adding extra heuristic value of %u\n", extra_heur);
-			heur += extra_heur;
+			if (length >= 5) {
+				if (isUnbreakable(start_idx, i, dirs[d])) {
+					heur += 1000000u;
+					this->winner = (int)stone_p;
+				} else {
+					heur += open_sides * values[length];
+				}
+			} else {
+				extra_heur = open_sides * values[length] / 2;
+				if (g_log)
+					dprintf(2, "adding extra heuristic value of %u\n", extra_heur);
+				heur += extra_heur;
+			}
 		}
 	}
 	return (heur);
@@ -186,7 +193,7 @@ bool Gamestate::canGetCaptured(unsigned int start_idx, int dir) const {
 //	return ((int)tile_is_empty(idx) + (int)tile_is_empty(back_idx) == 1);
 }
 
-bool Gamestate::isUnbreakable(unsigned int start_idx, unsigned int end_idx, unsigned int dir) {
+bool Gamestate::isUnbreakable(unsigned int start_idx, unsigned int end_idx, int dir) const {
 	static const std::array<int, 4> dirs = setup_dirs();
 	unsigned int unbroken_length = 0;
 
@@ -205,12 +212,14 @@ bool Gamestate::isUnbreakable(unsigned int start_idx, unsigned int end_idx, unsi
 }
 
 void	Gamestate::set_heuristic() {
+	static const int winner_vals[] = { 0, -2000000, 2000000};
+	std::unordered_map<int, unsigned int> checked_tiles;
 	auto hash = hash_fn(this->board);
+
 	if (tt.find(hash) != tt.end()) {
 		this->h = tt[hash];
 		return ;
 	}
-	std::unordered_map<int, unsigned int> checked_tiles;
 	this->h = 0;
 
 	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
@@ -224,9 +233,27 @@ void	Gamestate::set_heuristic() {
 		else
 			this->h += (int)h_for_tile(i, stone, opponent_stone, checked_tiles);
 	}
+	if (this->has_winner()) {
+		this->h = winner_vals[this->winner];
+	}
 	if (g_log)
 		dprintf(2, "final heuristic value is %d\n", this->h);
 	tt[hash] = this->h;
+
+	if (!this->has_winner()) {
+		if (this->captures[0] >= 10) {
+			this->h = winner_vals[1];
+			this->winner = 1;
+		}
+		else if (this->captures[1] >= 10) {
+			this->h = winner_vals[2];
+			this->winner = 2;
+		}
+		else {
+			// adding a little extra value for captures in case of a tie between gamestates
+			this->h += 10 * (this->captures[1] - this->captures[0]);
+		}
+	}
 }
 
 int Gamestate::change_player() {
