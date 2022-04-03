@@ -24,6 +24,9 @@ void check_time_limit() {
 // Player 1 is the maximizing player
 // Player 0 is the minimizing player
 Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
+#ifndef CHECK_TIME_LIMIT
+	check_time_limit();
+#endif
 	if (depth == 0 || state->has_winner()) // Terminal gamestate
 		return (state);
 
@@ -55,7 +58,9 @@ Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 }
 
 Gamestate *alphabeta(Gamestate *state, int depth, int alpha, int beta, bool maximizing_player) {
+#if CHECK_TIME_LIMIT
 	check_time_limit();
+#endif
 	if (depth == 0 || state->has_winner()) // Terminal gamestate
 		return (state);
 

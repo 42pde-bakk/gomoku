@@ -8,6 +8,8 @@
 #include "Minimax.hpp"
 #include "Colours.hpp"
 
+#undef CHECK_TIME_LIMIT
+#define CHECK_TIME_LIMIT 0
 const int middle_idx = 9 * 20 + 9;
 
 void	place_stones(Gamestate *gs) {
@@ -24,7 +26,7 @@ TEST_CASE("Alphabeta pruning", "[MinimaxTests]") {
 	place_stones(gs);
 	place_stones(gs2);
 
-	auto start_time = std::chrono::steady_clock::now();
+	start_time = std::chrono::steady_clock::now();
 	Gamestate *minimax_res = minimax(gs, 4, gs->get_player());
 	auto end_time = std::chrono::steady_clock::now();
 	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
