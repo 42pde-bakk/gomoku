@@ -31,9 +31,9 @@ std::array<int, 4> setup_dirs() {
 std::array<int, 4> setup_dirs_opposite() {
 	static const std::array<int, 4> northside = {
 			-1, // W
-			-19, // NE
+			-21,  // NW
 			-20, // N
-			-21  // NW
+			-19 // NE
 	};
 	return (northside);
 }
