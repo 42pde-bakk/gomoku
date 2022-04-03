@@ -75,7 +75,23 @@ void Gamestate::generate_children() {
 	std::sort(children.begin(), children.end(), compareFuncs[this->get_player()]);
 }
 
+#include <fstream>
+#include <sstream>
+void	Gamestate::write_to_file() const {
+	static int idx = 1;
+	std::fstream fs;
+	std::stringstream ss;
+	ss << "tests/log/gamestate_" << idx++;
+	fs.open(ss.str(), std::fstream::out | std::fstream::trunc);
+	if (!fs.is_open())
+		exit(1);
+	fs << hash_fn(this->board) << '\n';
+	fs << "Heuristic value: " << this->h << '\n';
+	print_board(fs, false);
+}
+
 Gamestate::Gamestate() { }
+
 void Gamestate::place_stone(int move_idx) {
 	assert(move_idx >= 0 && move_idx < BOARDSIZE);
 	assert (this->tile_is_empty(move_idx));
@@ -88,6 +104,7 @@ void Gamestate::place_stone(int move_idx) {
 	}
 	// TODO: update heuristic value
 	this->set_heuristic();
+	this->write_to_file();
 	this->turn++;
 	this->change_player();
 }

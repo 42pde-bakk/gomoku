@@ -61,7 +61,7 @@ public:
 	void	clear_children();
 protected:
 	int		change_player();
-
+	void	write_to_file() const;
 	// Captures.cpp
 	unsigned int perform_captures(int pos);
 	unsigned int capture_check_dir(int idx, int dir);
