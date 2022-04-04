@@ -6,6 +6,7 @@
 #include "Directions.hpp"
 #include "Gomoku.hpp"
 #include <iostream>
+#include <cassert>
 
 std::hash<bitboard> Heuristic::hash_fn;
 std::unordered_map<int, unsigned int> g_checkedTiles;
@@ -182,10 +183,12 @@ std::string	LineValueToStr(const LineValue& x) {
 			return "OPEN_FOUR";
 		case LineValue::FIVE:
 			return "FIVE";
-		case LineValue::NONE:
-			return "NONE";
+		default:
+			break ;
 	}
+	return ("NONE");
 }
+
 void Heuristic::print_heuristic(std::ostream &o) const {
 	static const LineValue linevalues[] = {
 			LineValue::TWO, LineValue::HALF_OPEN_THREE, LineValue::OPEN_THREE,
