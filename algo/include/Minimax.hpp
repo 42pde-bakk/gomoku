@@ -10,10 +10,6 @@
 #include <chrono>
 #include <exception>
 
-#ifndef CHECK_TIME_LIMIT
-# define CHECK_TIME_LIMIT 1
-#endif
-
 #define MAX_THINK_TIME 490
 
 Gamestate	*minimax(Gamestate *state, int depth, bool maximizing_player);

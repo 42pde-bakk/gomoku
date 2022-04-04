@@ -7,8 +7,8 @@
 #include <limits>
 #include <chrono>
 
-std::chrono::time_point<std::chrono::steady_clock> start_time;
-std::chrono::time_point<std::chrono::steady_clock> current_time;
+std::chrono::time_point<std::chrono::steady_clock> start_time = std::chrono::steady_clock::now();;
+std::chrono::time_point<std::chrono::steady_clock> current_time = std::chrono::steady_clock::now();;
 long long int elapsed_time;
 
 void check_time_limit() {
@@ -24,9 +24,7 @@ void check_time_limit() {
 // Player 1 is the maximizing player
 // Player 0 is the minimizing player
 Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
-#ifndef CHECK_TIME_LIMIT
 	check_time_limit();
-#endif
 	if (depth == 0 || state->has_winner()) // Terminal gamestate
 		return (state);
 
@@ -39,18 +37,18 @@ Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 		best_state_value = std::numeric_limits<int>::min();
 		for (auto& child : state->get_children()) {
 			new_state = minimax(child, depth - 1, false);
-			if (new_state->get_heuristic() > best_state_value) {
+			if (new_state->get_h() > best_state_value) {
 				best_state = new_state;
-				best_state_value = new_state->get_heuristic();
+				best_state_value = new_state->get_h();
 			}
 		}
 	} else {
 		best_state_value = std::numeric_limits<int>::max();
 		for (auto& child : state->get_children()) {
 			new_state = minimax(child, depth - 1, true);
-			if (new_state->get_heuristic() < best_state_value) {
+			if (new_state->get_h() < best_state_value) {
 				best_state = new_state;
-				best_state_value = new_state->get_heuristic();
+				best_state_value = new_state->get_h();
 			}
 		}
 	}
@@ -58,9 +56,7 @@ Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 }
 
 Gamestate *internal_alphabeta(Gamestate *state, int depth, int alpha, int beta, bool maximizing_player) {
-//#if CHECK_TIME_LIMIT
-//	check_time_limit();
-//#endif
+	check_time_limit();
 	if (depth == 0 || state->has_winner()) // Terminal gamestate
 		return (state);
 
@@ -75,25 +71,25 @@ Gamestate *internal_alphabeta(Gamestate *state, int depth, int alpha, int beta, 
 		best_state_value = std::numeric_limits<int>::min();
 		for (auto& child : state->get_children()) {
 			new_state = internal_alphabeta(child, depth - 1, alpha, beta, false);
-			if (new_state->get_heuristic() > best_state_value) {
+			if (new_state->get_h() > best_state_value) {
 				best_state = new_state;
-				best_state_value = new_state->get_heuristic();
+				best_state_value = new_state->get_h();
 			}
 			if (best_state_value >= beta)
 				break ; // β cutoff
-			alpha = std::max(alpha, new_state->get_heuristic());
+			alpha = std::max(alpha, new_state->get_h());
 		}
 	} else {
 		best_state_value = std::numeric_limits<int>::max();
 		for (auto& child : state->get_children()) {
 			new_state = internal_alphabeta(child, depth - 1, alpha, beta, true);
-			if (new_state->get_heuristic() < best_state_value) {
+			if (new_state->get_h() < best_state_value) {
 				best_state = new_state;
-				best_state_value = new_state->get_heuristic();
+				best_state_value = new_state->get_h();
 			}
 			if (best_state_value <= alpha)
 				break ; // α cutoff
-			beta = std::min(beta, new_state->get_heuristic());
+			beta = std::min(beta, new_state->get_h());
 		}
 	}
 	if (best_state == nullptr) {
@@ -122,9 +118,10 @@ Gamestate	*iterative_deepening(Gamestate *gs, int player) {
 //			gs->clear_children();
 			result = alphabeta(gs, depth, bool(player));
 
-	//		if (result->get_heuristic() >= winCutoff) {
-	//			return (result);
-	//		}
+			if (result->has_winner()) {
+				return (result);
+			}
+
 			std::cerr << "End of loop, elapsed time: " << elapsed_time << '\n';
 			depth++;
 			check_time_limit();

@@ -24,7 +24,7 @@ int main() {
 			Gamestate *result = iterative_deepening(gs, gs->get_player());
 			Move move = result->get_first_move();
 			std::cerr << "Move: " << move;
-			std::cerr << "Result gamestate: h=" << result->get_heuristic() << ".\n";
+			std::cerr << "Result gamestate: h=" << result->get_h() << ".\n";
 			result->print_board(std::cout, true);
 			current_time = std::chrono::steady_clock::now();
 			auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time);
