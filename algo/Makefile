@@ -32,6 +32,9 @@ endif
 ifdef PROFILING
  CFLAGS += -g3 -pg
 endif
+ifdef SPEED
+ CFLAGS += -Ofast
+endif
 
 SHELL := /bin/bash
 export SHELL
