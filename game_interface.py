@@ -36,7 +36,7 @@ class Game(tk.Frame):
         self.black = tk.PhotoImage(file='/Users/abumbier/gomoku/assets/black.png')
         self.gray = tk.PhotoImage(file='/Users/abumbier/gomoku/assets/gray.png')
         self.red = tk.PhotoImage(file="/Users/abumbier/gomoku/assets/red.png")
-        self.hotseat_move = [-1, -1]
+        self.hotseat_move = [0, 0]
 
     def print_board(self):
         print(self.gamestate.board.get_board())
@@ -93,6 +93,7 @@ class Game(tk.Frame):
         return button_img
 
     def update_button(self, row: int, col: int) -> None:
+        print(f"placing a new button at row: {row}, col: {col}")
         button_img = self.pick_color(row, col)
         self.buttons[row * self.size + col].config(image=button_img)
         self.update()
@@ -118,7 +119,7 @@ class Game(tk.Frame):
             self.change_player()
             self.select_next_move()
 
-    def after_move_check(self, row, col):
+    def after_move_check(self, row: int, col: int) -> bool:
         """ Check for captures and wins"""
         if self.game_mode == GameMode.HOTSEAT:
             self.update_button(self.hotseat_move[0], self.hotseat_move[1])
@@ -146,7 +147,7 @@ class Game(tk.Frame):
         print(f"Suggested row: {self.hotseat_move[0]}, col: {self.hotseat_move[1]}")
         self.display_suggested_move(row, col)
 
-    def display_suggested_move(self, row, col):
+    def display_suggested_move(self, row: int, col: int) -> None:
         self.buttons[row * self.size + col].config(image=self.red)
         self.update()
 
@@ -200,7 +201,7 @@ class Game(tk.Frame):
         )
         bt_new_game.pack()
 
-    def change_game_mode(self, choice):
+    def change_game_mode(self, choice) -> None:
         if choice == GameMode.BOT_POT.__str__():
             self.game_mode = GameMode.BOT_POT
         elif choice == GameMode.HOTSEAT.__str__():
@@ -211,9 +212,9 @@ class Game(tk.Frame):
 
     def choose_different_game_om(self, frm_options):
         lbl_choose_game_mode = ttk.Label(frm_options, text=f"Change Game Mode").pack()
-        options = ['Versus ai', 'Hotseat', 'Bot pot']
+        options = ['Versus ai', 'Hotseat', 'Bot pot', 'blabla', 'blablabla']
         clicked = tk.StringVar()
-        clicked.set(options[0])
+        # clicked.set(options[0])
         om_choose_game = ttk.OptionMenu(
             frm_options,
             clicked,
@@ -222,7 +223,7 @@ class Game(tk.Frame):
         )
         om_choose_game.pack()
 
-    def handle_captures(self, row, col):
+    def handle_captures(self, row, col) -> None:
         capture_check = Game.rules.is_capturing(row, col, self.player, self.gamestate.board)
         if capture_check is not None:
             for i in range(int(len(capture_check) // 2)):
