@@ -3,38 +3,15 @@
 //
 
 #include "Gamestate.hpp"
-#include "Colours.hpp"
-#include "Directions.hpp"
-#include <unordered_map>
 #include <cassert>
 #include <algorithm>
-#include "Utils.hpp"
 
 bool g_log = false;
-std::unordered_map<std::bitset<BOARDSIZE>, int> Gamestate::tt;
-std::hash<bitboard> hash_fn;
-
-Gamestate &Gamestate::operator=(const Gamestate& x) {
-	for (auto child : this->children)
-		delete child;
-	if (this != &x) {
-		this->board = x.board;
-		this->captures = x.captures;
-		this->moves = x.moves;
-		this->parent = x.parent;
-		this->children = x.children;
-		this->depth = x.depth;
-		this->h = x.h;
-		this->winner = x.winner;
-		this->player = x.player;
-	}
-	return (*this);
-}
 
 Gamestate::Gamestate(const Gamestate &x) :
-		Bitboard(x), captures(x.captures), moves(x.moves),
+		Heuristic(x), captures(x.captures), moves(x.moves),
 		parent(&x), children(),
-		depth(x.depth), h(x.h), winner(x.winner), player(x.player) {
+		depth(x.depth), player(x.player) {
 }
 
 Gamestate::~Gamestate() {
@@ -90,7 +67,7 @@ void	Gamestate::write_to_file() const {
 	fs.open(ss.str(), std::fstream::out | std::fstream::trunc);
 	if (!fs.is_open())
 		throw std::runtime_error("Couldn't write to logfile");
-	fs << hash_fn(this->board) << '\n';
+	fs << Heuristic::hash_fn(this->board) << '\n';
 	fs << "Heuristic value: " << this->h << '\n';
 	print_board(fs, false);
 }
@@ -108,152 +85,11 @@ void Gamestate::place_stone(int move_idx) {
 		// a double-three by capturing a pair.
 	}
 	// TODO: update heuristic value
-	this->set_heuristic();
+	this->set_h();
+	this->add_h_for_captures(this->captures);
 //	this->write_to_file();
 	this->depth++;
 	this->change_player();
-}
-
-unsigned int Gamestate::h_for_tile(unsigned int start_idx, unsigned int stone_p, unsigned int stone_opp, std::unordered_map<int, unsigned int> &checked_tiles) {
-	static const std::array<int, 4> dirs = setup_dirs();
-	static const int values[] = {0, 0, 10, 100, 1000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000};
-	unsigned int heur = 0;
-	if (g_log)
-		dprintf(2, "start_idx: %u, stones: p=%u, opp=%u\n", start_idx, stone_p, stone_opp);
-	for (unsigned int d = 0; d < dirs.size(); d++) {
-		if (g_log)
-			dprintf(2, "dirs[%u] = %d\n", d, dirs[d]);
-		if (checked_tiles[start_idx] & (1u << d)) {
-			if (g_log)
-				dprintf(2, "already checked %u in direction %d\n", start_idx, dirs[d]);
-			continue ;
-		}
-		unsigned int length = 1;
-		unsigned int i = start_idx + dirs[d];
-//		unsigned int stone_value = this->bitboard_get(i);
-		while (i < REALBOARDSIZE && !isSeperatingBitIndex(i) && this->bitboard_get(i) == stone_p) {
-			length++;
-			checked_tiles[i] |= 1u << d;
-			if (g_log)
-				dprintf(2, "checked_tiles[%u] now is %d, Unioned this into it: (%u)\n", i, checked_tiles[i], 1u << (d + 1));
-			i += dirs[d];
-		}
-		if (g_log)
-			dprintf(2, "start_idx=%u, dir=%d, length=%u\n", start_idx, dirs[d], length);
-
-		if (length > 1) {
-			unsigned int open_sides = 0;
-			unsigned int prev = start_idx - dirs[d];
-			if (prev < REALBOARDSIZE && !isSeperatingBitIndex(prev) && tile_is_empty(prev)) {
-				if (g_log)
-					dprintf(2, "prev (%u) is empty! So extra value!\n", prev);
-				open_sides += 1u;
-			}
-			if (i < REALBOARDSIZE && !isSeperatingBitIndex(i) && tile_is_empty(i)) {
-				if (g_log)
-					dprintf(2, "next (%u) is empty! So extra value!\n", i);
-				open_sides += 1u;
-			}
-			unsigned int extra_heur;
-			if (length >= 5) {
-				if (isUnbreakable(start_idx, i, dirs[d])) {
-					heur += 1000000u;
-					this->winner = (int)stone_p;
-				} else {
-					heur += open_sides * values[length];
-				}
-			} else {
-				extra_heur = open_sides * values[length] / 2;
-				if (g_log)
-					dprintf(2, "adding extra heuristic value of %u\n", extra_heur);
-				heur += extra_heur;
-			}
-		}
-	}
-	return (heur);
-}
-
-bool Gamestate::canGetCaptured(unsigned int start_idx, int dir) const {
-	const unsigned int stone_p = this->bitboard_get(start_idx);
-	const int dir_opp = -dir;
-	unsigned int length = 1;
-	unsigned int idx = start_idx + dir;
-	while (idx < REALBOARDSIZE && !isSeperatingBitIndex(idx) && this->bitboard_get(idx) == stone_p) {
-		++length;
-		idx += dir;
-	}
-	unsigned int back_idx = start_idx + dir_opp;
-	while (back_idx < REALBOARDSIZE && !isSeperatingBitIndex(back_idx) && this->bitboard_get(back_idx) == stone_p) {
-		++length;
-		back_idx += dir_opp;
-	}
-	if (length != 2 || idx >= REALBOARDSIZE || isSeperatingBitIndex(idx) || back_idx >= REALBOARDSIZE || isSeperatingBitIndex(back_idx))
-		return (false);
-	return (tile_is_empty(idx) ^ tile_is_empty(back_idx));
-//	return ((int)tile_is_empty(idx) + (int)tile_is_empty(back_idx) == 1);
-}
-
-bool Gamestate::isUnbreakable(unsigned int start_idx, unsigned int end_idx, int dir) const {
-	static const std::array<int, 4> dirs = setup_dirs();
-	unsigned int unbroken_length = 0;
-
-	for (; start_idx <= end_idx; start_idx += dir) {
-		for (int d = 0; d < 4; d++) {
-			if (d == dir)
-				continue ;
-			if (canGetCaptured(start_idx, dirs[d]))
-				unbroken_length = -1;
-		}
-		++unbroken_length;
-		if (unbroken_length == 5)
-			break ;
-	}
-	return (unbroken_length == 5);
-}
-
-void	Gamestate::set_heuristic() {
-	static const int winner_vals[] = { 0, -2000000, 2000000};
-	std::unordered_map<int, unsigned int> checked_tiles;
-	auto hash = hash_fn(this->board);
-
-	if (tt.find(hash) != tt.end()) {
-		this->h = tt[hash];
-		return ;
-	}
-	this->h = 0;
-
-	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
-		unsigned int stone = this->bitboard_get(i);
-		if (!stone)
-			continue;
-		assert(stone == 1 || stone == 2);
-		unsigned int opponent_stone = Gamestate::get_opponent_stone(stone);
-		if (stone == 1)
-			this->h -= (int)h_for_tile(i, stone, opponent_stone, checked_tiles);
-		else
-			this->h += (int)h_for_tile(i, stone, opponent_stone, checked_tiles);
-	}
-	if (this->has_winner()) {
-		this->h = winner_vals[this->winner];
-	}
-	if (g_log)
-		dprintf(2, "final heuristic value is %d\n", this->h);
-	tt[hash] = this->h;
-
-	if (!this->has_winner()) {
-		if (this->captures[0] >= 10) {
-			this->h = winner_vals[1];
-			this->winner = 1;
-		}
-		else if (this->captures[1] >= 10) {
-			this->h = winner_vals[2];
-			this->winner = 2;
-		}
-		else {
-			// adding a little extra value for captures in case of a tie between gamestates
-			this->h += 10 * (this->captures[1] - this->captures[0]);
-		}
-	}
 }
 
 int Gamestate::change_player() {
@@ -263,10 +99,6 @@ int Gamestate::change_player() {
 
 const Move &Gamestate::get_first_move() const {
 	return this->moves.front();
-}
-
-int Gamestate::get_heuristic() const {
-	return (this->h);
 }
 
 unsigned int Gamestate::get_opponent_stone(unsigned int stone) {
