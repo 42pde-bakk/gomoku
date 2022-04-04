@@ -81,20 +81,39 @@ TEST_CASE_METHOD(Gamestate, "2 fours", "[HeuristicTests]") {
 	REQUIRE(this->h == -2000);
 }
 
+TEST_CASE_METHOD(Gamestate, "BLOCKED BY JAMES", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+
+	this->set(start_idx, 0);
+	for (int i = 1; i < 4; i++) {
+		this->set(start_idx - i * 21, 0);
+	}
+	this->set(start_idx - 4 * 21, 1);
+	this->set(start_idx + 21, 1);
+	this->set_heuristic();
+	std::cerr << h << "\n"<< *this << '\n';
+	REQUIRE(this->h == 0);
+}
+
 TEST_CASE_METHOD(Gamestate, "MinimaxHeuristicReturn", "[HeuristicTests]") {
 	const int start_idx = middle_idx;
 
 	this->set(start_idx, 0);
 	for (int i = 1; i < 4; i++) {
 		this->set(start_idx - i * 21, 0);
-		this->set(start_idx - i * 19, 0);
 	}
+	this->set(start_idx - 4 * 21, 1);
 	this->set_heuristic();
-	REQUIRE(this->h == -2000);
+	std::cerr << h << "\n"<< *this << '\n';
+	REQUIRE(this->h == -500);
 	this->player = 1;
-	Gamestate *result = minimax(this, 2, true);
-	std::cerr << *result;
-	REQUIRE(result->get_heuristic() == -2000000);
+	Gamestate *result = minimax(this, 1, true);
+
+	for (auto& child : children) {
+		std::cerr << "child: " << child->get_heuristic() << "\n" << *child << "\n";
+	}
+
+	REQUIRE(result->get_heuristic() == 0);
 }
 
 TEST_CASE_METHOD(Gamestate, "Block", "[HeuristicTests]") {
