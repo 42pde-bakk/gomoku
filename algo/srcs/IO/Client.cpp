@@ -54,13 +54,7 @@ Gamestate *Client::receiveGamestate() const {
 	gs->player = turn % 2;
 	gs->depth = 0;
 
-#if LOG
-	dprintf(2, "Turn: %d\n", turn);
-#endif
 	stones_amount = this->receive(4)[0];
-#if LOG
-	dprintf(2, "Stones_amount: %d\n", stones_amount);
-#endif
 	for (int i = 0; i < stones_amount; i++) {
 		std::vector<int> arr = this->receive(12);
 		int y = arr[0],
@@ -68,10 +62,6 @@ Gamestate *Client::receiveGamestate() const {
 			colour = arr[2];
 		assert(colour == 1 || colour == 2);
 		gs->set(y * 20 + x, colour - 1);
-//		gs->boards[colour - 1][y * 20 + x] = true;
-#if LOG
-		dprintf(2, "i=%d,\ty=%d, x=%d, colour=%d\n", i, y, x, colour);
-#endif
 	}
 	return (gs);
 }

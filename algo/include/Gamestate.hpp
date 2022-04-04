@@ -51,6 +51,8 @@ public:
 
 	void	place_stone(int move_idx);
 	void	clear_children();
+
+	void	print_history(std::ostream& o) const;
 protected:
 	int		change_player();
 	void	write_to_file() const;

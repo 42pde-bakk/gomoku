@@ -20,6 +20,7 @@ enum LineValue {
 	OPEN_FOUR = 5,
 	FIVE = 6
 };
+std::ostream&	operator<<(std::ostream& o, const LineValue& lv);
 
 class Heuristic : public Bitboard {
 protected:
@@ -39,6 +40,7 @@ private:
 	unsigned int get_length(unsigned int *idx, unsigned int stone_p, unsigned int d) const;
 	[[nodiscard]] unsigned int count_open_sides(unsigned int prev, unsigned int next) const;
 	[[nodiscard]] static LineValue	calc_linevalue(unsigned int length, unsigned int open_sides);
+	void tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int next, const int dir, unsigned int stone_p) const;
 	void	calculate_heuristic();
 	void	count_lines(unsigned int start_idx, unsigned int stone_p);
 	void	loop_over_tiles();

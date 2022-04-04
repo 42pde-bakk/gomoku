@@ -111,3 +111,10 @@ void Gamestate::clear_children() {
 	}
 	this->children.clear();
 }
+
+void Gamestate::print_history(std::ostream& o) const {
+	if (this->parent)
+		this->parent->print_history(o);
+	this->print_board(o, true);
+	o << '\n';
+}

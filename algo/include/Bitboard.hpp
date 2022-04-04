@@ -24,6 +24,7 @@ public:
 	Bitboard(const Bitboard& x);
 	Bitboard& operator=(const Bitboard& x);
 
+	static bool	isvalid_tile(unsigned int idx);
 	[[nodiscard]] unsigned int bitboard_get(unsigned int idx) const;
 	[[nodiscard]] bool	tile_is_empty(unsigned int idx) const;
 	[[nodiscard]] static bool	isSeperatingBitIndex(unsigned int idx) ;

@@ -44,11 +44,7 @@ LineValue	Heuristic::calc_linevalue(unsigned int length, unsigned int open_sides
 			{LineValue::FIVE, LineValue::FIVE, LineValue::FIVE}
 	};
 
-	if (length > 5) {
-		length = 5;
-		// check whether it is unbreakable or not
-	}
-
+	length = std::min(length, 5u);
 	return values[length][open_sides];
 }
 
@@ -67,26 +63,42 @@ unsigned int Heuristic::count_open_sides(unsigned int prev, unsigned int next) c
 	return (open_sides);
 }
 
+void Heuristic::tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int next, const int dir, unsigned int stone_p) const {
+	unsigned int before_prev = prev - dir;
+	unsigned int after_next = next + dir;
+	if (!isvalid_tile(before_prev) || !isvalid_tile(after_next))
+		return ;
+	if ((bitboard_get(before_prev) == stone_p || bitboard_get(after_next) == stone_p))
+		lv = static_cast<LineValue>(int(lv) + 1);
+}
+
 void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 	static const std::array<int, 4> dirs = setup_dirs();
 	const unsigned int player = stone_p - 1;
 
 	if (g_log) dprintf(2, "start_idx: %u, stones: p=%u\n", start_idx, stone_p);
 	for (unsigned int d = 0; d < dirs.size(); d++) {
-		if (g_log) dprintf(2, "dirs[%u] = %d\n", d, dirs[d]);
+		const int dir = dirs[d];
+
+		if (g_log) dprintf(2, "dirs[%u] = %d\n", d, dir);
 		if (g_checkedTiles[start_idx] & (1u << d)) {
-			if (g_log) dprintf(2, "already checked %u in direction %d\n", start_idx, dirs[d]);
+			if (g_log) dprintf(2, "already checked %u in direction %d\n", start_idx, dir);
 			continue ;
 		}
-		unsigned int next = start_idx + dirs[d];
+		unsigned int next = start_idx + dir;
 		unsigned int length = this->get_length(&next, stone_p, d);
 
 		if (length < 2) // Might change this to (length <= 2)
 			continue;
-		unsigned int open_sides = this->count_open_sides(start_idx - dirs[d], next);
+		unsigned int prev = start_idx - dir;
+		unsigned int open_sides = this->count_open_sides(prev, next);
+
 		LineValue linevalue = this->calc_linevalue(length, open_sides);
+		if (linevalue < HALF_OPEN_FOUR)
+			tryUpgradeLineVal(linevalue, prev, next, dir, stone_p);
+
 		this->values[player][linevalue] += 1u;
-		if (linevalue == LineValue::FIVE && this->isUnbreakable(start_idx, next - dirs[d], dirs[d])) {
+		if (linevalue == LineValue::FIVE && this->isUnbreakable(start_idx, next - dir, dir)) {
 			this->winner = static_cast<int>(stone_p);
 		}
 	}
@@ -243,4 +255,9 @@ bool Heuristic::isUnbreakable(unsigned int start_idx, unsigned int end_idx, int 
 			break ;
 	}
 	return (unbroken_length == 5);
+}
+
+std::ostream &operator<<(std::ostream &o, const LineValue &lv) {
+	o << LineValueToStr(lv);
+	return (o);
 }

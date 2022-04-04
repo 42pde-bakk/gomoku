@@ -37,6 +37,86 @@ TEST_CASE_METHOD(Gamestate, "Three", "[HeuristicTests]") {
 	REQUIRE(set_h() == -1000);
 }
 
+TEST_CASE_METHOD(Gamestate, "Three at the top wall", "[HeuristicTests]") {
+	const int start_idx = 5;
+	const int dir = 20;
+	set(start_idx, 0);
+	set(start_idx + dir, 0);
+	set(start_idx + 2 * dir, 0);
+
+	set_h();
+	REQUIRE(get_h() == -1000);
+	set(start_idx + 3 * dir, 1);
+	set_h();
+	REQUIRE(get_h() == 0);
+	std::cerr << *this;
+	print_heuristic(std::cerr);
+}
+
+TEST_CASE_METHOD(Gamestate, "Three at the bottom wall", "[HeuristicTests]") {
+	const int start_idx = 360;
+	const int dir = -20;
+	set(start_idx, 0);
+	set(start_idx + dir, 0);
+	set(start_idx + 2 * dir, 0);
+
+	set_h();
+	REQUIRE(get_h() == -1000);
+	set(start_idx + 3 * dir, 1);
+	set_h();
+	REQUIRE(get_h() == 0);
+	std::cerr << *this;
+	print_heuristic(std::cerr);
+}
+
+TEST_CASE_METHOD(Gamestate, "Three at the left wall", "[HeuristicTests]") {
+	const int start_idx = 180;
+	const int dir = 1;
+	set(start_idx, 0);
+	set(start_idx + dir, 0);
+	set(start_idx + 2 * dir, 0);
+
+	set_h();
+	REQUIRE(get_h() == -1000);
+	set(start_idx + 3 * dir, 1);
+	set_h();
+	REQUIRE(get_h() == 0);
+	std::cerr << *this;
+	print_heuristic(std::cerr);
+}
+
+TEST_CASE_METHOD(Gamestate, "Three at the right wall", "[HeuristicTests]") {
+	const int start_idx = 178;
+	const int dir = -1;
+	set(start_idx, 0);
+	set(start_idx + dir, 0);
+	set(start_idx + 2 * dir, 0);
+
+	set_h();
+	std::cerr << *this;
+	print_heuristic(std::cerr);
+	REQUIRE(get_h() == -1000);
+	set(start_idx + 3 * dir, 1);
+	set_h();
+	REQUIRE(get_h() == 0);
+}
+
+TEST_CASE_METHOD(Gamestate, "Three plus one", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+	const int dir = 1;
+	set(start_idx, 0);
+	set(start_idx + dir, 0);
+	set(start_idx + 2 * dir, 0);
+
+	set_h();
+	std::cerr << *this;
+	print_heuristic(std::cerr);
+	REQUIRE(get_h() == -1000);
+	set(start_idx + 3 * dir, 1);
+	set_h();
+	REQUIRE(get_h() == 0);
+}
+
 TEST_CASE_METHOD(Gamestate, "four", "[HeuristicTests]") {
 	const int start_idx = middle_idx;
 	const int dir = 21;
@@ -127,12 +207,6 @@ TEST_CASE_METHOD(Gamestate, "MinimaxHeuristicReturn", "[HeuristicTests]") {
 	this->player = 0;
 	Gamestate *result = minimax(this, 1, false);
 
-//	for (auto& child : children) {
-//		std::cerr << "child: " << child->get_h() << "\n" << *child << "\n";
-//		child->print_heuristic(std::cerr);
-//		std::cerr << "\n";
-//	}
-
 	REQUIRE(result->get_h() == 0);
 }
 
@@ -165,4 +239,18 @@ TEST_CASE_METHOD(Gamestate, "Block", "[HeuristicTests]") {
 	this->set_h();
 	REQUIRE(this->get_h() == -22500);
 	this->clear_tile(start_idx + 21);
+}
+
+TEST_CASE_METHOD(Gamestate, "Upgrade", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+	const int dir = 1;
+
+	this->set(start_idx, 1);
+	this->set(start_idx - 1 * dir, 1);
+	this->set(start_idx - 2 * dir, 1);
+	this->set(start_idx - 4 * dir, 1);
+	this->set_h();
+	std::cerr << *this;
+	print_heuristic(std::cerr);
+	REQUIRE(this->h == 15000);
 }

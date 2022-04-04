@@ -156,3 +156,7 @@ unsigned int Bitboard::count() const {
 		res += (this->bitboard_get(i) > 0);
 	return (res);
 }
+
+bool Bitboard::isvalid_tile(unsigned int idx) {
+	return (idx < REALBOARDSIZE && !isSeperatingBitIndex(idx));
+}
