@@ -107,13 +107,14 @@ TEST_CASE_METHOD(Gamestate, "Three plus one", "[HeuristicTests]") {
 	set(start_idx, 0);
 	set(start_idx + dir, 0);
 	set(start_idx + 2 * dir, 0);
+	set(start_idx - dir, 1);
 
 	set_h();
-	std::cerr << *this;
-	print_heuristic(std::cerr);
 	REQUIRE(get_h() == -1000);
 	set(start_idx + 3 * dir, 1);
 	set_h();
+	std::cerr << *this;
+	print_heuristic(std::cerr);
 	REQUIRE(get_h() == 0);
 }
 
@@ -145,7 +146,7 @@ TEST_CASE_METHOD(Gamestate, "five", "[HeuristicTests]") {
 	this->set(start_idx + dir, 0);
 	this->set_h();
 
-	REQUIRE(this->h == -100000);
+	REQUIRE(this->h == -2000000); // because it is unbreakable
 	REQUIRE(this->winner == 1);
 }
 
@@ -252,5 +253,5 @@ TEST_CASE_METHOD(Gamestate, "Upgrade", "[HeuristicTests]") {
 	this->set_h();
 	std::cerr << *this;
 	print_heuristic(std::cerr);
-	REQUIRE(this->h == 15000);
+	REQUIRE(this->h == 7500);
 }
