@@ -97,6 +97,8 @@ build/
 # File to save our portnb (for the python prog to read)
 portnb.txt
 
+# gprof output
+profiling*.txt
 
 # cmake
 CMakeLists.txt.user
