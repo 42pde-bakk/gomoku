@@ -131,10 +131,10 @@ void Heuristic::calculate_heuristic() {
 }
 
 int Heuristic::set_h() {
-//	static const int winner_values[3] = {0, -2000000, 2000000};
+	static const int winner_values[3] = {0, -2000000, 2000000};
 	g_checkedTiles.clear();
 //	auto hash = hash_fn(this->board);
-//
+
 	this->h = 0;
 //	if (tt.find(hash) != tt.end()) {
 //		this->h = tt[hash];
@@ -145,8 +145,10 @@ int Heuristic::set_h() {
 	this->loop_over_tiles();
 	this->calculate_heuristic();
 
-//	if (this->has_winner())
-//		this->h = winner_values[this->get_winner()];
+	if (this->has_winner())
+		this->h = winner_values[this->get_winner()];
+	else
+		this->h = std::min(std::max(h, -1900000), 1900000);
 
 //	tt[hash] = this->h;
 
