@@ -1,0 +1,11 @@
+#version: '3'
+
+gomoku:
+  build: .
+  volumes:
+  - .:/code
+  tty: true
+  ports:
+    - 4242-4269:4242-4269
+  command: bash
+  container_name: gomoku
