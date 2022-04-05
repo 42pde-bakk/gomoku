@@ -14,13 +14,16 @@ class Client {
 	int	fd{};
 	struct sockaddr_in	addr{};
 
-	[[nodiscard]] std::vector<int> receive(size_t bufsize) const;
+	[[nodiscard]] std::vector<int> receive(size_t bufsize);
+	void	closeClient();
+	void	error(const char* str);
 
 public:
 	explicit Client(Server *s);
 	~Client();
-	[[nodiscard]] Gamestate	*receiveGamestate() const;
-	void send_move(const Move &move) const;
+	[[nodiscard]] Gamestate	*receiveGamestate();
+	void send_move(const Move &move);
+	[[nodiscard]] bool	isAlive() const;
 };
 
 

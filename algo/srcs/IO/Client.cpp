@@ -9,7 +9,9 @@
 #include <cstring>
 #include <cassert>
 
-static void	error(const char* str) {
+void	Client::error(const char* str) {
+	this->closeClient();
+	std::cerr << "client error\n";
 	std::cerr << _RED _BOLD << str << "\n" _END;
 	throw std::runtime_error(strerror(errno));
 }
@@ -23,12 +25,10 @@ Client::Client(Server *s) : parent(s) {
 }
 
 Client::~Client() {
-	close(fd);
-	std::cerr << "Closed Client with fd " << fd << "\n";
-	fd = -1;
+	this->closeClient();
 }
 
-std::vector<int> Client::receive(size_t bufsize) const {
+std::vector<int> Client::receive(size_t bufsize) {
 	int		recvRet;
 	char	buf[bufsize + 1];
 	std::vector<int> intArray;
@@ -44,7 +44,7 @@ std::vector<int> Client::receive(size_t bufsize) const {
 	return (intArray);
 }
 
-Gamestate *Client::receiveGamestate() const {
+Gamestate *Client::receiveGamestate() {
 	auto	*gs = new Gamestate();
 	int 	stones_amount;
 	int		turn;
@@ -65,13 +65,14 @@ Gamestate *Client::receiveGamestate() const {
 		}
 	} catch (std::runtime_error& e) {
 		delete gs;
+		std::cerr << "rethrowing\n";
 		throw (e);
 	}
 	return (gs);
 }
 
 
-void Client::send_move(const Move &move) const {
+void Client::send_move(const Move &move) {
 	char buff[BUFSIZ];
 	// We have to translate the move to Pythons X,Y system (no seperating bit)
 	const int y = move.move_idx / REALBOARDWIDTH; // -1 to account for the seperating bit
@@ -91,5 +92,14 @@ void Client::send_move(const Move &move) const {
 	int sendRet = write(fd, buff, sizeof(int) * 3);
 	if (sendRet <= 0)
 		error("Error sending move");
+}
+
+bool Client::isAlive() const {
+	return (this->fd != -1);
+}
+
+void Client::closeClient() {
+	close(this->fd);
+	this->fd = -1;
 }
 

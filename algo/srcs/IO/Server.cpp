@@ -10,11 +10,12 @@
 #include <fstream>
 
 static void	error(const char* str) {
+	std::cerr << "server error\n";
 	std::cerr << _RED _BOLD << str << "\n" _END;
 	throw std::runtime_error(strerror(errno));
 }
 
-Server::Server() : port(4242) {
+Server::Server() : port(4242u) {
 	bzero(&this->serv_addr, sizeof(struct sockaddr_in));
 	if ((this->sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) // PF_INET maybe?
 		error("Error setting server socket");
@@ -45,7 +46,7 @@ Server::~Server() {
 	this->sockfd = -1;
 }
 
-int Server::getport() const {
+unsigned int Server::getport() const {
 	return (this->port);
 }
 
