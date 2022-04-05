@@ -155,19 +155,21 @@ int Heuristic::set_h() {
 	return (this->h);
 }
 
-int Heuristic::add_h_for_captures(const std::array<int, 2> &captures) {
+int Heuristic::add_h_for_captures() {
 	static const int winner_values[2] = {-2000000, 2000000};
+	assert(!(captures[0] >= 10 && captures[1] >= 10));
 	if (this->has_winner())
 		return (this->h);
 
-	for (int p = 0; p < 2; ++p) {
-		if (captures[p] >= 10) {
-			this->winner = p;
-			this->h = winner_values[p];
-		}
+	if (captures[0] >= 10 || captures[1] >= 10) {
+		// winning condition
+		auto p = (captures[0] >= 10) ? 0 : 1;
+		this->winner = p;
+		this->h = winner_values[p];
 	}
-	// Not adding extra value to any non game-winning captures for now
-	// This might change later
+	else {
+		this->h += (captures[1] - captures[0] * 1000);
+	}
 	return (this->h);
 }
 
@@ -202,6 +204,7 @@ void Heuristic::print_heuristic(std::ostream &o) const {
 		for (auto & i : linevalues) {
 			o << '\t' << LineValueToStr(i) << ": " << this->values[p].at(i) << "\n";
 		}
+		o << "\tCaptures: " << this->captures[p] << '\n';
 	}
 }
 
@@ -216,7 +219,7 @@ int Heuristic::get_winner() const {
 Heuristic::Heuristic() { }
 
 Heuristic::Heuristic(const Heuristic &x)
-	: Bitboard(x), values(), h(x.h), winner(x.winner) {
+	: Bitboard(x), values(), h(x.h), winner(x.winner), captures(x.captures) {
 	values[0].fill(0);
 	values[1].fill(0);
 }

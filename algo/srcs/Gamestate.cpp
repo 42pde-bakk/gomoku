@@ -9,7 +9,7 @@
 bool g_log = false;
 
 Gamestate::Gamestate(const Gamestate &x) :
-		Heuristic(x), captures(x.captures), moves(x.moves),
+		Heuristic(x), moves(x.moves),
 		parent(&x), children(),
 		depth(x.depth), player(x.player) {
 }
@@ -77,6 +77,11 @@ Gamestate::Gamestate() { }
 void Gamestate::place_stone(int move_idx) {
 	assert(move_idx >= 0 && move_idx < BOARDSIZE);
 	assert (this->tile_is_empty(move_idx));
+//	static size_t whoo = 1;
+//
+//	dprintf(1, "whoo = %zu\n", whoo);
+//	whoo++;
+
 	this->set(move_idx, this->get_player());
 	this->moves.emplace_back(move_idx, player);
 	if (!this->perform_captures(move_idx)) {
@@ -86,7 +91,7 @@ void Gamestate::place_stone(int move_idx) {
 	}
 	// TODO: update heuristic value
 	this->set_h();
-	this->add_h_for_captures(this->captures);
+	this->add_h_for_captures();
 //	this->write_to_file();
 	this->depth++;
 	this->change_player();

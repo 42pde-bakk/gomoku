@@ -18,7 +18,6 @@ class Client;
 class Gamestate : public Heuristic {
 	Gamestate& operator=(const Gamestate& x);
 protected:
-	std::array<int, 2>	captures{};
 	std::vector<Move>	moves;
 	const Gamestate	*parent{};
 	std::vector<Gamestate*> children;

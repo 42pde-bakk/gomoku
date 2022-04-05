@@ -28,9 +28,10 @@ protected:
 	std::array<std::array<int, 7>, 2> values{};
 	int h{};
 	int winner{};
+	std::array<int, 2>	captures{};
 
 	int set_h();
-	int	add_h_for_captures(const std::array<int, 2>& captures);
+	int add_h_for_captures();
 	[[nodiscard]] bool isUnbreakable(unsigned int start_idx, unsigned int end_idx, int dir) const;
 	[[nodiscard]] bool canGetCaptured(unsigned int start_idx, int dir) const;
 
