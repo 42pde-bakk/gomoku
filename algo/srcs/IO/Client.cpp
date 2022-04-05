@@ -24,6 +24,7 @@ Client::Client(Server *s) : parent(s) {
 
 Client::~Client() {
 	close(fd);
+	std::cerr << "Closed Client with fd " << fd << "\n";
 	fd = -1;
 }
 
@@ -35,10 +36,8 @@ std::vector<int> Client::receive(size_t bufsize) const {
 	bzero(&buf, sizeof(buf));
 	if ((recvRet = read(fd, buf, bufsize)) == -1)
 		error("Error reading from socket");
-	if (recvRet == 0) {
-		std::cerr << "Read returned 0.\n";
-		exit(1);
-	}
+	if (recvRet == 0)
+		error("Read returned 0");
 
 	for (int i = 0; i < recvRet; i += 4)
 		intArray.push_back(buf[i]);
@@ -50,18 +49,23 @@ Gamestate *Client::receiveGamestate() const {
 	int 	stones_amount;
 	int		turn;
 
-	turn = this->receive(4)[0];
-	gs->player = turn % 2;
-	gs->depth = 0;
+	try {
+		turn = this->receive(4)[0];
+		gs->player = turn % 2;
+		gs->depth = 0;
 
-	stones_amount = this->receive(4)[0];
-	for (int i = 0; i < stones_amount; i++) {
-		std::vector<int> arr = this->receive(12);
-		int y = arr[0],
-			x = arr[1],
-			colour = arr[2];
-		assert(colour == 1 || colour == 2);
-		gs->set(y * 20 + x, colour - 1);
+		stones_amount = this->receive(4)[0];
+		for (int i = 0; i < stones_amount; i++) {
+			std::vector<int> arr = this->receive(12);
+			int y = arr[0],
+				x = arr[1],
+				colour = arr[2];
+			assert(colour == 1 || colour == 2);
+			gs->set(y * 20 + x, colour - 1);
+		}
+	} catch (std::runtime_error& e) {
+		delete gs;
+		throw (e);
 	}
 	return (gs);
 }

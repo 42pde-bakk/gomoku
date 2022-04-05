@@ -36,5 +36,5 @@ int main() {
 	catch (std::exception& e) {
 		std::cerr << _RED _BOLD << e.what() << _END << '\n';
 	}
-	exit(0);
+	// exit(0);
 }
