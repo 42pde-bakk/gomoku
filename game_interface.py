@@ -32,11 +32,11 @@ class Game(tk.Frame):
         self.minimax = Minimax()
         self.game_mode = game_mode
         self.frm_board = None
-        self.white = tk.PhotoImage(file='/Users/abumbier/gomoku/assets/white.png')
-        self.black = tk.PhotoImage(file='/Users/abumbier/gomoku/assets/black.png')
-        self.gray = tk.PhotoImage(file='/Users/abumbier/gomoku/assets/gray.png')
-        self.red = tk.PhotoImage(file="/Users/abumbier/gomoku/assets/red.png")
         self.hotseat_move = [0, 0]
+        self.white = tk.PhotoImage(file='assets/white.png')
+        self.black = tk.PhotoImage(file='assets/black.png')
+        self.gray = tk.PhotoImage(file='assets/gray.png')
+        self.red = tk.PhotoImage(file="assets/red.png")
 
     def print_board(self):
         print(self.gamestate.board.get_board())
