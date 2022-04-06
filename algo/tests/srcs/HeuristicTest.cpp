@@ -323,10 +323,7 @@ TEST_CASE_METHOD(Gamestate, "Mistake", "[HeuristicTests]") {
 	set_h();
 	std::cerr << *this << '\n';
 
-	generate_children();
-	for (auto& child : children) {
-		std::cerr << "Child:\n" << *child;
-		child->print_heuristic(std::cerr);
-	}
-
+	auto* result = iterative_deepening(this, this->get_player());
+	std::cerr << *result;
+	result->print_heuristic(std::cerr);
 }

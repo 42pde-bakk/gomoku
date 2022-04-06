@@ -7,6 +7,7 @@
 #include <algorithm>
 
 bool g_log = false;
+bool g_log_heur = false;
 
 Gamestate::Gamestate(const Gamestate &x) :
 		Heuristic(x), moves(x.moves),
@@ -70,6 +71,7 @@ void	Gamestate::write_to_file() const {
 	fs << Heuristic::hash_fn(this->board) << '\n';
 	fs << "Heuristic value: " << this->h << '\n';
 	print_board(fs, false);
+	print_heuristic(fs);
 }
 
 Gamestate::Gamestate() { }
@@ -92,7 +94,8 @@ void Gamestate::place_stone(int move_idx) {
 	// TODO: update heuristic value
 	this->set_h();
 	this->add_h_for_captures();
-//	this->write_to_file();
+	if (g_log_heur)
+		this->write_to_file();
 	this->depth++;
 	this->change_player();
 }

@@ -10,5 +10,6 @@
 #endif
 
 extern bool g_log; // Used to turn logging off and on on short intervals to discover bugs
+extern bool g_log_heur; // Used to turn logging off and on on short intervals to discover bugs
 
 #endif //GOMOKUBOT_GOMOKU_HPP
