@@ -11,50 +11,62 @@ class Rules:
 		self.opp_val = [Board.get_relative_position(direction, -2) for direction in self.dir]
 
 	def is_legal_move(self, row: int, col: int, player: int, board: Board) -> bool:
-		# if self.is_two_open_threes(row, col, player, board):
-		# 	return False
+		if self.is_two_open_threes(row, col, player, board):
+			return False
 		return True
 
-	# def is_open_three(self, row: int, col: int, player: int, board: Board, d: tuple) -> bool:
-	# 	inside_zero = False
-	# 	stones = 0
-	# 	for i in range(1, 5): # check given direction
-	# 		rel = board.get_relative_position(d, i)
-	# 		if stones == 2:
-	# 			if board.get(row + rel[0], col + rel[1]): # if forms three and is not null
-	# 				return False # cant be open three
-	# 			break
-	# 		if not self.is_not_player_check(row + rel[0], col + rel[1], player, board) or not board.get(row + rel[0], col + rel[1]):
-	# 			if not board.get(row + rel[0], col + rel[1]):
-	# 				if inside_zero:
-	# 					break
-	# 				inside_zero = True
-	# 			else:
-	# 				stones += 1
-	# 	for i in range(-1, -4, -1): # check opposite direction
-	# 		rel = board.get_relative_position(d, i)
-	# 		if stones == 2:
-	# 			if board.get(row + rel[0], col + rel[1]): # if forms three and is not null
-	# 				return False # cant be open three
-	# 			return True
-	# 		if not self.is_not_player_check(row + rel[0], col + rel[1], player, board) or not board.get(row + rel[0], col + rel[1]):
-	# 			if not board.get(row + rel[0], col + rel[1]):
-	# 				if inside_zero:
-	# 					return False
-	# 				else:
-	# 					inside_zero = True
-	# 			else:
-	# 				stones += 1
-	# 	return False
+	def is_open_three(self, row: int, col: int, player: int, board: Board, d: tuple) -> bool:
+		inside_zero = False
+		first_zero = False
+		stones = 0
+		for i in range(1, 5):
+			rel = board.get_relative_position(d, i)
+			if stones == 2:
+				if board.get(row + rel[0], col + rel[1]):
+					return False
+				break
+			if not board.get(row + rel[0], col + rel[1]):
+				if inside_zero:
+					break
+				if first_zero:
+					break
+				first_zero = True
+			elif not self.is_not_player_check(row + rel[0], col + rel[1], player, board):
+				stones += 1
+				if first_zero:
+					inside_zero = True
+				first_zero = False
+			else:
+				return False
+		first_zero = False
+		for i in range(-1, -5, -1):
+			rel = board.get_relative_position(d, i)
+			if stones == 2:
+				if board.get(row + rel[0], col + rel[1]):
+					return False
+				return True
+			if not board.get(row + rel[0], col + rel[1]):
+				if inside_zero:
+					return False
+				if first_zero:
+					return False
+				first_zero = True
+			elif not self.is_not_player_check(row + rel[0], col + rel[1], player, board):
+				stones += 1
+				if first_zero:
+					inside_zero = True
+			else:
+				return False
+		return True
 
-	# def is_two_open_threes(self, row: int, col: int, player: int, board: Board) -> bool:
-	# 	second_three = False
-	# 	for direction in self.dir[:4]:
-	# 		if self.is_open_three(row, col, player, board, direction):
-	# 			if second_three:
-	# 				return True
-	# 			second_three = True
-	# 	return False
+	def is_two_open_threes(self, row: int, col: int, player: int, board: Board) -> bool:
+		second_three = False
+		for direction in self.dir[:4]:
+			if self.is_open_three(row, col, player, board, direction):
+				if second_three:
+					return True
+				second_three = True
+		return False
 
 	@staticmethod
 	def opponent_value(player: int) -> int:
