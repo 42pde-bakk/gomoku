@@ -87,19 +87,6 @@ class Gamestate:
 				self.capture((y + dy, x + dx), (y + 2 * dy, x + 2 * dx), player)
 		return True
 
-	# def game_over_check(self, y: int, x: int, player: Stone) -> bool:
-	# 	for dy, dx in [(1, 0), (0, 1), (1, 1), (-1, 1)]:
-	# 		n = m = 1
-	# 		while self.board.get(y + n * dy, x + n * dx) == player.value:
-	# 			n += 1
-	# 		while self.board.get(y + m * -dy, x + m * -dx) == player.value:
-	# 			m += 1
-	# 		if n + m + 1 >= 5:
-	# 			# self.winner = player
-	# 			self.captures[player.value - 1] += 10  # Win
-	# 			return True
-	# 	return False
-
 	def set_h(self) -> int:
 		p1, game_over1 = get_connects_of_player(self.board.arr, player = 1)
 		p2, game_over2 = get_connects_of_player(self.board.arr, player = 2)
