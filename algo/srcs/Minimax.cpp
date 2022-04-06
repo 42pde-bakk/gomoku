@@ -119,6 +119,7 @@ Gamestate	*iterative_deepening(Gamestate *gs, int player) {
 			result = alphabeta(gs, depth, bool(player));
 
 			if (result->has_winner()) {
+				std::cerr << "FOUND A WINNER: Player " << result->get_winner() << "\n";
 				return (result);
 			}
 
