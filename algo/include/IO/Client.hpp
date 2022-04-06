@@ -21,7 +21,7 @@ class Client {
 public:
 	explicit Client(Server *s);
 	~Client();
-	[[nodiscard]] Gamestate	*receiveGamestate();
+	[[nodiscard]] Gamestate receiveGamestate();
 	void send_move(const Move &move);
 	[[nodiscard]] bool	isAlive() const;
 };

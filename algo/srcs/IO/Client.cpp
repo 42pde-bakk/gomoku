@@ -11,7 +11,6 @@
 
 void	Client::error(const char* str) {
 	this->closeClient();
-	std::cerr << "client error\n";
 	std::cerr << _RED _BOLD << str << "\n" _END;
 	throw std::runtime_error(strerror(errno));
 }
@@ -44,29 +43,23 @@ std::vector<int> Client::receive(size_t bufsize) {
 	return (intArray);
 }
 
-Gamestate *Client::receiveGamestate() {
-	auto	*gs = new Gamestate();
+Gamestate Client::receiveGamestate() {
+	Gamestate gs;
 	int 	stones_amount;
 	int		turn;
 
-	try {
-		turn = this->receive(4)[0];
-		gs->player = turn % 2;
-		gs->depth = 0;
+	turn = this->receive(4)[0];
+	gs.player = turn % 2;
+	gs.depth = 0;
 
-		stones_amount = this->receive(4)[0];
-		for (int i = 0; i < stones_amount; i++) {
-			std::vector<int> arr = this->receive(12);
-			int y = arr[0],
-				x = arr[1],
-				colour = arr[2];
-			assert(colour == 1 || colour == 2);
-			gs->set(y * 20 + x, colour - 1);
-		}
-	} catch (std::runtime_error& e) {
-		delete gs;
-		std::cerr << "rethrowing\n";
-		throw (e);
+	stones_amount = this->receive(4)[0];
+	for (int i = 0; i < stones_amount; i++) {
+		std::vector<int> arr = this->receive(12);
+		int y = arr[0],
+			x = arr[1],
+			colour = arr[2];
+		assert(colour == 1 || colour == 2);
+		gs.set(y * 20 + x, colour - 1);
 	}
 	return (gs);
 }

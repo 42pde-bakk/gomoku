@@ -21,9 +21,9 @@ int main() {
 			try {
 				while (client.isAlive()) {
 					std::cerr << "Lets receive a gamestate\n";
-					Gamestate *gs = client.receiveGamestate();
+					Gamestate gs = client.receiveGamestate();
 					std::cerr << "got the gamestate\n";
-					Gamestate *result = iterative_deepening(gs, gs->get_player());
+					Gamestate *result = iterative_deepening(&gs, gs.get_player());
 					Move move = result->get_first_move();
 					std::cerr << "Move: " << move;
 					std::cerr << "Result gamestate: h=" << result->get_h() << ".\n";
@@ -33,10 +33,9 @@ int main() {
 					std::cerr << _PURPLE "Calculating move took " << elapsed_time.count() << " ms\n" _END;
 					client.send_move(move);
 					result->print_history(std::cerr);
-					delete gs;
 				}
 			} catch (const std::exception& e) {
-				std::cerr << _RED _BOLD << e.what() << _END << '\n';
+//				std::cerr << _RED _BOLD << e.what() << _END << '\n';
 			}
 		}
 	}
