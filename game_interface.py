@@ -216,7 +216,7 @@ class Game(tk.Frame):
 
 	def choose_different_game_om(self, frm_options):
 		lbl_choose_game_mode = ttk.Label(frm_options, text=f"Change Game Mode").pack()
-		options = ['Versus ai', 'Hotseat', 'Bot pot', 'blabla', 'blablabla']
+		options = ['Versus ai', 'Hotseat', 'Bot pot', 'Versus ai']
 		clicked = tk.StringVar()
 		# clicked.set(options[0])
 		om_choose_game = ttk.OptionMenu(
