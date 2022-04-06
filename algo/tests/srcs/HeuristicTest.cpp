@@ -242,16 +242,91 @@ TEST_CASE_METHOD(Gamestate, "Block", "[HeuristicTests]") {
 	this->clear_tile(start_idx + 21);
 }
 
-TEST_CASE_METHOD(Gamestate, "Upgrade", "[HeuristicTests]") {
+TEST_CASE_METHOD(Gamestate, "Upgrade 3-1 W-E", "[HeuristicTests]") {
 	const int start_idx = middle_idx;
 	const int dir = 1;
 
 	this->set(start_idx, 1);
-	this->set(start_idx - 1 * dir, 1);
-	this->set(start_idx - 2 * dir, 1);
-	this->set(start_idx - 4 * dir, 1);
+	this->set(start_idx + 1 * dir, 1);
+	this->set(start_idx + 2 * dir, 1);
+	this->set(start_idx + 4 * dir, 1);
 	this->set_h();
 	std::cerr << *this;
 	print_heuristic(std::cerr);
 	REQUIRE(this->h == 7500);
+}
+
+TEST_CASE_METHOD(Gamestate, "Upgrade 1-3 W-E", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+	const int dir = -1;
+
+	this->set(start_idx, 1);
+	this->set(start_idx + 1 * dir, 1);
+	this->set(start_idx + 2 * dir, 1);
+	this->set(start_idx + 4 * dir, 1);
+	this->set_h();
+	std::cerr << *this;
+	print_heuristic(std::cerr);
+	REQUIRE(this->h == 7500);
+}
+
+TEST_CASE_METHOD(Gamestate, "Upgrade 3-1 N-S", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+	const int dir = 20;
+
+	this->set(start_idx, 1);
+	this->set(start_idx + 1 * dir, 1);
+	this->set(start_idx + 2 * dir, 1);
+	this->set(start_idx + 4 * dir, 1);
+	this->set_h();
+	std::cerr << *this;
+	print_heuristic(std::cerr);
+	REQUIRE(this->h == 7500);
+}
+
+TEST_CASE_METHOD(Gamestate, "Upgrade 1-3 N-S", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+	const int dir = -20;
+
+	this->set(start_idx, 1);
+	this->set(start_idx + 1 * dir, 1);
+	this->set(start_idx + 2 * dir, 1);
+	this->set(start_idx + 4 * dir, 1);
+	this->set_h();
+	std::cerr << *this;
+	print_heuristic(std::cerr);
+	REQUIRE(this->h == 7500);
+}
+
+TEST_CASE_METHOD(Gamestate, "Mistake", "[HeuristicTests]") {
+	this->captures[0] = 4;
+	set(89, 1);
+	set(91, 0);
+	set(108, 0);
+	set(111, 0);
+	set(129, 1);
+	set(131, 0);
+	set(147, 0);
+	set(148, 1);
+	set(149, 1);
+	set(150, 1);
+	set(151, 0);
+	set(152, 0);
+	set(170, 0);
+	set(171, 1);
+	set(190, 0);
+	set(191, 0);
+	set(210, 0);
+	set(230, 0);
+	set(250, 1);
+	this->player = 1;
+	set_h();
+	std::cerr << *this << '\n';
+
+	generate_children();
+	for (auto& child : children) {
+		std::cerr << "Child:\n" << *child;
+		child->print_heuristic(std::cerr);
+	}
+
 }
