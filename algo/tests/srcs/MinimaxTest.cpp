@@ -40,3 +40,16 @@ TEST_CASE("Alphabeta pruning", "[MinimaxTests]") {
 
 	delete gs; delete gs2;
 }
+
+TEST_CASE("Whoo", "[MinimaxTests]") {
+	auto *gs = new Gamestate();
+
+	place_stones(gs);
+
+	Gamestate *ab_res = iterative_deepening(gs, gs->get_player());
+	auto end_time = std::chrono::steady_clock::now();
+	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+	std::cerr << _PURPLE "Iterative deepening pruning took " << elapsed_time.count() << " ms\n" _END;
+
+	delete gs;
+}
