@@ -322,6 +322,7 @@ TEST_CASE_METHOD(Gamestate, "Mistake", "[HeuristicTests]") {
 	this->player = 1;
 	set_h();
 	std::cerr << *this << '\n';
+//	g_log_heur = true;
 
 	auto* result = iterative_deepening(this, this->get_player());
 	std::cerr << *result;

@@ -99,7 +99,7 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 			tryUpgradeLineVal(linevalue, prev, next, dir, stone_p);
 
 		this->values[player][linevalue] += 1u;
-		if (linevalue == LineValue::FIVE && this->isUnbreakable(start_idx, next - dir, dir)) {
+		if (linevalue == LineValue::FIVE) { //&& this->isUnbreakable(start_idx, next - dir, dir)) {
 			this->winner = static_cast<int>(stone_p);
 		}
 	}

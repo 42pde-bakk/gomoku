@@ -53,3 +53,32 @@ TEST_CASE("Whoo", "[MinimaxTests]") {
 
 	delete gs;
 }
+
+TEST_CASE_METHOD(Gamestate, "Mistake2", "[HeuristicTests]") {
+	set(88, 0);
+	set(107, 0);
+	set(110, 0);
+	set(125, 0);
+	set(126, 0);
+	set(127, 1);
+	set(128, 1);
+	set(129, 1);
+	set(130, 0);
+	set(131, 1);
+	set(145, 1);
+	set(146, 1);
+	set(148, 1);
+	this->player = 0;
+	place_stone(167); // p0
+	place_stone(148); // p1
+	set_h();
+	std::cerr << *this << '\n';
+	g_log_heur = true;
+
+	auto* result = iterative_deepening(this, this->get_player());
+	std::cerr << *result;
+	result->print_heuristic(std::cerr);
+//	REQUIRE(result->get_first_move().move_idx == 147);
+	REQUIRE(true);
+	delete result;
+}

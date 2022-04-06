@@ -69,7 +69,7 @@ void	Gamestate::write_to_file() const {
 	if (!fs.is_open())
 		throw std::runtime_error("Couldn't write to logfile");
 	fs << Heuristic::hash_fn(this->board) << '\n';
-	fs << "Heuristic value: " << this->h << '\n';
+	fs << "Depth: " << this->depth << ", heuristic value: " << this->h << '\n';
 	print_board(fs, false);
 	print_heuristic(fs);
 }
