@@ -30,7 +30,7 @@ void	place_random_stone(Gamestate *gs) {
 TEST_CASE("Bitset hash", "[HashingTests]") {
 	auto start_time = std::chrono::steady_clock::now();
 	std::hash<bitboard> hash_fn;
-	for (int i = 0; i < 720; i++) {
+	for (int i = 0; i < 20000; i++) {
 		Gamestate gs;
 		place_random_stone(&gs);
 		auto hash = hash_fn(gs.get());
@@ -38,5 +38,5 @@ TEST_CASE("Bitset hash", "[HashingTests]") {
 	}
 	auto end_time = std::chrono::steady_clock::now();
 	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-	std::cerr << _PURPLE "hashing 720x took " << elapsed_time.count() << " ms\n" _END;
+	std::cerr << _PURPLE "hashing 20 000x took " << elapsed_time.count() << " ms\n" _END;
 }

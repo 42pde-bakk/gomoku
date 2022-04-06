@@ -118,7 +118,7 @@ TEST_CASE_METHOD(Gamestate, "Three plus one", "[HeuristicTests]") {
 	REQUIRE(get_h() == 0);
 }
 
-TEST_CASE_METHOD(Gamestate, "four", "[HeuristicTests]") {
+TEST_CASE_METHOD(Gamestate, "FourLoco", "[HeuristicTests]") {
 	const int start_idx = middle_idx;
 	const int dir = 21;
 
@@ -127,6 +127,7 @@ TEST_CASE_METHOD(Gamestate, "four", "[HeuristicTests]") {
 	this->set(start_idx - 2 * dir, 1);
 	this->set(start_idx - 3 * dir, 1);
 	this->set_h();
+//	std::cerr << *this;
 	REQUIRE(this->h == 15000);
 
 	this->set(start_idx + dir, 0);
@@ -319,6 +320,66 @@ TEST_CASE_METHOD(Gamestate, "Mistake", "[HeuristicTests]") {
 	set(210, 0);
 	set(230, 0);
 	set(250, 1);
+	this->player = 1;
+	set_h();
+	std::cerr << *this << '\n';
+//	g_log_heur = true;
+
+	auto* result = iterative_deepening(this, this->get_player());
+	std::cerr << *result;
+	result->print_heuristic(std::cerr);
+}
+
+TEST_CASE_METHOD(Gamestate, "Mistake2", "[HeuristicTests]") {
+	set(88, 0);
+	set(107, 0);
+	set(110, 0);
+	set(125, 0);
+	set(126, 0);
+	set(127, 1);
+	set(128, 1);
+	set(129, 1);
+	set(130, 0);
+	set(131, 1);
+	set(145, 1);
+	set(146, 1);
+	set(148, 1);
+	this->player = 0;
+//	place_stone(167); // p0
+//	place_stone(148); // p1
+	set_h();
+	std::cerr << *this << '\n';
+
+	auto result = iterative_deepening(this, this->get_player());
+	std::cerr << *result;
+	result->print_heuristic(std::cerr);
+	unsigned int m = result->get_first_move().move_idx;
+	std::cerr << result->get_first_move().move_idx << '\n';
+	REQUIRE((m == 147 || m == 167));
+}
+
+TEST_CASE_METHOD(Gamestate, "Mistake3", "[HeuristicTests]") {
+	this->captures = {4, 4};
+
+	set(24, 1);
+	set(41, 0);
+	set(44, 1);
+	set(61, 1);
+	set(62, 0);
+	set(63, 1);
+	set(65, 0);
+	set(81, 1);
+	set(82, 1);
+	set(83, 0);
+	set(84, 0);
+	set(101, 1);
+//	set(102, 1);
+//	set(104, 0);
+	set(105, 0);
+	set(121, 0);
+	set(124, 1);
+	set(125, 0);
+	set(145, 0);
 	this->player = 1;
 	set_h();
 	std::cerr << *this << '\n';

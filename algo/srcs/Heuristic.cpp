@@ -133,13 +133,13 @@ void Heuristic::calculate_heuristic() {
 int Heuristic::set_h() {
 	static const int winner_values[3] = {0, -2000000, 2000000};
 	g_checkedTiles.clear();
-//	auto hash = hash_fn(this->board);
+	auto hash = hash_fn(this->board);
 
 	this->h = 0;
-//	if (tt.find(hash) != tt.end()) {
-//		this->h = tt[hash];
-//		return (this->h);
-//	}
+	if (tt.find(hash) != tt.end()) {
+		this->h = tt[hash];
+		return (this->h);
+	}
 	for (int i = 0; i < 2; ++i)
 		this->values[i].fill(0);
 	this->loop_over_tiles();
@@ -150,25 +150,23 @@ int Heuristic::set_h() {
 	else
 		this->h = std::min(std::max(h, -1900000), 1900000);
 
-//	tt[hash] = this->h;
-
+	tt[hash] = this->h;
 	return (this->h);
 }
 
 int Heuristic::add_h_for_captures() {
-	static const int winner_values[2] = {-2000000, 2000000};
+	static const int winner_values[2] = {-2100000, 2100000};
 	assert(!(captures[0] >= 10 && captures[1] >= 10));
 	if (this->has_winner())
 		return (this->h);
 
 	if (captures[0] >= 10 || captures[1] >= 10) {
 		// winning condition
-		auto p = (captures[0] >= 10) ? 0 : 1;
-		this->winner = p;
-		this->h = winner_values[p];
+		this->winner = (captures[0] >= 10) ? 0 : 1;
+		this->h = winner_values[this->winner];
 	}
 	else {
-		this->h += (captures[1] - captures[0] * 1000);
+		this->h += (captures[1] - captures[0]) * 500;
 	}
 	return (this->h);
 }

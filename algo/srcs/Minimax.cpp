@@ -109,7 +109,7 @@ Gamestate *alphabeta(Gamestate *state, int depth, bool maximizing_player) {
 Gamestate	*iterative_deepening(Gamestate *gs, int player) {
 	start_time = std::chrono::steady_clock::now();
 
-	int depth = 1;
+	int depth = 2;
 	Gamestate *result = nullptr;
 
 	try {
@@ -124,7 +124,7 @@ Gamestate	*iterative_deepening(Gamestate *gs, int player) {
 			}
 
 			std::cerr << "End of loop, elapsed time: " << elapsed_time << '\n';
-			depth++;
+			depth += 2;
 			check_time_limit();
 		}
 	} catch (std::logic_error& e) {
