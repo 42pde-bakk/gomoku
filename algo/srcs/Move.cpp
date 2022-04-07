@@ -9,7 +9,9 @@ Move::Move(int idx, int player) : move_idx(idx), player(player) {
 }
 
 std::ostream&	operator<<(std::ostream& o, const Move& m) {
-	o << "Move (p" << m.player << "), y: " << m.move_idx / BOARDHEIGHT << ", x: " << m.move_idx % BOARDHEIGHT << "\n";
+	const int y = m.move_idx / REALBOARDWIDTH; // -1 to account for the seperating bit
+	const int x = m.move_idx % REALBOARDWIDTH;
+	o << "Move (p" << m.player << "), y: " << y << ", x: " << x << "\n";
 	return (o);
 }
 
