@@ -10,8 +10,8 @@
 #include <fstream>
 
 static void	error(const char* str) {
-	std::cerr << "server error\n";
-	std::cerr << _RED _BOLD << str << "\n" _END;
+	std::cout << "server error\n"; // cerr
+	std::cout << _RED _BOLD << str << "\n" _END; // cerr
 	throw std::runtime_error(strerror(errno));
 }
 
@@ -25,7 +25,7 @@ Server::Server() : port(4242u) {
 	this->serv_addr.sin_family = INADDR_ANY;
 
 	while (bind(this->sockfd, (struct sockaddr *)&this->serv_addr, sizeof(struct sockaddr)) == -1) {
-		std::cerr << _RED _BOLD "Address in use, sleeping 1\n" << _END;
+		std::cout << _RED _BOLD "Address in use, sleeping 1\n" << _END;
 		port++;
 		this->serv_addr.sin_port = htons(this->port);
 	}
