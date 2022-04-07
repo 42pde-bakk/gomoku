@@ -5,6 +5,7 @@
 #ifndef GOMOKUBOT_JOBQUEUE_HPP
 #define GOMOKUBOT_JOBQUEUE_HPP
 # include "AsyncQueue.hpp"
+# include <atomic>
 
 class JobQueue : public AsyncQueue<Job> {
 private:
@@ -14,8 +15,8 @@ private:
 
 public:
 	void	waitFinished();
-	void	enqueue(Job& job) override;
-	Job		dequeue() override;
+	void	push(Job& job) override;
+	Job		pop() override;
 };
 
 JobQueue&		getJobQueue();

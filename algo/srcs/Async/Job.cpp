@@ -5,7 +5,18 @@
 #include "Async/Job.hpp"
 #include "Gamestate.hpp"
 
-Job::Job(const Gamestate *parent, const unsigned int moveIdx) : _parent(parent), _moveIdx(moveIdx) {
+Job::Job() : _parent(), _moveIdx(-1) { }
+
+Job::Job(const Gamestate *parent, const unsigned int moveIdx) : _parent(parent), _moveIdx(moveIdx) { }
+
+Job::Job(const Job &x) : _parent(x._parent), _moveIdx(x._moveIdx) { }
+
+Job &Job::operator=(const Job& x) {
+	if (this != &x) {
+		this->_parent = x._parent;
+		this->_moveIdx = x._moveIdx;
+	}
+	return (*this);
 }
 
 Job::~Job() = default;
@@ -23,3 +34,4 @@ Gamestate *Job::execute() const {
 	child->place_stone(this->_moveIdx);
 	return (child);
 }
+

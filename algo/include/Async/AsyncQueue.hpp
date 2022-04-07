@@ -6,6 +6,7 @@
 #define GOMOKUBOT_ASYNCQUEUE_HPP
 
 #include <queue>
+#include <stack>
 #include <mutex>
 #include <condition_variable>
 #include "Job.hpp"
@@ -13,7 +14,7 @@
 template <typename T>
 class AsyncQueue {
 protected:
-	std::queue<T>			_q;
+	std::stack<T>			_q;
 	mutable std::mutex		_m;
 	std::condition_variable	_c;
 
@@ -21,8 +22,11 @@ public:
 	AsyncQueue();
 	~AsyncQueue();
 
-	virtual void	enqueue(T& t);
-	virtual T		dequeue();
+	AsyncQueue(const AsyncQueue<T> &) = delete ;
+	AsyncQueue& operator=(const AsyncQueue<T> &) = delete ;
+
+	virtual void	push(T& t);
+	virtual T		pop();
 	bool	empty() const;
 	void	clear();
 };
@@ -35,29 +39,30 @@ template<typename T>
 AsyncQueue<T>::~AsyncQueue() = default;
 
 template<typename T>
-void AsyncQueue<T>::enqueue(T& t) {
+void AsyncQueue<T>::push(T& t) {
 	std::lock_guard<std::mutex>	lock_guard(this->_m);
 	this->_q.push(t);
 	this->_c.notify_one();
 }
 
 template<typename T>
-T AsyncQueue<T>::dequeue() {
+T AsyncQueue<T>::pop() {
 	std::unique_lock<std::mutex> lock(this->_m);
 //	while(this->_q.empty()) {
 //		// release lock as long as the wait and reaquire it afterwards.
 //		this->_c.wait(lock);
 //	}
 	this->_c.wait(lock, [&]{ return (!this->_q.empty()); } );
-	T t = this->_q.front();
+	T t = this->_q.top();
 	this->_q.pop();
 	return t;
 }
 
 template<typename T>
 bool AsyncQueue<T>::empty() const {
-	std::unique_lock<std::mutex>	lock(_m);
 	return (this->_q.empty());
+//	std::unique_lock<std::mutex>	lock(_m);
+//	return (this->_q.empty());
 }
 
 template<typename T>

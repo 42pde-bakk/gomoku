@@ -8,10 +8,12 @@
 #include <utility>
 #include "AsyncQueue.hpp"
 #include <vector>
+#include <atomic>
 
 // Singleton
 class Threadpool {
-	unsigned int		_numThreads;
+	const unsigned int		_numThreads;
+	std::atomic<int>		busyWorkers;
 	std::vector<std::thread>	_threads;
 	AsyncQueue<Job>&	_jobQueue;
 	AsyncQueue<Gamestate*>&	_outputQueue;
@@ -29,6 +31,7 @@ public:
 		return threadpool;
 	}
 
+	void WaitForWorkers() const;
 };
 
 

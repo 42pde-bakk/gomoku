@@ -4,9 +4,12 @@
 
 #include "Threadpool.hpp"
 #include "JobQueue.hpp"
+#include "Gomoku.hpp"
+#include <unistd.h>
+#if THREADED
 
 Threadpool::Threadpool(unsigned int numThreads)
-	: _numThreads(numThreads), _jobQueue(getJobQueue()), _outputQueue(getOutputQueue())
+	: _numThreads(numThreads), busyWorkers(numThreads), _jobQueue(getJobQueue()), _outputQueue(getOutputQueue())
 {
 	this->_threads.reserve(this->_numThreads);
 	for (unsigned int i = 0; i < _numThreads; i++) {
@@ -21,8 +24,19 @@ Threadpool::~Threadpool() {
 
 void Threadpool::launch_worker() {
 	while (true) {
-		Job job = this->_jobQueue.dequeue();
+		--busyWorkers;
+		Job job = this->_jobQueue.pop();
+		++busyWorkers;
 		auto gs = job.execute();
-		this->_outputQueue.enqueue(gs);
+		this->_outputQueue.push(gs);
 	}
 }
+
+void Threadpool::WaitForWorkers() const {
+	while (this->busyWorkers) {
+		// dummy
+		usleep(500);
+	}
+}
+
+#endif
