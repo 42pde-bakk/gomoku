@@ -48,7 +48,7 @@ public:
 
 	[[nodiscard]] const Move& get_first_move() const;
 
-	void	place_stone(int move_idx);
+	void	place_stone(unsigned int move_idx);
 	void	clear_children();
 
 	void	print_history(std::ostream& o) const;
@@ -56,8 +56,8 @@ protected:
 	int		change_player();
 	void	write_to_file() const;
 	// Captures.cpp
-	unsigned int perform_captures(int pos);
-	unsigned int capture_check_dir(int idx, int dir);
+	unsigned int perform_captures(unsigned int pos);
+	unsigned int capture_check_dir(unsigned int idx, unsigned int dir);
 };
 
 typedef bool (*compareFunc)(const Gamestate* a, const Gamestate* b);

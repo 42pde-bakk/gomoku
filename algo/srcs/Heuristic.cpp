@@ -8,15 +8,15 @@
 #include <iostream>
 #include <cassert>
 
-std::hash<bitboard> Heuristic::hash_fn;
-std::unordered_map<int, unsigned int> g_checkedTiles;
-std::unordered_map<std::bitset<BOARDSIZE>, int> Heuristic::tt;
+//std::hash<bitboard> Heuristic::hash_fn;
+//std::unordered_map<int, unsigned int> g_checkedTiles;
+//std::unordered_map<std::bitset<BOARDSIZE>, int> Heuristic::tt;
 
 int Heuristic::get_h() const {
 	return (this->h);
 }
 
-unsigned int Heuristic::get_length(unsigned int *i, unsigned int stone_p, unsigned int d) const {
+unsigned int Heuristic::get_length(unsigned int *i, unsigned int stone_p, unsigned int d,  std::array<unsigned int, REALBOARDSIZE>& g_checkedTiles) const {
 	static const std::array<int, 4> dirs = setup_dirs();
 	unsigned int length = 1;
 	unsigned int& idx = *i;
@@ -26,12 +26,12 @@ unsigned int Heuristic::get_length(unsigned int *i, unsigned int stone_p, unsign
 	while (idx < REALBOARDSIZE && !isSeperatingBitIndex(idx) && this->bitboard_get(idx) == stone_p) {
 		length++;
 		g_checkedTiles[idx] |= 1u << d;
-		if (g_log)
-			dprintf(2, "checked_tiles[%u] now is %d, Unioned this into it: (%u)\n", idx, g_checkedTiles[idx], 1u << (d + 1));
+//		if (g_log)
+//			dprintf(2, "checked_tiles[%u] now is %d, Unioned this into it: (%u)\n", idx, g_checkedTiles[idx], 1u << (d + 1));
 		idx += dirs[d];
 	}
-	if (g_log)
-		dprintf(2, "dir=%d, length=%u\n", dirs[d], length);
+//	if (g_log)
+//		dprintf(2, "dir=%d, length=%u\n", dirs[d], length);
 	return (length);
 }
 
@@ -52,13 +52,13 @@ LineValue	Heuristic::calc_linevalue(unsigned int length, unsigned int open_sides
 unsigned int Heuristic::count_open_sides(unsigned int prev, unsigned int next) const {
 	unsigned int open_sides = 0;
 	if (prev < REALBOARDSIZE && !isSeperatingBitIndex(prev) && tile_is_empty(prev)) {
-		if (g_log)
-			dprintf(2, "prev (%u) is empty!\n", prev);
+//		if (g_log)
+//			dprintf(2, "prev (%u) is empty!\n", prev);
 		open_sides += 1u;
 	}
 	if (next < REALBOARDSIZE && !isSeperatingBitIndex(next) && tile_is_empty(next)) {
-		if (g_log)
-			dprintf(2, "next (%u) is empty!\n", next);
+//		if (g_log)
+//			dprintf(2, "next (%u) is empty!\n", next);
 		open_sides += 1u;
 	}
 	return (open_sides);
@@ -73,21 +73,21 @@ void Heuristic::tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int
 		lv = static_cast<LineValue>(int(lv) + 1);
 }
 
-void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
+void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::array<unsigned int, REALBOARDSIZE>& checkedTiles) {
 	static const std::array<int, 4> dirs = setup_dirs();
 	const unsigned int player = stone_p - 1;
 
-	if (g_log) dprintf(2, "start_idx: %u, stones: p=%u\n", start_idx, stone_p);
+//	if (g_log) dprintf(2, "start_idx: %u, stones: p=%u\n", start_idx, stone_p);
 	for (unsigned int d = 0; d < dirs.size(); d++) {
 		const int dir = dirs[d];
 
-		if (g_log) dprintf(2, "dirs[%u] = %d\n", d, dir);
-		if (g_checkedTiles[start_idx] & (1u << d)) {
-			if (g_log) dprintf(2, "already checked %u in direction %d\n", start_idx, dir);
+//		if (g_log) dprintf(2, "dirs[%u] = %d\n", d, dir);
+		if (checkedTiles[start_idx] & (1u << d)) {
+//			if (g_log) dprintf(2, "already checked %u in direction %d\n", start_idx, dir);
 			continue ;
 		}
 		unsigned int next = start_idx + dir;
-		unsigned int length = this->get_length(&next, stone_p, d);
+		unsigned int length = this->get_length(&next, stone_p, d, checkedTiles);
 
 		if (length < 2) // Might change this to (length <= 2)
 			continue;
@@ -106,12 +106,14 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 }
 
 void Heuristic::loop_over_tiles() {
+	std::array<unsigned int, REALBOARDSIZE> checkedTiles{};
+
 	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
 		unsigned int stone = this->bitboard_get(i);
 		if (!stone)
 			continue;
 		assert(stone == 1 || stone == 2);
-		this->count_lines(i, stone);
+		this->count_lines(i, stone, checkedTiles);
 	}
 }
 
@@ -132,7 +134,6 @@ void Heuristic::calculate_heuristic() {
 
 int Heuristic::set_h() {
 	static const int winner_values[3] = {0, -2000000, 2000000};
-	g_checkedTiles.clear();
 //	auto hash = hash_fn(this->board);
 
 	this->h = 0;

@@ -6,7 +6,6 @@
 #include "../catch.hpp"
 #include "Gamestate.hpp"
 #include "Colours.hpp"
-#include "Utils.hpp"
 #include <random>
 
 const int middle_idx = 9 * 20 + 9;

@@ -6,6 +6,7 @@
 #include "Gamestate.hpp"
 #include <limits>
 #include <chrono>
+#include "Colours.hpp"
 
 std::chrono::time_point<std::chrono::steady_clock> start_time = std::chrono::steady_clock::now();;
 std::chrono::time_point<std::chrono::steady_clock> current_time = std::chrono::steady_clock::now();;
@@ -16,7 +17,10 @@ void check_time_limit() {
 
 	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
 	if (elapsed_time >= MAX_THINK_TIME) {
-		dprintf(2, "elapsed_time = %llu, LETS THROW THIS BITCH\n", elapsed_time);
+		{
+			std::lock_guard<std::mutex> lock(cerrMutex);
+			std::cout << _RED << _BOLD "elapsed_time = " << elapsed_time << ", LETS THROW THIS BITCH\n" _END;
+		}
 		throw std::logic_error("Timeout value reached");
 	}
 }
@@ -92,10 +96,6 @@ Gamestate *internal_alphabeta(Gamestate *state, int depth, int alpha, int beta, 
 			beta = std::min(beta, new_state->get_h());
 		}
 	}
-	if (best_state == nullptr) {
-		dprintf(2, "depth=%d, alpha=%d, beta=%d, maximizing_player=%d\n", depth, alpha, beta, maximizing_player);
-		dprintf(2, "state->children.size() = %zu\n", state->get_children().size());
-	}
 	return (best_state);
 }
 
@@ -108,27 +108,28 @@ Gamestate *alphabeta(Gamestate *state, int depth, bool maximizing_player) {
 
 Gamestate	*iterative_deepening(Gamestate *gs, int player) {
 	start_time = std::chrono::steady_clock::now();
+	current_time = std::chrono::steady_clock::now();
 
 	int depth = 1;
 	Gamestate *result = nullptr;
 
 	try {
 		while (true) {
-			std::cerr << "Start loop, depth: " << depth << ", elapsed time: " << elapsed_time << '\n';
+			std::cout << "Start loop, depth: " << depth << ", elapsed time: " << elapsed_time << '\n';
 //			gs->clear_children();
 			result = alphabeta(gs, depth, bool(player));
 
 			if (result->has_winner()) {
-				std::cerr << "FOUND A WINNER: Player " << result->get_winner() << "\n";
+				std::cout << "FOUND A WINNER: Player " << result->get_winner() << "\n";
 				return (result);
 			}
 
-			std::cerr << "End of loop, elapsed time: " << elapsed_time << '\n';
+			std::cout << "End of loop, elapsed time: " << elapsed_time << '\n';
 			depth++;
 			check_time_limit();
 		}
 	} catch (std::logic_error& e) {
-		std::cerr << "Caught: " << e.what() << std::endl;
+		std::cout << "Caught: " << e.what() << std::endl;
 	}
 	return (result);
 }

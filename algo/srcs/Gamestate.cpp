@@ -3,8 +3,13 @@
 //
 
 #include "Gamestate.hpp"
+#include "JobQueue.hpp"
 #include <cassert>
 #include <algorithm>
+#include "Gomoku.hpp"
+#include <fstream>
+#include <sstream>
+#include <chrono>
 
 bool g_log = false;
 
@@ -15,8 +20,10 @@ Gamestate::Gamestate(const Gamestate &x) :
 }
 
 Gamestate::~Gamestate() {
-	for (auto child : this->children)
+	for (auto& child : this->children) {
 		delete child;
+		child = nullptr;
+	}
 	this->children.clear();
 }
 
@@ -29,12 +36,22 @@ bool compareGamestatesReverse(const Gamestate* a, const Gamestate* b) { return (
 
 // https://core.ac.uk/download/pdf/33500946.pdf
 void Gamestate::generate_children() {
+#if THREADED
+	static std::fstream fs("log/generate_children.txt", std::fstream::out | std::fstream::trunc);
+	static JobQueue&	jobQueue(getJobQueue());
+	static AsyncQueue<Gamestate *>& outputQueue(getOutputQueue());
+#else
+	static std::fstream fs("log/generate_children_singlethreaded.txt", std::fstream::out | std::fstream::trunc);
+#endif
 	static compareFunc compareFuncs[] = {
 		compareGamestates, compareGamestatesReverse
 	};
 	if (!this->children.empty() || this->has_winner()) {
 		return ;
 	}
+	auto start = std::chrono::steady_clock::now();
+	auto current_time = std::chrono::steady_clock::now();
+	long long int elapsed_time;
 	if (this->board.none()) {
 		int idx = 20 * 9 + 9;
 		auto	*middle = new Gamestate(*this);
@@ -46,38 +63,68 @@ void Gamestate::generate_children() {
 	if (empty_neighbours.none()) {
 		throw std::runtime_error("Error. No more empty tiles");
 	}
-	for (int i = 0; i < REALBOARDSIZE; i++) {
+	unsigned int stones = 0;
+	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
 		if (!empty_neighbours.bitboard_get(i) || Bitboard::isSeperatingBitIndex(i))
 			continue;
+		++stones;
+	#if THREADED
+		auto loop_start = std::chrono::steady_clock::now();
+
+		Job newjob(this, i);
+		jobQueue.push(newjob);
+
+		current_time = std::chrono::steady_clock::now();
+		elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - loop_start).count();
+		fs << "enqueueing Job took " << elapsed_time << " microseconds.\n";
+	#else
 		auto	*child = new Gamestate(*this);
 		child->place_stone(i);
 		this->children.emplace_back(child);
+	#endif
 	}
+#if THREADED
+	{
+		current_time = std::chrono::steady_clock::now();
+		auto c = std::chrono::duration_cast<std::chrono::microseconds>(current_time - start).count();
+		fs << "Main thread took " << c << " microseconds to get to jobQueue.waitFinished().\n";
+		auto a = std::chrono::steady_clock::now();
+		jobQueue.waitFinished();
+		current_time = std::chrono::steady_clock::now();
+		elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - a).count();
+		fs << "Main thread had to wait " << elapsed_time << " microseconds.\n";
+	};
+
+	while (!outputQueue.empty()) {
+		this->children.emplace_back(outputQueue.pop());
+	}
+#endif
 	std::sort(children.begin(), children.end(), compareFuncs[this->get_player()]);
+
+	current_time = std::chrono::steady_clock::now();
+	elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - start).count();
+	fs << "Gamestate::place_stone took " << elapsed_time << " microseconds to place " << stones << " stones.\n\n";
 }
 
-#include <fstream>
-#include <sstream>
 void	Gamestate::write_to_file() const {
 	static int idx = 1;
-	std::fstream fs;
 	std::stringstream ss;
-//	ss << "tests/log/gamestate_" << idx++;
 	ss << "/Users/pde-bakk/PycharmProjects/gomoku/algo/tests/log/gamestate_" << idx++;
-	fs.open(ss.str(), std::fstream::out | std::fstream::trunc);
+	std::fstream fs(ss.str(), std::fstream::out | std::fstream::trunc);
+
 	if (!fs.is_open())
 		throw std::runtime_error("Couldn't write to logfile");
-	fs << Heuristic::hash_fn(this->board) << '\n';
+//	fs << Heuristic::hash_fn(this->board) << '\n';
 	fs << "Heuristic value: " << this->h << '\n';
 	print_board(fs, false);
 }
 
 Gamestate::Gamestate() { }
 
-void Gamestate::place_stone(int move_idx) {
-	assert(move_idx >= 0 && move_idx < BOARDSIZE);
+void Gamestate::place_stone(unsigned int move_idx) {
+//	static std::atomic<int> whoo = 1;
+	assert(move_idx < BOARDSIZE);
 	assert (this->tile_is_empty(move_idx));
-//	static size_t whoo = 1;
 //
 //	dprintf(1, "whoo = %zu\n", whoo);
 //	whoo++;
