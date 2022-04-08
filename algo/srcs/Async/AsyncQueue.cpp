@@ -9,3 +9,9 @@ AsyncQueue<Gamestate*>&	getOutputQueue() {
 
 	return (outputQueue);
 }
+
+AsyncQueue<Job>&	getJobQueue() {
+	static AsyncQueue<Job>	jobQueue;
+
+	return (jobQueue);
+}

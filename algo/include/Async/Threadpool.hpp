@@ -10,13 +10,13 @@
 #include <vector>
 #include <atomic>
 
-// Singleton
+// Singleton FTW
 class Threadpool {
-	const unsigned int		_numThreads;
-	std::atomic<int>		busyWorkers;
+	const unsigned int			_numThreads;
+	std::atomic<int>			busyWorkers;
 	std::vector<std::thread>	_threads;
-	AsyncQueue<Job>&	_jobQueue;
-	AsyncQueue<Gamestate*>&	_outputQueue;
+	AsyncQueue<Job>&			_jobQueue;
+	AsyncQueue<Gamestate*>&		_outputQueue;
 
 	void	launch_worker();
 	explicit Threadpool(unsigned int numThreads = std::thread::hardware_concurrency());

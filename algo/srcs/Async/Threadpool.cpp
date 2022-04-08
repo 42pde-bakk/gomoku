@@ -35,7 +35,7 @@ void Threadpool::launch_worker() {
 void Threadpool::WaitForWorkers() const {
 	while (this->busyWorkers) {
 		// dummy
-		usleep(500);
+		usleep(10u);
 	}
 }
 

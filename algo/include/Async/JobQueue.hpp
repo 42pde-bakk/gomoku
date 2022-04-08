@@ -7,18 +7,18 @@
 # include "AsyncQueue.hpp"
 # include <atomic>
 
-class JobQueue : public AsyncQueue<Job> {
+class JobQueue : public AsyncQueue<const Job *> {
 private:
-	std::atomic<int>	njobs_pending;
-	std::mutex			main_mutex;
+	std::atomic<int>		njobs_pending;
+	std::mutex				main_mutex;
 	std::condition_variable	main_condition;
 
 public:
 	void	waitFinished();
-	void	push(Job& job) override;
-	Job		pop() override;
+	void	pushJob(const Job* job);
+	const Job	*pop() override;
 };
 
-JobQueue&		getJobQueue();
+AsyncQueue<Job>&	getJobQueue();
 
 #endif //GOMOKUBOT_JOBQUEUE_HPP

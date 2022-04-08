@@ -9,13 +9,14 @@
 class Job {
 private:
 	const Gamestate*	_parent;
-	unsigned int		_moveIdx;
+	const unsigned int	_moveIdx;
 
 public:
 	Job();
 	Job(const Gamestate* parent, unsigned int moveIdx);
-	Job(const Job& x);
-	Job& operator=(const Job& x);
+	Job(Job&& x);
+	Job(const Job& x) = delete;
+	Job& operator=(const Job& x) = delete;
 	~Job();
 
 	const Gamestate*	get_parent();
