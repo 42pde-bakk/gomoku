@@ -27,10 +27,10 @@ ifdef DEBUG
  CFLAGS += -g3
 endif
 ifdef LEAKS
- CFLAGS += -g3 -fsanitize=address
+ CFLAGS += -fsanitize=address
 endif
 ifdef PROFILING
- CFLAGS += -g3 -pg
+ CFLAGS += -pg
 endif
 ifdef THREAD_DEBUG
  CFLAGS += -g3 -fsanitize=thread

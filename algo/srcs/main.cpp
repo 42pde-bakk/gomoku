@@ -20,7 +20,7 @@ int main() {
 	try {
 #if THREADED
 		Threadpool& threadpool = Threadpool::GetInstance();
-		JobQueue&	jobQ(getJobQueue());
+//		AsyncQueue<Job>&	jobQ(getJobQueue());
 		AsyncQueue<Gamestate *>&	outputQ(getOutputQueue());
 		(void)threadpool;
 #endif
@@ -48,7 +48,7 @@ int main() {
 					std::cout << "result @ " << result << "\n";
 //					result->print_history(std::cout);
 				#if THREADED
-					jobQ.waitFinished();
+//					jobQ.waitFinished();
 					threadpool.WaitForWorkers();
 					outputQ.clear();
 				#endif

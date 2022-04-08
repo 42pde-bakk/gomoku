@@ -4,6 +4,7 @@
 
 #include "Gamestate.hpp"
 #include "JobQueue.hpp"
+#include "Threadpool.hpp"
 #include <cassert>
 #include <algorithm>
 #include "Gomoku.hpp"
@@ -38,8 +39,9 @@ bool compareGamestatesReverse(const Gamestate* a, const Gamestate* b) { return (
 void Gamestate::generate_children() {
 #if THREADED
 	static std::fstream fs("log/generate_children.txt", std::fstream::out | std::fstream::trunc);
-	static JobQueue&	jobQueue(getJobQueue());
+	static AsyncQueue<Job>&			jobQueue(getJobQueue());
 	static AsyncQueue<Gamestate *>& outputQueue(getOutputQueue());
+	static Threadpool& threadpool = Threadpool::GetInstance();
 #else
 	static std::fstream fs("log/generate_children_singlethreaded.txt", std::fstream::out | std::fstream::trunc);
 #endif
@@ -63,25 +65,27 @@ void Gamestate::generate_children() {
 	if (empty_neighbours.none()) {
 		throw std::runtime_error("Error. No more empty tiles");
 	}
+
+	fs << "Starting to place stones\n";
 	unsigned int stones = 0;
 	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
 		if (!empty_neighbours.bitboard_get(i) || Bitboard::isSeperatingBitIndex(i))
 			continue;
 		++stones;
-	#if THREADED
+#if THREADED
 		auto loop_start = std::chrono::steady_clock::now();
 
-		Job newjob(this, i);
-		jobQueue.push(newjob);
+		Job job(this, i);
+		jobQueue.push(job);
 
 		current_time = std::chrono::steady_clock::now();
 		elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - loop_start).count();
 		fs << "enqueueing Job took " << elapsed_time << " microseconds.\n";
-	#else
+#else
 		auto	*child = new Gamestate(*this);
 		child->place_stone(i);
 		this->children.emplace_back(child);
-	#endif
+#endif
 	}
 #if THREADED
 	{
@@ -89,7 +93,8 @@ void Gamestate::generate_children() {
 		auto c = std::chrono::duration_cast<std::chrono::microseconds>(current_time - start).count();
 		fs << "Main thread took " << c << " microseconds to get to jobQueue.waitFinished().\n";
 		auto a = std::chrono::steady_clock::now();
-		jobQueue.waitFinished();
+//		jobQueue.waitFinished();
+		threadpool.WaitForWorkers();
 		current_time = std::chrono::steady_clock::now();
 		elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - a).count();
 		fs << "Main thread had to wait " << elapsed_time << " microseconds.\n";
