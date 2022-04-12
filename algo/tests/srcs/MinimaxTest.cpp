@@ -19,8 +19,8 @@ void	place_stones(Gamestate *gs) {
 }
 
 TEST_CASE("Basic Minimax test", "[MinimaxTests]") {
-	Threadpool& t = Threadpool::GetInstance();
-	(void)t;
+//	Threadpool& t = Threadpool::GetInstance();
+//	(void)t;
 	auto *gs = new Gamestate();
 
 	place_stones(gs);
@@ -35,7 +35,7 @@ TEST_CASE("Basic Minimax test", "[MinimaxTests]") {
 	std::cerr << _PURPLE "Minimax took " << elapsed_time.count() << " ms. to find " << minimax_res << "\n" _END;
 
 	delete gs;
-	t.stop_threads();
+//	t.stop_threads();
 }
 
 TEST_CASE("Alphabeta Test", "[MinimaxTests]") {
@@ -52,8 +52,8 @@ TEST_CASE("Alphabeta Test", "[MinimaxTests]") {
 }
 
 TEST_CASE("Compare minimax with AB-pruning", "[MinimaxTests]") {
-	Threadpool& t = Threadpool::GetInstance();
-	(void)t;
+//	Threadpool& t = Threadpool::GetInstance();
+//	(void)t;
 	auto *gs = new Gamestate();
 	auto *gs2 = new Gamestate();
 
