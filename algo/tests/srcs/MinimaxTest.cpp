@@ -7,7 +7,6 @@
 #include "Gamestate.hpp"
 #include "Minimax.hpp"
 #include "Colours.hpp"
-#include "Threadpool.hpp"
 
 const int middle_idx = 9 * 20 + 9;
 
@@ -19,32 +18,25 @@ void	place_stones(Gamestate *gs) {
 }
 
 TEST_CASE("Basic Minimax test", "[MinimaxTests]") {
-//	Threadpool& t = Threadpool::GetInstance();
-//	(void)t;
 	auto *gs = new Gamestate();
-
 	place_stones(gs);
-	std::cerr << "yo\n";
 
 	start_time = std::chrono::steady_clock::now();
 	Gamestate *minimax_res = minimax(gs, 2, gs->get_player());
-//	REQUIRE(minimax_res);
-	(void)minimax_res;
+	REQUIRE(minimax_res);
 	auto end_time = std::chrono::steady_clock::now();
 	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 	std::cerr << _PURPLE "Minimax took " << elapsed_time.count() << " ms. to find " << minimax_res << "\n" _END;
 
 	delete gs;
-//	t.stop_threads();
 }
 
 TEST_CASE("Alphabeta Test", "[MinimaxTests]") {
-
-	auto *gs2 = new Gamestate();
-	place_stones(gs2);
+	auto *gs = new Gamestate();
+	place_stones(gs);
 
 	start_time = std::chrono::steady_clock::now();
-	Gamestate *ab_res = alphabeta(gs2, 2, gs2->get_player());
+	Gamestate *ab_res = alphabeta(gs, 2, gs->get_player());
 	REQUIRE(ab_res);
 	auto end_time = std::chrono::steady_clock::now();
 	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
@@ -52,8 +44,6 @@ TEST_CASE("Alphabeta Test", "[MinimaxTests]") {
 }
 
 TEST_CASE("Compare minimax with AB-pruning", "[MinimaxTests]") {
-//	Threadpool& t = Threadpool::GetInstance();
-//	(void)t;
 	auto *gs = new Gamestate();
 	auto *gs2 = new Gamestate();
 
@@ -65,12 +55,14 @@ TEST_CASE("Compare minimax with AB-pruning", "[MinimaxTests]") {
 	auto end_time = std::chrono::steady_clock::now();
 	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 	std::cerr << _PURPLE "Minimax took " << elapsed_time.count() << " ms\n" _END;
+	minimax_res->print_heuristic(std::cerr);
 
 	start_time = std::chrono::steady_clock::now();
 	Gamestate *ab_res = alphabeta(gs2, 2, gs2->get_player());
 	end_time = std::chrono::steady_clock::now();
 	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 	std::cerr << _PURPLE "Alpha-Beta pruning took " << elapsed_time.count() << " ms\n" _END;
+	ab_res->print_heuristic(std::cerr);
 
 	REQUIRE(*minimax_res == *ab_res);
 	delete gs; delete gs2;

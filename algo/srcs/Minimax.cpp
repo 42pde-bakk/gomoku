@@ -28,7 +28,7 @@ void check_time_limit() {
 // Player 1 is the maximizing player
 // Player 0 is the minimizing player
 Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
-//	check_time_limit();
+	check_time_limit();
 	if (depth == 0 || state->has_winner()) // Terminal gamestate
 		return (state);
 

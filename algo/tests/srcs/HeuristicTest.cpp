@@ -37,6 +37,21 @@ TEST_CASE_METHOD(Gamestate, "Three", "[HeuristicTests]") {
 	REQUIRE(set_h() == -1000);
 }
 
+TEST_CASE_METHOD(Gamestate, "Blocked Three", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+
+	place_stone(start_idx);
+	place_stone(start_idx + 1);
+	place_stone(start_idx + 2);
+	place_stone(start_idx + 2 + 20);
+	place_stone(start_idx + 3);
+
+	std::cerr << *this;
+
+	REQUIRE(h == 0);
+}
+
+
 TEST_CASE_METHOD(Gamestate, "Three at the top wall", "[HeuristicTests]") {
 	const int start_idx = 5;
 	const int dir = 20;

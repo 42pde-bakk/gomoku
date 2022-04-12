@@ -67,10 +67,16 @@ unsigned int Heuristic::count_open_sides(unsigned int prev, unsigned int next) c
 void Heuristic::tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int next, const int dir, unsigned int stone_p) const {
 	unsigned int before_prev = prev - dir;
 	unsigned int after_next = next + dir;
-	if (!isvalid_tile(before_prev) || !isvalid_tile(after_next))
-		return ;
-	if ((bitboard_get(before_prev) == stone_p || bitboard_get(after_next) == stone_p))
+	if ((tile_is_empty(prev) && bitboard_get(before_prev) == stone_p) || (tile_is_empty(next) && bitboard_get(after_next) == stone_p)) {
+		std::cerr << "b4_prev: " << bitboard_get(before_prev) << ", af_next: " << bitboard_get(after_next) << '\n';
 		lv = static_cast<LineValue>(int(lv) + 1);
+		std::cerr << "upgraded line to " << lv << '\n';
+	}
+//	if (!isvalid_tile(before_prev) || !isvalid_tile(after_next))
+//		return ;
+//	if ((bitboard_get(before_prev) == stone_p || bitboard_get(after_next) == stone_p)) {
+//
+//	}
 }
 
 void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::array<unsigned int, REALBOARDSIZE>& checkedTiles) {
@@ -94,6 +100,7 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::a
 		unsigned int prev = start_idx - dir;
 		unsigned int open_sides = this->count_open_sides(prev, next);
 
+
 		LineValue linevalue = this->calc_linevalue(length, open_sides);
 		if (linevalue < HALF_OPEN_FOUR)
 			tryUpgradeLineVal(linevalue, prev, next, dir, stone_p);
@@ -110,7 +117,7 @@ void Heuristic::loop_over_tiles() {
 
 	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
 		unsigned int stone = this->bitboard_get(i);
-		if (!stone)
+		if (!stone || stone == std::numeric_limits<unsigned int>::max())
 			continue;
 		assert(stone == 1 || stone == 2);
 		this->count_lines(i, stone, checkedTiles);
