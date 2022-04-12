@@ -25,20 +25,22 @@ std::ostream&	operator<<(std::ostream& o, const LineValue& lv);
 class Heuristic : public Bitboard {
 protected:
 //	static std::hash<bitboard> hash_fn;
+//	static std::unordered_map<std::bitset<BOARDSIZE>, int> tt;
+
 	std::array<std::array<int, 7>, 2> values{};
 	int h{};
 	int winner{};
+	int depth{},
+		player{};
 	std::array<int, 2>	captures{};
 
 	int set_h();
 	int add_h_for_captures();
 	[[nodiscard]] bool isUnbreakable(unsigned int start_idx, unsigned int end_idx, int dir) const;
 	[[nodiscard]] bool canGetCaptured(unsigned int start_idx, int dir) const;
-
+	static unsigned int get_opponent_stone(unsigned int stone);
 
 private:
-//	static std::unordered_map<std::bitset<BOARDSIZE>, int> tt;
-
 	unsigned int get_length(unsigned int *idx, unsigned int stone_p, unsigned int d, std::array<unsigned int, REALBOARDSIZE>& g_checkedTiles) const;
 	[[nodiscard]] unsigned int count_open_sides(unsigned int prev, unsigned int next) const;
 	[[nodiscard]] static LineValue	calc_linevalue(unsigned int length, unsigned int open_sides);
@@ -56,6 +58,7 @@ public:
 	[[nodiscard]] int get_h() const;
 	[[nodiscard]] bool	has_winner() const;
 	[[nodiscard]] int	get_winner() const;
+	[[nodiscard]] int	get_player() const;
 
 	void	print_heuristic(std::ostream& o) const;
 };

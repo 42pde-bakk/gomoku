@@ -16,9 +16,8 @@ bool g_log = false;
 
 Gamestate::Gamestate(const Gamestate &x) :
 		Heuristic(x), moves(x.moves),
-		parent(&x), children(),
-		depth(x.depth), player(x.player) {
-}
+		parent(&x), children()
+{ }
 
 Gamestate::~Gamestate() {
 	for (auto& child : this->children) {
@@ -26,10 +25,6 @@ Gamestate::~Gamestate() {
 		child = nullptr;
 	}
 	this->children.clear();
-}
-
-int Gamestate::get_player() const {
-	return (this->player);
 }
 
 bool compareGamestates(const Gamestate* a, const Gamestate* b) { return (*a < *b); }
@@ -156,10 +151,6 @@ int Gamestate::change_player() {
 
 const Move &Gamestate::get_first_move() const {
 	return this->moves.front();
-}
-
-unsigned int Gamestate::get_opponent_stone(unsigned int stone) {
-	return (stone ^ 3u);
 }
 
 void Gamestate::clear_children() {

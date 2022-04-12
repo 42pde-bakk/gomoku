@@ -21,8 +21,6 @@ protected:
 	std::vector<Move>	moves;
 	const Gamestate	*parent{};
 	std::vector<Gamestate*> children;
-	int depth{},
-		player{};
 
 	friend Client;
 public:
@@ -31,7 +29,6 @@ public:
 	~Gamestate();
 
 //	void	update_heuristic(unsigned int move_idx);
-	static unsigned int get_opponent_stone(unsigned int stone);
 
 	void generate_children();
 	std::vector<Gamestate*>& get_children() { return (this->children); }
@@ -43,8 +40,6 @@ public:
 	bool	operator>(const Gamestate& rhs) const { return (rhs < *this); }
 	bool	operator<=(const Gamestate& rhs) const { return !(rhs < *this); }
 	bool	operator>=(const Gamestate& rhs) const { return !(*this < rhs); }
-
-	[[nodiscard]] int		get_player() const;
 
 	[[nodiscard]] const Move& get_first_move() const;
 
