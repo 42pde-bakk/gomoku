@@ -33,14 +33,14 @@ bool compareGamestatesReverse(const Gamestate* a, const Gamestate* b) { return (
 // https://core.ac.uk/download/pdf/33500946.pdf
 void Gamestate::generate_children() {
 //	const static std::string	root = "/code/log/";
-	const static std::string	root = "/Users/pde-bakk/PycharmProjects/gomoku/algo/log/";
+//	const static std::string	root = "/Users/pde-bakk/PycharmProjects/gomoku/algo/log/";
 #if THREADED
-	static std::fstream fs(root + "generate_children.txt", std::fstream::out | std::fstream::trunc);
+//	static std::fstream fs(root + "generate_children.txt", std::fstream::out | std::fstream::trunc);
 	static AsyncQueue<Job>&			jobQueue(getJobQueue());
 	static Threadpool& threadpool(Threadpool::GetInstance());
-	assert(fs.is_open());
+//	assert(fs.is_open());
 #else
-	static std::fstream fs(root + "generate_children_singlethreaded.txt", std::fstream::out | std::fstream::trunc);
+//	static std::fstream fs(root + "generate_children_singlethreaded.txt", std::fstream::out | std::fstream::trunc);
 #endif
 	static compareFunc compareFuncs[] = {
 		compareGamestates, compareGamestatesReverse
@@ -63,7 +63,7 @@ void Gamestate::generate_children() {
 		throw std::runtime_error("Error. No more empty tiles");
 	}
 
-	fs << "Starting to place stones\n";
+//	fs << "Starting to place stones\n";
 	unsigned int stones = 0;
 	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
 		if (!empty_neighbours.bitboard_get(i) || Bitboard::isSeperatingBitIndex(i))
@@ -77,7 +77,7 @@ void Gamestate::generate_children() {
 
 		current_time = std::chrono::steady_clock::now();
 		elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - loop_start).count();
-		fs << "enqueueing Job took " << elapsed_time << " microseconds.\n";
+//		fs << "enqueueing Job took " << elapsed_time << " microseconds.\n";
 #else
 		auto	*child = new Gamestate(*this);
 		child->place_stone(i);
@@ -88,13 +88,13 @@ void Gamestate::generate_children() {
 	{
 		current_time = std::chrono::steady_clock::now();
 		auto c = std::chrono::duration_cast<std::chrono::microseconds>(current_time - start).count();
-		fs << "Main thread took " << c << " microseconds to get to threadpool.WaitForWorkers().\n";
+//		fs << "Main thread took " << c << " microseconds to get to threadpool.WaitForWorkers().\n";
 		auto a = std::chrono::steady_clock::now();
 		jobQueue.waitTillFinished();
 		threadpool.WaitForWorkers();
 		current_time = std::chrono::steady_clock::now();
 		elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - a).count();
-		fs << "Main thread had to wait " << elapsed_time << " microseconds.\n";
+//		fs << "Main thread had to wait " << elapsed_time << " microseconds.\n";
 	};
 
 #endif
@@ -103,7 +103,7 @@ void Gamestate::generate_children() {
 
 	current_time = std::chrono::steady_clock::now();
 	elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - start).count();
-	fs << "Gamestate::place_stone took " << elapsed_time << " microseconds to place " << stones << " stones.\n\n";
+//	fs << "Gamestate::place_stone took " << elapsed_time << " microseconds to place " << stones << " stones.\n\n";
 }
 
 void	Gamestate::write_to_file() const {
