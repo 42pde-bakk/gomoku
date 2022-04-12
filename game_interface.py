@@ -177,8 +177,7 @@ class Game(tk.Frame):
 		self.change_player()
 
 	def play_bot_pot(self):
-		pass
-		self.gamestate.place_stone(y=0, x=0, stone=self.player)
+		self.gamestate.place_stone(y=10, x=10, stone=self.player)
 		self.update_button(0, 0)
 		self.change_player()
 		while self.game_mode == GameMode.BOT_POT:
@@ -208,6 +207,7 @@ class Game(tk.Frame):
 	def change_game_mode(self, choice) -> None:
 		if choice == GameMode.BOT_POT.__str__():
 			self.game_mode = GameMode.BOT_POT
+			self.play_bot_pot()
 		elif choice == GameMode.HOTSEAT.__str__():
 			self.game_mode = GameMode.HOTSEAT
 		else:
