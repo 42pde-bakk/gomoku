@@ -48,9 +48,9 @@ void Gamestate::generate_children() {
 	if (!this->children.empty() || this->has_winner()) {
 		return ;
 	}
-	auto start = std::chrono::steady_clock::now();
-	auto current_time = std::chrono::steady_clock::now();
-	long long int elapsed_time = 0;
+//	auto start = std::chrono::steady_clock::now();
+//	auto current_time = std::chrono::steady_clock::now();
+//	long long int elapsed_time = 0;
 	if (this->board.none()) {
 		int idx = 20 * 9 + 9;
 		auto	*middle = new Gamestate(*this);
@@ -70,13 +70,13 @@ void Gamestate::generate_children() {
 			continue;
 		++stones;
 #if THREADED
-		auto loop_start = std::chrono::steady_clock::now();
+//		auto loop_start = std::chrono::steady_clock::now();
 
 		Job job(this, i);
 		jobQueue.push(job);
 
-		current_time = std::chrono::steady_clock::now();
-		elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - loop_start).count();
+//		current_time = std::chrono::steady_clock::now();
+//		elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - loop_start).count();
 //		fs << "enqueueing Job took " << elapsed_time << " microseconds.\n";
 #else
 		auto	*child = new Gamestate(*this);
@@ -86,14 +86,14 @@ void Gamestate::generate_children() {
 	}
 #if THREADED
 	{
-		current_time = std::chrono::steady_clock::now();
-		auto c = std::chrono::duration_cast<std::chrono::microseconds>(current_time - start).count();
+//		current_time = std::chrono::steady_clock::now();
+//		auto c = std::chrono::duration_cast<std::chrono::microseconds>(current_time - start).count();
 //		fs << "Main thread took " << c << " microseconds to get to threadpool.WaitForWorkers().\n";
-		auto a = std::chrono::steady_clock::now();
+//		auto a = std::chrono::steady_clock::now();
 		jobQueue.waitTillFinished();
 		threadpool.WaitForWorkers();
-		current_time = std::chrono::steady_clock::now();
-		elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - a).count();
+//		current_time = std::chrono::steady_clock::now();
+//		elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - a).count();
 //		fs << "Main thread had to wait " << elapsed_time << " microseconds.\n";
 	};
 
@@ -101,8 +101,8 @@ void Gamestate::generate_children() {
 	assert(!children.empty());
 	std::sort(children.begin(), children.end(), compareFuncs[this->get_player()]);
 
-	current_time = std::chrono::steady_clock::now();
-	elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - start).count();
+//	current_time = std::chrono::steady_clock::now();
+//	elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - start).count();
 //	fs << "Gamestate::place_stone took " << elapsed_time << " microseconds to place " << stones << " stones.\n\n";
 }
 
