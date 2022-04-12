@@ -5,9 +5,9 @@
 #include "Async/Job.hpp"
 #include "Gamestate.hpp"
 
-Job::Job() : _parent(), _moveIdx(-1) { }
+Job::Job() : _parent(), _moveIdx((unsigned int)-1) { }
 
-Job::Job(const Gamestate *parent, const unsigned int moveIdx) : _parent(parent), _moveIdx(moveIdx) { }
+Job::Job(Gamestate* const parent, const unsigned int moveIdx) : _parent(parent), _moveIdx(moveIdx) { }
 
 //Job::Job(const Job &x) : _parent(x._parent), _moveIdx(x._moveIdx) { }
 //
@@ -21,11 +21,11 @@ Job::Job(const Gamestate *parent, const unsigned int moveIdx) : _parent(parent),
 
 Job::~Job() = default;
 
-const Gamestate *Job::get_parent() {
+Gamestate* Job::get_parent() const {
 	return (this->_parent);
 }
 
-unsigned int Job::get_moveIdx() {
+unsigned int Job::get_moveIdx() const {
 	return (this->_moveIdx);
 }
 
@@ -36,3 +36,8 @@ Gamestate *Job::execute() const {
 }
 
 Job::Job(Job&& x) : _parent(std::move(x._parent)), _moveIdx(std::move(x._moveIdx)) { }
+
+std::ostream &operator<<(std::ostream &o, const Job &j) {
+	o << "Job " << j.get_parent() << ", " << j.get_moveIdx() << '\n';
+	return o;
+}

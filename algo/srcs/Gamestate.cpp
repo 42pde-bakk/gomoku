@@ -3,8 +3,8 @@
 //
 
 #include "Gamestate.hpp"
-#include "JobQueue.hpp"
 #include "Threadpool.hpp"
+#include "Job.hpp"
 #include <cassert>
 #include <algorithm>
 #include "Gomoku.hpp"
@@ -37,13 +37,15 @@ bool compareGamestatesReverse(const Gamestate* a, const Gamestate* b) { return (
 
 // https://core.ac.uk/download/pdf/33500946.pdf
 void Gamestate::generate_children() {
+//	const static std::string	root = "/code/log/";
+	const static std::string	root = "/Users/pde-bakk/PycharmProjects/gomoku/algo/log/";
 #if THREADED
-	static std::fstream fs("log/generate_children.txt", std::fstream::out | std::fstream::trunc);
+	static std::fstream fs(root + "generate_children.txt", std::fstream::out | std::fstream::trunc);
 	static AsyncQueue<Job>&			jobQueue(getJobQueue());
-	static AsyncQueue<Gamestate *>& outputQueue(getOutputQueue());
-	static Threadpool& threadpool = Threadpool::GetInstance();
+	static Threadpool& threadpool(Threadpool::GetInstance());
+	assert(fs.is_open());
 #else
-	static std::fstream fs("log/generate_children_singlethreaded.txt", std::fstream::out | std::fstream::trunc);
+	static std::fstream fs(root + "generate_children_singlethreaded.txt", std::fstream::out | std::fstream::trunc);
 #endif
 	static compareFunc compareFuncs[] = {
 		compareGamestates, compareGamestatesReverse
@@ -53,7 +55,7 @@ void Gamestate::generate_children() {
 	}
 	auto start = std::chrono::steady_clock::now();
 	auto current_time = std::chrono::steady_clock::now();
-	long long int elapsed_time;
+	long long int elapsed_time = 0;
 	if (this->board.none()) {
 		int idx = 20 * 9 + 9;
 		auto	*middle = new Gamestate(*this);
@@ -91,19 +93,17 @@ void Gamestate::generate_children() {
 	{
 		current_time = std::chrono::steady_clock::now();
 		auto c = std::chrono::duration_cast<std::chrono::microseconds>(current_time - start).count();
-		fs << "Main thread took " << c << " microseconds to get to jobQueue.waitFinished().\n";
+		fs << "Main thread took " << c << " microseconds to get to threadpool.WaitForWorkers().\n";
 		auto a = std::chrono::steady_clock::now();
-//		jobQueue.waitFinished();
+		jobQueue.waitTillFinished();
 		threadpool.WaitForWorkers();
 		current_time = std::chrono::steady_clock::now();
 		elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - a).count();
 		fs << "Main thread had to wait " << elapsed_time << " microseconds.\n";
 	};
 
-	while (!outputQueue.empty()) {
-		this->children.emplace_back(outputQueue.pop());
-	}
 #endif
+	assert(!children.empty());
 	std::sort(children.begin(), children.end(), compareFuncs[this->get_player()]);
 
 	current_time = std::chrono::steady_clock::now();
@@ -174,4 +174,8 @@ void Gamestate::print_history(std::ostream& o) const {
 		this->parent->print_history(o);
 	this->print_board(o, true);
 	o << '\n';
+}
+
+void Gamestate::add_child(Gamestate *child) {
+	this->children.push_back(child);
 }

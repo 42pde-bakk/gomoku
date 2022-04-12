@@ -8,7 +8,7 @@
 #include "Colours.hpp"
 #include <random>
 
-const int middle_idx = 9 * 20 + 9;
+//const int middle_idx = 9 * 20 + 9;
 
 void	place_random_stone(Gamestate *gs) {
 	unsigned int player = 0;
@@ -33,6 +33,7 @@ TEST_CASE("Bitset hash", "[HashingTests]") {
 		Gamestate gs;
 		place_random_stone(&gs);
 		auto hash = hash_fn(gs.get());
+		(void)hash;
 //		std::cerr << "hash = " << hash << std::endl;
 	}
 	auto end_time = std::chrono::steady_clock::now();

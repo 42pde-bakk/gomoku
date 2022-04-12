@@ -8,7 +8,7 @@
 #include "Bitboard.hpp"
 #include "Colours.hpp"
 
-const int middle_idx = 9 * 20 + 9;
+//const int middle_idx = 9 * 20 + 9;
 
 
 TEST_CASE("Bitboard relational operators", "[BitboardTests]") {

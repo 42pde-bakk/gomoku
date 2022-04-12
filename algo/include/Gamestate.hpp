@@ -51,6 +51,8 @@ public:
 	void	place_stone(unsigned int move_idx);
 	void	clear_children();
 
+	void	add_child(Gamestate* child);
+
 	void	print_history(std::ostream& o) const;
 protected:
 	int		change_player();

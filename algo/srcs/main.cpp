@@ -8,6 +8,7 @@
 #include "IO/Server.hpp"
 #include "IO/Client.hpp"
 #include "Colours.hpp"
+
 #if THREADED
 # include "Threadpool.hpp"
 # include "AsyncQueue.hpp"
@@ -16,13 +17,12 @@
 #include <chrono>
 #include <exception>
 
-int main() {
+
+int fmain() {
 	try {
 #if THREADED
 		Threadpool& threadpool = Threadpool::GetInstance();
-//		AsyncQueue<Job>&	jobQ(getJobQueue());
 		AsyncQueue<Gamestate *>&	outputQ(getOutputQueue());
-		(void)threadpool;
 #endif
 		Server server;
 
@@ -41,25 +41,46 @@ int main() {
 					std::cout << "Move: " << move;
 					std::cout << "Result gamestate: h=" << result->get_h() << ".\n";
 					current_time = std::chrono::steady_clock::now();
-					auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(
-							current_time - start_time);
-					std::cout << _PURPLE "Calculating move took " << elapsed_time.count() << " ms\n" _END;
+					auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time);
+					std::cout << _PURPLE "Calculating move took " << elapsed_time.count() << " ms.\n" _END;
 					client.send_move(move);
-					std::cout << "result @ " << result << "\n";
 //					result->print_history(std::cout);
 				#if THREADED
-//					jobQ.waitFinished();
+					std::cout << "lets wait for the workers\n";
 					threadpool.WaitForWorkers();
+					std::cout << "waited for the workers\n";
 					outputQ.clear();
 				#endif
+					std::cout << "end of while loop\n";
 				}
 			} catch (const std::exception& e) {
-//				std::cerr << _RED _BOLD << e.what() << _END << '\n';
+				std::cerr << _RED _BOLD << e.what() << _END << '\n';
 			}
 		}
 	}
 	catch (const std::exception& e) {
 		std::cerr << _RED _BOLD << e.what() << _END << '\n';
+		return (1);
 	}
-	// exit(0);
+	return (0);
+}
+
+int main() {
+#if THREADED
+	Threadpool& threadpool = Threadpool::GetInstance();
+	(void)threadpool;
+#endif
+	Gamestate *gs = new Gamestate();
+	const int middle_idx = 9 * 20 + 9;
+	gs->place_stone(middle_idx);
+	gs->place_stone(middle_idx + 1);
+	gs->place_stone(middle_idx - 1);
+
+//	std::cerr << *gs;
+	Gamestate* result = minimax(gs, 2, gs->get_player());
+//	gs->generate_children();
+	std::cerr << "minimax generated " << result << "\n";
+	const size_t kids = gs->get_children().size();
+	std::cerr << "generated " << kids << " kids\n";
+	assert(kids >= 5);
 }

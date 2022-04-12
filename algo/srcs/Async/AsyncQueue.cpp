@@ -15,3 +15,6 @@ AsyncQueue<Job>&	getJobQueue() {
 
 	return (jobQueue);
 }
+
+std::mutex cerrMutex;
+std::mutex fsMutex;

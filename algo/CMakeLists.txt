@@ -14,7 +14,7 @@ add_executable(Gomokubot ${includes} ${srcs} ${IO} ${Gamerules} ${Async})
 target_include_directories(Gomokubot PRIVATE include)
 target_include_directories(Gomokubot PRIVATE include/Gamerules)
 target_include_directories(Gomokubot PRIVATE include/IO)
-target_include_directories(Gomokubot PRIVATE include/Async)
+target_include_directories(Gomokubot PRIVATE include/async)
 
 add_subdirectory(tests)
 

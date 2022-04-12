@@ -28,7 +28,7 @@ void check_time_limit() {
 // Player 1 is the maximizing player
 // Player 0 is the minimizing player
 Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
-	check_time_limit();
+//	check_time_limit();
 	if (depth == 0 || state->has_winner()) // Terminal gamestate
 		return (state);
 
@@ -69,8 +69,8 @@ Gamestate *internal_alphabeta(Gamestate *state, int depth, int alpha, int beta, 
 	Gamestate	*new_state;
 
 	state->generate_children();
-	if (state->get_children().empty())
-		return (state);
+//	if (state->get_children().empty())
+//		return (state);
 	if (maximizing_player) {
 		best_state_value = std::numeric_limits<int>::min();
 		for (auto& child : state->get_children()) {

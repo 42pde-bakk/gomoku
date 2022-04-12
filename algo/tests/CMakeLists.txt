@@ -11,7 +11,10 @@ file(GLOB includes "../include/*.hpp")
 file(GLOB srcs "../srcs/*.cpp")
 list(FILTER srcs EXCLUDE REGEX "../srcs/main.cpp")
 file(GLOB IO "../srcs/IO/*.cpp" "../include/IO/*.hpp")
+file(GLOB Async "../srcs/Async/*.cpp" "../include/Async/*.hpp")
 file(GLOB Gamerules "../srcs/Gamerules/*.cpp" "../include/Gamerules/*.hpp")
 
-add_executable(Catch_tests_run ${test_srcs} ${includes} ${srcs} ${Gamerules} ${IO})
-target_include_directories(Catch_tests_run PRIVATE ../include ../include/Gamerules )
+add_executable(Catch_tests_run ${test_srcs} ${includes} ${srcs} ${Gamerules} ${IO} ${Async})
+target_include_directories(Catch_tests_run PRIVATE ../include ../include/Gamerules ../include/Async)
+
+#set(CMAKE_CXX_FLAGS "-Wall -Werror -Wextra")

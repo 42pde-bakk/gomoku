@@ -7,6 +7,7 @@
 #include "Gamestate.hpp"
 #include "Colours.hpp"
 #include "Minimax.hpp"
+#include "Threadpool.hpp"
 
 const int middle_idx = 9 * 20 + 9;
 
