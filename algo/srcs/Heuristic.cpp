@@ -68,15 +68,10 @@ void Heuristic::tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int
 	unsigned int before_prev = prev - dir;
 	unsigned int after_next = next + dir;
 	if ((tile_is_empty(prev) && bitboard_get(before_prev) == stone_p) || (tile_is_empty(next) && bitboard_get(after_next) == stone_p)) {
-		std::cerr << "b4_prev: " << bitboard_get(before_prev) << ", af_next: " << bitboard_get(after_next) << '\n';
+//		std::cerr << "b4_prev: " << bitboard_get(before_prev) << ", af_next: " << bitboard_get(after_next) << '\n';
 		lv = static_cast<LineValue>(int(lv) + 1);
-		std::cerr << "upgraded line to " << lv << '\n';
+//		std::cerr << "upgraded line to " << lv << '\n';
 	}
-//	if (!isvalid_tile(before_prev) || !isvalid_tile(after_next))
-//		return ;
-//	if ((bitboard_get(before_prev) == stone_p || bitboard_get(after_next) == stone_p)) {
-//
-//	}
 }
 
 void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::array<unsigned int, REALBOARDSIZE>& checkedTiles) {
