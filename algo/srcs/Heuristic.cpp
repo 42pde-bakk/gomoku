@@ -80,7 +80,7 @@ void Heuristic::tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int
 
 void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::array<unsigned int, REALBOARDSIZE>& checkedTiles) {
 	static const std::array<int, 4> dirs = setup_dirs();
-	const unsigned int player = stone_p - 1;
+	const unsigned int p = stone_p - 1;
 
 //	if (g_log) dprintf(2, "start_idx: %u, stones: p=%u\n", start_idx, stone_p);
 	for (unsigned int d = 0; d < dirs.size(); d++) {
@@ -104,7 +104,7 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::a
 		if (linevalue < HALF_OPEN_FOUR)
 			tryUpgradeLineVal(linevalue, prev, next, dir, stone_p);
 
-		this->values[player][linevalue] += 1u;
+		this->values[p][linevalue] += 1u;
 		if (linevalue == LineValue::FIVE && this->isUnbreakable(start_idx, next - dir, dir)) {
 			this->winner = static_cast<int>(stone_p);
 		}
