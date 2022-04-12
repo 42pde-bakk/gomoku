@@ -66,21 +66,5 @@ int fmain() {
 }
 
 int main() {
-#if THREADED
-	Threadpool& threadpool = Threadpool::GetInstance();
-	(void)threadpool;
-#endif
-	Gamestate *gs = new Gamestate();
-	const int middle_idx = 9 * 20 + 9;
-	gs->place_stone(middle_idx);
-	gs->place_stone(middle_idx + 1);
-	gs->place_stone(middle_idx - 1);
-
-//	std::cerr << *gs;
-	Gamestate* result = minimax(gs, 2, gs->get_player());
-//	gs->generate_children();
-	std::cerr << "minimax generated " << result << "\n";
-	const size_t kids = gs->get_children().size();
-	std::cerr << "generated " << kids << " kids\n";
-	assert(kids >= 5);
+	return (fmain());
 }
