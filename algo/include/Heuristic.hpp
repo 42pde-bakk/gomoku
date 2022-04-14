@@ -38,7 +38,6 @@ protected:
 	int add_h_for_captures();
 	[[nodiscard]] bool isUnbreakable(unsigned int start_idx, unsigned int end_idx, int dir) const;
 	[[nodiscard]] bool canGetCaptured(unsigned int start_idx, int dir) const;
-	static unsigned int get_opponent_stone(unsigned int stone);
 
 private:
 	unsigned int get_length(unsigned int *idx, unsigned int stone_p, unsigned int d, std::array<unsigned int, REALBOARDSIZE>& g_checkedTiles) const;
@@ -61,6 +60,7 @@ public:
 	[[nodiscard]] int	get_player() const;
 
 	void	print_heuristic(std::ostream& o) const;
+	static unsigned int get_opponent_stone(unsigned int stone);
 };
 
 #endif //GOMOKUBOT_HEURISTIC_HPP
