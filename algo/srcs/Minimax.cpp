@@ -59,6 +59,17 @@ Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 	return (best_state);
 }
 
+//Gamestate*	queiescence_search(Gamestate* state, int alpha, int beta) {
+//	state->calcH();
+//	int evaluation = state->get_h();
+//
+//	// fail-hard beta cutoff
+//	if (evaluation >= beta) {
+//		// node (move) fails high
+//		return
+//	}
+//}
+
 Gamestate *alphabeta_(Gamestate *state, int depth, int alpha, int beta, bool maximizing_player) {
 	check_time_limit();
 	if (depth == 0 || state->has_winner()) // Terminal gamestate
@@ -119,16 +130,28 @@ Gamestate *pvs_(Gamestate *state, int depth, int alpha, int beta, bool maximizin
 //	if (state->get_children().empty())
 //		return (state);
 	if (maximizing_player) {
-		best_state_value = std::numeric_limits<int>::min();
-		for (auto& child : state->get_children()) {
+		auto& children = state->get_children();
+		best_state = pvs_(children[0], depth - 1, alpha, beta, false);
+
+		for (size_t i = 1; i < state->get_children().size(); ++i) {
+			auto* child = state->get_children()[i];
 			new_state = pvs_(child, depth - 1, alpha, beta, false);
+			if (alpha < new_state->get_h() && new_state->get_h() < beta) {
+				//re-search
+			}
 			if (new_state->get_h() > best_state_value) {
 				best_state = new_state;
 				best_state_value = new_state->get_h();
 			}
+			alpha = std::max(alpha, new_state->get_h());
 			if (best_state_value >= beta)
 				break ; // β cutoff
-			alpha = std::max(alpha, new_state->get_h());
+		}
+		for (auto& child : state->get_children()) {
+			new_state = pvs_(child, depth - 1, alpha, beta, false);
+
+
+
 		}
 	} else {
 		best_state_value = std::numeric_limits<int>::max();

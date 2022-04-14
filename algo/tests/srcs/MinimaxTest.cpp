@@ -86,3 +86,36 @@ TEST_CASE("Whoo", "[MinimaxTests]") {
 
 	delete gs;
 }
+
+TEST_CASE_METHOD(Gamestate, "Faulty", "[MinimaxTests]") {
+	place_stone(middle_idx); //p0
+	change_player();
+	place_stone(middle_idx - 1); //p1
+	change_player();
+	this->place_stone(middle_idx + 20); //p0
+	change_player();
+	this->place_stone(middle_idx + 1); //p1
+	change_player();
+	this->place_stone(middle_idx + 1 * 19); //p0
+	change_player();
+	this->place_stone(middle_idx - 20); //p1
+	change_player();
+	this->place_stone(middle_idx + 2 * 19); //p0
+	change_player();
+	this->place_stone(middle_idx - 20 - 1 * 21); //p1
+	change_player();
+	this->place_stone(middle_idx + 3 * 19); //p0
+//	change_player();
+	this->calcH();
+	print_heuristic(std::cout);
+	std::cerr << *this << "\n\n\n";
+
+//	Gamestate* result = alphabeta(this, 2, this->get_player());
+	Gamestate*	result = iterative_deepening(this, this->get_player());
+	auto end_time = std::chrono::steady_clock::now();
+	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+	std::cerr << _PURPLE "Iterative deepening pruning took " << elapsed_time.count() << " ms\n" _END;
+	std::cerr << "endresult = " << *result << "\n\n";
+	std::cerr << "History:\n";
+	result->print_history(std::cerr, false);
+}
