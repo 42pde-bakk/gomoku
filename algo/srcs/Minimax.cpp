@@ -30,7 +30,7 @@ void check_time_limit() {
 Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 	check_time_limit();
 	if (depth == 0 || state->has_winner()) // Terminal gamestate
-		return (state);
+		return (state->calcH());
 
 	Gamestate	*best_state = nullptr;
 	int			best_state_value;
@@ -59,10 +59,10 @@ Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 	return (best_state);
 }
 
-Gamestate *internal_alphabeta(Gamestate *state, int depth, int alpha, int beta, bool maximizing_player) {
+Gamestate *alphabeta_(Gamestate *state, int depth, int alpha, int beta, bool maximizing_player) {
 	check_time_limit();
 	if (depth == 0 || state->has_winner()) // Terminal gamestate
-		return (state);
+		return (state->calcH());
 
 	Gamestate	*best_state = nullptr;
 	int			best_state_value;
@@ -74,7 +74,7 @@ Gamestate *internal_alphabeta(Gamestate *state, int depth, int alpha, int beta, 
 	if (maximizing_player) {
 		best_state_value = std::numeric_limits<int>::min();
 		for (auto& child : state->get_children()) {
-			new_state = internal_alphabeta(child, depth - 1, alpha, beta, false);
+			new_state = alphabeta_(child, depth - 1, alpha, beta, false);
 			if (new_state->get_h() > best_state_value) {
 				best_state = new_state;
 				best_state_value = new_state->get_h();
@@ -86,7 +86,7 @@ Gamestate *internal_alphabeta(Gamestate *state, int depth, int alpha, int beta, 
 	} else {
 		best_state_value = std::numeric_limits<int>::max();
 		for (auto& child : state->get_children()) {
-			new_state = internal_alphabeta(child, depth - 1, alpha, beta, true);
+			new_state = alphabeta_(child, depth - 1, alpha, beta, true);
 			if (new_state->get_h() < best_state_value) {
 				best_state = new_state;
 				best_state_value = new_state->get_h();
@@ -103,7 +103,47 @@ Gamestate *alphabeta(Gamestate *state, int depth, bool maximizing_player) {
 	static const int	intmin = std::numeric_limits<int>::min();
 	static const int	intmax = std::numeric_limits<int>::max();
 
-	return (internal_alphabeta(state, depth, intmin, intmax, maximizing_player));
+	return (alphabeta_(state, depth, intmin, intmax, maximizing_player));
+}
+
+Gamestate *pvs_(Gamestate *state, int depth, int alpha, int beta, bool maximizing_player) {
+	check_time_limit();
+	if (depth == 0 || state->has_winner()) // Terminal gamestate
+		return (state->calcH());
+
+	Gamestate	*best_state = nullptr;
+	int			best_state_value;
+	Gamestate	*new_state;
+
+	state->generate_children();
+//	if (state->get_children().empty())
+//		return (state);
+	if (maximizing_player) {
+		best_state_value = std::numeric_limits<int>::min();
+		for (auto& child : state->get_children()) {
+			new_state = pvs_(child, depth - 1, alpha, beta, false);
+			if (new_state->get_h() > best_state_value) {
+				best_state = new_state;
+				best_state_value = new_state->get_h();
+			}
+			if (best_state_value >= beta)
+				break ; // β cutoff
+			alpha = std::max(alpha, new_state->get_h());
+		}
+	} else {
+		best_state_value = std::numeric_limits<int>::max();
+		for (auto& child : state->get_children()) {
+			new_state = pvs_(child, depth - 1, alpha, beta, true);
+			if (new_state->get_h() < best_state_value) {
+				best_state = new_state;
+				best_state_value = new_state->get_h();
+			}
+			if (best_state_value <= alpha)
+				break ; // α cutoff
+			beta = std::min(beta, new_state->get_h());
+		}
+	}
+	return (best_state);
 }
 
 Gamestate	*iterative_deepening(Gamestate *gs, int player) {

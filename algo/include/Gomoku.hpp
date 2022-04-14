@@ -10,7 +10,7 @@
 #endif
 
 #ifndef THREADED
-# define THREADED 1
+# define THREADED 0
 #endif
 #include <mutex>
 extern std::mutex cerrMutex;

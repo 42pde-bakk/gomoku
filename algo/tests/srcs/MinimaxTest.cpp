@@ -9,7 +9,7 @@
 #include "Colours.hpp"
 
 const int middle_idx = 9 * 20 + 9;
-const int DEPTH = 1;
+const int DEPTH = 4;
 
 void	place_stones(Gamestate *gs) {
 	int indices[] = {middle_idx, middle_idx + 1, middle_idx + 2};

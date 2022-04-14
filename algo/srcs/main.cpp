@@ -9,11 +9,6 @@
 #include "IO/Client.hpp"
 #include "Colours.hpp"
 
-#if THREADED
-# include "Threadpool.hpp"
-# include "AsyncQueue.hpp"
-# include "JobQueue.hpp"
-#endif
 #include <chrono>
 #include <exception>
 
@@ -21,6 +16,9 @@
 int fmain() {
 	try {
 #if THREADED
+# include "Threadpool.hpp"
+# include "AsyncQueue.hpp"
+# include "JobQueue.hpp"
 		Threadpool& threadpool = Threadpool::GetInstance();
 		AsyncQueue<Gamestate *>&	outputQ(getOutputQueue());
 #endif
