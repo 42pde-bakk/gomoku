@@ -144,12 +144,8 @@ void	Gamestate::write_to_file() const {
 Gamestate::Gamestate() { }
 
 void Gamestate::place_stone(unsigned int move_idx) {
-//	static std::atomic<int> whoo = 1;
 	assert(move_idx < BOARDSIZE);
 	assert (this->tile_is_empty(move_idx));
-//
-//	dprintf(1, "whoo = %zu\n", whoo);
-//	whoo++;
 
 	this->set(move_idx, this->get_player());
 	this->moves.emplace_back(move_idx, player);
@@ -165,21 +161,23 @@ int Gamestate::change_player() {
 	return (this->player);
 }
 
-const Move &Gamestate::get_first_move() const {
+const Move& Gamestate::get_first_move() const {
 	return this->moves.front();
 }
 
 void Gamestate::clear_children() {
 	for (auto child : this->children) {
 		delete child;
+		child = nullptr;
 	}
 	this->children.clear();
 }
 
-void Gamestate::print_history(std::ostream& o) const {
+void Gamestate::print_history(std::ostream& o, bool colours) const {
 	if (this->parent)
-		this->parent->print_history(o);
-	this->print_board(o, true);
+		this->parent->print_history(o, colours);
+	this->print_board(o, colours);
+	this->print_heuristic(o);
 	o << '\n';
 }
 
@@ -195,4 +193,8 @@ Gamestate *Gamestate::calcH() {
 	this->change_player();
 
 	return (this);
+}
+
+const Gamestate *Gamestate::get_parent() {
+	return (this->parent);
 }

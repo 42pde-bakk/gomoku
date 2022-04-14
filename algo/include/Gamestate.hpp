@@ -47,9 +47,10 @@ public:
 	void	clear_children();
 
 	void	add_child(Gamestate* child);
-	[[nodiscard]] Gamestate*	calcH();
+	Gamestate*	calcH();
+	const Gamestate*	get_parent();
 
-	void	print_history(std::ostream& o) const;
+	void	print_history(std::ostream& o, bool colours) const;
 protected:
 	int		change_player();
 	void	write_to_file() const;
