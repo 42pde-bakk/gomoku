@@ -47,6 +47,7 @@ public:
 	void	clear_children();
 
 	void	add_child(Gamestate* child);
+	[[nodiscard]] Gamestate*	calcH();
 
 	void	print_history(std::ostream& o) const;
 protected:
