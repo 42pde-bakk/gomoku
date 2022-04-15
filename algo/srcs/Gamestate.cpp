@@ -157,6 +157,8 @@ void Gamestate::place_stone(unsigned int move_idx) {
 		// It is important to note that it is not forbidden to introduce
 		// a double-three by capturing a pair.
 	}
+	++depth;
+	this->change_player();
 }
 
 int Gamestate::change_player() {
@@ -192,9 +194,6 @@ Gamestate *Gamestate::calcH() {
 	this->set_h();
 	this->add_h_for_captures();
 //	this->write_to_file();
-	this->depth++;
-	this->change_player();
-
 	return (this);
 }
 
