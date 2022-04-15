@@ -72,8 +72,12 @@ Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 
 Gamestate *alphabeta_(Gamestate *state, int depth, int alpha, int beta, bool maximizing_player) {
 	check_time_limit();
-	if (depth == 0 || state->has_winner()) // Terminal gamestate
+	if (state->has_winner())
+		return (state);
+	else if (depth == 0) {
 		return (state->calcH());
+		// return quiescence search
+	}
 
 	Gamestate	*best_state = nullptr;
 	int			best_state_value;

@@ -111,11 +111,17 @@ TEST_CASE_METHOD(Gamestate, "Faulty", "[MinimaxTests]") {
 	std::cerr << *this << "\n\n\n";
 
 //	Gamestate* result = alphabeta(this, 2, this->get_player());
-	Gamestate*	result = iterative_deepening(this, this->get_player());
+	Gamestate *result = minimax(this, 1, player);
+//	Gamestate*	result = iterative_deepening(this, this->get_player());
 	auto end_time = std::chrono::steady_clock::now();
 	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 	std::cerr << _PURPLE "Iterative deepening pruning took " << elapsed_time.count() << " ms\n" _END;
 	std::cerr << "endresult = " << *result << "\n\n";
-	std::cerr << "History:\n";
-	result->print_history(std::cerr, false);
+//	std::cerr << "History:\n";
+//	result->print_history(std::cerr, false);
+	for (auto child : children) {
+		print_board(std::cout, false);
+		print_heuristic(std::cout);
+		std::cout << "\n\n";
+	}
 }

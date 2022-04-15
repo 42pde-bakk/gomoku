@@ -29,6 +29,7 @@ Gamestate::~Gamestate() {
 
 bool compareGamestates(const Gamestate* a, const Gamestate* b) { return (*a < *b); }
 bool compareGamestatesReverse(const Gamestate* a, const Gamestate* b) { return (*b < *a); }
+bool compareGamestatesByTacticalMove(const Gamestate* a, const Gamestate* b) { return (a->isTactical() < b->isTactical()); }
 
 // https://core.ac.uk/download/pdf/33500946.pdf
 #if THREADED
@@ -96,9 +97,9 @@ void Gamestate::generate_children() {
 #else
 
 void Gamestate::generate_children() {
-	static compareFunc compareFuncs[] = {
-			compareGamestates, compareGamestatesReverse
-	};
+//	static compareFunc compareFuncs[] = {
+//			compareGamestates, compareGamestatesReverse
+//	};
 	if (!this->children.empty() || this->has_winner()) {
 		return ;
 	}
@@ -115,16 +116,18 @@ void Gamestate::generate_children() {
 		throw std::runtime_error("Error. No more empty tiles");
 	}
 
-	unsigned int stones = 0;
 	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
 		if (!empty_neighbours.bitboard_get(i) || Bitboard::isSeperatingBitIndex(i))
 			continue;
-		++stones;
-		auto	*child = new Gamestate(*this);
-		child->place_stone(i);
-		this->children.emplace_back(child);
+		this->children.emplace_back(new Gamestate(*this));
+		this->children.back()->place_stone(i);
+//		auto	*child = new Gamestate(*this);
+//		child->place_stone(i);
+//		this->children.emplace_back(child);
 	}
-	std::sort(children.begin(), children.end(), compareFuncs[this->get_player()]);
+
+	// We want to sort not by heuristic value, but by whether or not the move is a tactical one
+	std::sort(children.begin(), children.end(), compareGamestatesByTacticalMove);
 }
 #endif
 
@@ -197,4 +200,8 @@ Gamestate *Gamestate::calcH() {
 
 const Gamestate *Gamestate::get_parent() {
 	return (this->parent);
+}
+
+int Gamestate::isTactical() const {
+	return (this->tactical);
 }

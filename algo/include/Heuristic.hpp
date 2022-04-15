@@ -32,6 +32,7 @@ protected:
 	int winner{};
 	int depth{},
 		player{};
+	int tactical{false};
 	std::array<int, 2>	captures{};
 
 	int set_h();

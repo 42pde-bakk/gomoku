@@ -42,7 +42,7 @@ int fmain() {
 					auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time);
 					std::cout << _PURPLE "Calculating move took " << elapsed_time.count() << " ms.\n" _END;
 					client.send_move(move);
-					result->print_history(std::cout);
+					result->print_history(std::cout, true);
 				#if THREADED
 					std::cout << "lets wait for the workers\n";
 					threadpool.WaitForWorkers();

@@ -49,6 +49,7 @@ public:
 	void	add_child(Gamestate* child);
 	Gamestate*	calcH();
 	const Gamestate*	get_parent();
+	[[nodiscard]] int	isTactical() const;
 
 	void	print_history(std::ostream& o, bool colours) const;
 protected:
