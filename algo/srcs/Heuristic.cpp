@@ -292,6 +292,10 @@ unsigned int Heuristic::get_opponent_stone(const unsigned int stone) {
 	return (stone ^ 3u);
 }
 
+std::array<int, 2> Heuristic::get_captures() const {
+	return (this->captures);
+}
+
 std::ostream &operator<<(std::ostream &o, const LineValue &lv) {
 	o << LineValueToStr(lv);
 	return (o);

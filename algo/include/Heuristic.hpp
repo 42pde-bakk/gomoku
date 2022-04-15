@@ -62,6 +62,8 @@ public:
 
 	void	print_heuristic(std::ostream& o) const;
 	static unsigned int get_opponent_stone(unsigned int stone);
+
+	std::array<int, 2>	get_captures() const;
 };
 
 #endif //GOMOKUBOT_HEURISTIC_HPP
