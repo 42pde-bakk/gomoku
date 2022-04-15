@@ -51,6 +51,8 @@ Gamestate Client::receiveGamestate() {
 	turn = this->receive(4)[0];
 	gs.player = turn % 2;
 	gs.depth = 0;
+	std::vector<int>	captures = this->receive(8);
+	std::copy_n(captures.begin(), 2, gs.captures.begin());
 
 	stones_amount = this->receive(4)[0];
 	for (int i = 0; i < stones_amount; i++) {
