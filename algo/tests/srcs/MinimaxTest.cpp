@@ -91,21 +91,13 @@ TEST_CASE_METHOD(Gamestate, "Faulty", "[MinimaxTests]") {
 	place_stone(middle_idx); //p0
 	change_player();
 	place_stone(middle_idx - 1); //p1
-	change_player();
 	this->place_stone(middle_idx + 20); //p0
-	change_player();
 	this->place_stone(middle_idx + 1); //p1
-	change_player();
 	this->place_stone(middle_idx + 1 * 19); //p0
-	change_player();
 	this->place_stone(middle_idx - 20); //p1
-	change_player();
 	this->place_stone(middle_idx + 2 * 19); //p0
-	change_player();
 	this->place_stone(middle_idx - 20 - 1 * 21); //p1
-	change_player();
 	this->place_stone(middle_idx + 3 * 19); //p0
-//	change_player();
 	this->calcH();
 	print_heuristic(std::cout);
 	std::cerr << *this << "\n\n\n";
@@ -124,4 +116,49 @@ TEST_CASE_METHOD(Gamestate, "Faulty", "[MinimaxTests]") {
 		print_heuristic(std::cout);
 		std::cout << "\n\n";
 	}
+}
+
+TEST_CASE_METHOD(Gamestate, "Not fucking blocking", "[MinimaxTests]") {
+	const unsigned int bottom_right = 378;
+	this->set(bottom_right, 0);
+	this->set(bottom_right - 1, 0);
+	this->set(bottom_right - 40, 0);
+	const int anchor = bottom_right - 60 - 2;
+	this->set(anchor, 0);
+	this->set(anchor - 1, 0);
+	this->set(anchor - 2, 0);
+	const int new_anchor = anchor - 60;
+	this->set(new_anchor, 0);
+	this->set(new_anchor - 1, 0);
+	this->set(new_anchor - 2, 0);
+	this->set(new_anchor - 3, 0);
+	this->set(new_anchor + 21, 0);
+	this->set(new_anchor + 20 - 3, 0);
+
+	this->set(bottom_right - 21, 1);
+	this->set(bottom_right - 40 - 3, 1);
+	this->set(bottom_right - 60 - 1, 1);
+	const int black_anchor = bottom_right - 80;
+//	this->set(black_anchor, 1);
+	this->set(black_anchor - 1, 1);
+	this->set(black_anchor - 2, 1);
+	this->set(black_anchor - 4, 1);
+	this->set(black_anchor - 20, 1);
+	this->set(black_anchor - 22, 1);
+	this->set(black_anchor - 41, 1);
+	this->player = 1;
+	calcH();
+
+	std::cerr << *this << '\n';
+	auto result = minimax(this, 2, this->player);
+
+	std::cerr << *result;
+	result->print_heuristic(std::cerr);
+
+//	for (auto child : children) {
+//		child->print_board(std::cerr, false);
+//		child->print_heuristic(std::cerr);
+//		std::cerr << '\n';
+//	}
+
 }

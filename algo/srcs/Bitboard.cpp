@@ -114,6 +114,7 @@ unsigned int Bitboard::operator[](size_t n) const {
 void Bitboard::set(unsigned int idx, unsigned int player) {
 	assert(idx <= BOARDSIZE / 2);
 	assert(player < 2);
+	assert(!isSeperatingBitIndex(idx));
 	const unsigned int real_idx = idx * 2;
 	this->board[real_idx] = player;
 	this->board[real_idx + 1] = !player;

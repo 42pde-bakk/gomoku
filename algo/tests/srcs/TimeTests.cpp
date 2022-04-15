@@ -13,8 +13,6 @@ const int middle_idx = 9 * 20 + 9;
 
 
 TEST_CASE_METHOD(Gamestate, "Hala madrid", "[TimeTests]") {
-	Threadpool& threadpool = Threadpool::GetInstance();
-	(void)threadpool;
 	this->place_stone(middle_idx);
 	this->place_stone(middle_idx + 1);
 	this->place_stone(middle_idx - 1);

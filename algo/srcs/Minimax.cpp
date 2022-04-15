@@ -59,7 +59,9 @@ Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 	return (best_state);
 }
 
-//Gamestate*	queiescence_search(Gamestate* state, int alpha, int beta) {
+// https://en.wikipedia.org/wiki/Quiescence_search
+// https://github.com/alextrevithick/ChessAI/blob/master/AlphaBeta.py
+//Gamestate*	queiescence_search(Gamestate* state, int depth, int alpha, int beta) {
 //	state->calcH();
 //	int evaluation = state->get_h();
 //
