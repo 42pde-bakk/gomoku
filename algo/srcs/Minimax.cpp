@@ -85,31 +85,41 @@ Gamestate *alphabeta_(Gamestate *state, int depth, int alpha, int beta, bool max
 	int			best_state_value;
 	Gamestate	*new_state;
 
-	state->generate_children();
-//	if (state->get_children().empty())
-//		return (state);
+	auto next_moves = state->generate_moves();
+	assert(!next_moves.empty());
+
 	if (maximizing_player) {
 		best_state_value = std::numeric_limits<int>::min();
-		for (auto& child : state->get_children()) {
+		for (size_t m_idx = 0ul; m_idx < next_moves.size(); m_idx++) {
+			auto& move = next_moves[m_idx];
+			auto child = new Gamestate(*state);
+			child->apply_move(move);
 			new_state = alphabeta_(child, depth - 1, alpha, beta, false);
 			if (new_state->get_h() > best_state_value) {
 				best_state = new_state;
 				best_state_value = new_state->get_h();
 			}
-			if (best_state_value >= beta)
+			if (best_state_value >= beta) {
+//				std::cout << "Beta cutoff, at " << m_idx + 1 << " / " << next_moves.size() << '\n';
 				break ; // β cutoff
+			}
 			alpha = std::max(alpha, new_state->get_h());
 		}
 	} else {
 		best_state_value = std::numeric_limits<int>::max();
-		for (auto& child : state->get_children()) {
+		for (size_t m_idx = 0ul; m_idx < next_moves.size(); m_idx++) {
+			auto& move = next_moves[m_idx];
+			auto child = new Gamestate(*state);
+			child->apply_move(move);
 			new_state = alphabeta_(child, depth - 1, alpha, beta, true);
 			if (new_state->get_h() < best_state_value) {
 				best_state = new_state;
 				best_state_value = new_state->get_h();
 			}
-			if (best_state_value <= alpha)
+			if (best_state_value <= alpha) {
+//				std::cout << "Alpha cutoff, at " << m_idx + 1 << " / " << next_moves.size() << '\n';
 				break ; // α cutoff
+			}
 			beta = std::min(beta, new_state->get_h());
 		}
 	}
@@ -178,6 +188,7 @@ Gamestate *pvs_(Gamestate *state, int depth, int alpha, int beta, bool maximizin
 Gamestate	*iterative_deepening(Gamestate *gs, int player) {
 	start_time = std::chrono::steady_clock::now();
 	current_time = std::chrono::steady_clock::now();
+	elapsed_time = 0ll;
 
 	int depth = 1;
 	Gamestate *result = nullptr;

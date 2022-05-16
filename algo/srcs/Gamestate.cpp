@@ -14,8 +14,11 @@
 
 bool g_log = false;
 
+Gamestate::Gamestate() : Heuristic(), lastmove(), parent(nullptr), children() {
+}
+
 Gamestate::Gamestate(const Gamestate &x) :
-		Heuristic(x), moves(x.moves),
+		Heuristic(x), lastmove(),
 		parent(&x), children()
 { }
 
@@ -131,6 +134,40 @@ void Gamestate::generate_children() {
 }
 #endif
 
+std::vector<Move> Gamestate::generate_moves() const {
+	std::vector<Move>	next_moves;
+
+	if (this->board.none()) {
+		auto idx = 20 * 9 + 9;
+		next_moves.emplace_back(idx, this->get_player());
+		return (next_moves);
+	}
+
+	Bitboard	empty_neighbours(this->get_empty_neighbours());
+	if (empty_neighbours.none()) {
+		throw std::runtime_error("Error. No more empty tiles");
+	}
+
+	for (unsigned int idx = 0; idx < REALBOARDSIZE; idx++) {
+		if (!empty_neighbours.bitboard_get(idx) || Bitboard::isSeperatingBitIndex(idx))
+			continue;
+		next_moves.emplace_back(idx, this->player);
+	}
+	return (next_moves);
+}
+
+void Gamestate::apply_move(const Move &mv) {
+	this->set(mv.move_idx, this->player);
+	if (!this->perform_captures(mv.move_idx)) {
+		// check double threes
+		// It is important to note that it is not forbidden to introduce
+		// a double-three by capturing a pair.
+	}
+	++depth;
+	this->change_player();
+	this->lastmove = std::move(mv);
+}
+
 void	Gamestate::write_to_file() const {
 	static int idx = 1;
 	std::stringstream ss;
@@ -144,14 +181,13 @@ void	Gamestate::write_to_file() const {
 	print_board(fs, false);
 }
 
-Gamestate::Gamestate() { }
-
 void Gamestate::place_stone(unsigned int move_idx) {
 	assert(move_idx < BOARDSIZE);
 	assert (this->tile_is_empty(move_idx));
 
 	this->set(move_idx, this->get_player());
-	this->moves.emplace_back(move_idx, player);
+	this->lastmove.move_idx = move_idx;
+	this->lastmove.player = player;
 	if (!this->perform_captures(move_idx)) {
 		// check double threes
 		// It is important to note that it is not forbidden to introduce
@@ -166,8 +202,10 @@ int Gamestate::change_player() {
 	return (this->player);
 }
 
-const Move& Gamestate::get_first_move() const {
-	return this->moves.front();
+const Move & Gamestate::get_first_move(const Gamestate *root) const {
+	if (this->parent && parent != root)
+		return (this->parent->get_first_move(root));
+	return (this->lastmove);
 }
 
 void Gamestate::clear_children() {

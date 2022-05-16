@@ -35,14 +35,14 @@ int fmain() {
 					Gamestate gs = client.receiveGamestate();
 					std::cout << "got the gamestate\n";
 					Gamestate *result = iterative_deepening(&gs, gs.get_player());
-					Move move = result->get_first_move();
+					Move move = result->get_first_move(&gs);
 					std::cout << "Move: " << move;
 					std::cout << "Result gamestate: h=" << result->get_h() << ".\n";
 					current_time = std::chrono::steady_clock::now();
 					auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time);
 					std::cout << _PURPLE "Calculating move took " << elapsed_time.count() << " ms.\n" _END;
 					client.send_move(move);
-					result->print_history(std::cout, true);
+//					result->print_history(std::cout, true);
 				#if THREADED
 					std::cout << "lets wait for the workers\n";
 					threadpool.WaitForWorkers();
