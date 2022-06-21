@@ -49,6 +49,8 @@ public:
 	void	clear_children();
 
 	void	add_child(Gamestate* child);
+	bool	has_children() const;
+	void	sort_children();
 	Gamestate*	calcH();
 	const Gamestate*	get_parent();
 	[[nodiscard]] int	isTactical() const;

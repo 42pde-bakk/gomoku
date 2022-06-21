@@ -14,7 +14,7 @@
 
 
 int fmain() {
-	try {
+//	try {
 #if THREADED
 # include "Threadpool.hpp"
 # include "AsyncQueue.hpp"
@@ -26,10 +26,11 @@ int fmain() {
 
 		std::cout << "Welcome to Gomokubot! Connect on port " << server.getport() << "\n";
 		std::cout << "Waiting for client to connect\n";
+		std::cout << "Sizeof gamestate = " << sizeof(Bitboard) << ", " << sizeof(Heuristic) << ", " << sizeof(Gamestate) << "\n";
 
 		while (true) {
 			Client	client(&server);
-			try {
+//			try {
 				while (client.isAlive()) {
 					std::cout << "Lets receive a gamestate\n";
 					Gamestate gs = client.receiveGamestate();
@@ -51,15 +52,15 @@ int fmain() {
 				#endif
 					std::cout << "end of while loop\n";
 				}
-			} catch (const std::exception& e) {
-				std::cerr << _RED _BOLD << e.what() << _END << '\n';
-			}
+//			} catch (const std::exception& e) {
+//				std::cerr << _RED _BOLD << e.what() << _END << '\n';
+//			}
 		}
-	}
-	catch (const std::exception& e) {
-		std::cerr << _RED _BOLD << e.what() << _END << '\n';
-		return (1);
-	}
+//	}
+//	catch (const std::exception& e) {
+//		std::cerr << _RED _BOLD << e.what() << _END << '\n';
+//		return (1);
+//	}
 	return (0);
 }
 

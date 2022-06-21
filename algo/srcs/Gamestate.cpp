@@ -13,14 +13,16 @@
 #include <chrono>
 
 bool g_log = false;
+unsigned int g_nb = 0;
 
 Gamestate::Gamestate() : Heuristic(), lastmove(), parent(nullptr), children() {
 }
 
 Gamestate::Gamestate(const Gamestate &x) :
 		Heuristic(x), lastmove(),
-		parent(&x), children()
-{ }
+		parent(&x), children() {
+	++g_nb;
+}
 
 Gamestate::~Gamestate() {
 	for (auto& child : this->children) {
@@ -35,22 +37,15 @@ bool compareGamestatesReverse(const Gamestate* a, const Gamestate* b) { return (
 bool compareGamestatesByTacticalMove(const Gamestate* a, const Gamestate* b) { return (a->isTactical() < b->isTactical()); }
 
 // https://core.ac.uk/download/pdf/33500946.pdf
-#if THREADED
 void Gamestate::generate_children() {
-	const static std::string	root = "/Users/pde-bakk/PycharmProjects/gomoku/algo/log/";
-	static std::fstream fs(root + "generate_children.txt", std::fstream::out | std::fstream::trunc);
-	assert(fs.is_open());
-	static AsyncQueue<Job>&			jobQueue(getJobQueue());
-	static Threadpool& threadpool(Threadpool::GetInstance());
-	static compareFunc compareFuncs[] = {
+	static const compareFunc compareFuncs[] = {
 			compareGamestates, compareGamestatesReverse
 	};
+
 	if (!this->children.empty() || this->has_winner()) {
 		return ;
 	}
-	auto start = std::chrono::steady_clock::now();
-	auto current_time = std::chrono::steady_clock::now();
-	long long int elapsed_time = 0;
+
 	if (this->board.none()) {
 		int idx = 20 * 9 + 9;
 		auto	*middle = new Gamestate(*this);
@@ -60,103 +55,52 @@ void Gamestate::generate_children() {
 	}
 	Bitboard	empty_neighbours(this->get_empty_neighbours());
 	if (empty_neighbours.none()) {
-		throw std::runtime_error("Error. No more empty tiles");
+		fprintf(stderr, "Error. No more empty tiles\n");
+		assert(!empty_neighbours.none());
 	}
 
-	unsigned int stones = 0;
 	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
 		if (!empty_neighbours.bitboard_get(i) || Bitboard::isSeperatingBitIndex(i))
 			continue;
-		++stones;
-		auto loop_start = std::chrono::steady_clock::now();
-
-		Job job(this, i);
-		jobQueue.push(job);
-
-		current_time = std::chrono::steady_clock::now();
-		elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - loop_start).count();
-		fs << "enqueueing Job took " << elapsed_time << " microseconds.\n";
+		auto	*child = new Gamestate(*this);
+		child->place_stone(i);
+		this->children.emplace_back(child);
 	}
-	{
-		current_time = std::chrono::steady_clock::now();
-		auto c = std::chrono::duration_cast<std::chrono::microseconds>(current_time - start).count();
-		fs << "Main thread took " << c << " microseconds to get to threadpool.WaitForWorkers().\n";
-		auto a = std::chrono::steady_clock::now();
-		jobQueue.waitTillFinished();
-		threadpool.WaitForWorkers();
-		current_time = std::chrono::steady_clock::now();
-		elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - a).count();
-		fs << "Main thread had to wait " << elapsed_time << " microseconds.\n";
-	};
 
-	assert(!children.empty());
+	// We want to sort not by heuristic value, but by whether the move is a tactical one
 	std::sort(children.begin(), children.end(), compareFuncs[this->get_player()]);
-
-	current_time = std::chrono::steady_clock::now();
-	elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(current_time - start).count();
-	fs << "Gamestate::place_stone took " << elapsed_time << " microseconds to place " << stones << " stones.\n\n";
 }
 
-#else
-
-void Gamestate::generate_children() {
-//	static compareFunc compareFuncs[] = {
-//			compareGamestates, compareGamestatesReverse
-//	};
-	if (!this->children.empty() || this->has_winner()) {
-		return ;
-	}
-
-	if (this->board.none()) {
-		int idx = 20 * 9 + 9;
-		auto	*middle = new Gamestate(*this);
-		middle->place_stone(idx);
-		this->children.emplace_back(middle);
-		return ;
-	}
-	Bitboard	empty_neighbours(this->get_empty_neighbours());
-	if (empty_neighbours.none()) {
-		throw std::runtime_error("Error. No more empty tiles");
-	}
-
-	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
-		if (!empty_neighbours.bitboard_get(i) || Bitboard::isSeperatingBitIndex(i))
-			continue;
-		this->children.emplace_back(new Gamestate(*this));
-		this->children.back()->place_stone(i);
-//		auto	*child = new Gamestate(*this);
-//		child->place_stone(i);
-//		this->children.emplace_back(child);
-	}
-
-	// We want to sort not by heuristic value, but by whether or not the move is a tactical one
-	std::sort(children.begin(), children.end(), compareGamestatesByTacticalMove);
-}
-#endif
-
+unsigned int g_moves = 0;
+unsigned int g_applied_moves = 0;
 std::vector<Move> Gamestate::generate_moves() const {
 	std::vector<Move>	next_moves;
 
 	if (this->board.none()) {
 		auto idx = 20 * 9 + 9;
 		next_moves.emplace_back(idx, this->get_player());
+		++g_moves;
 		return (next_moves);
 	}
 
 	Bitboard	empty_neighbours(this->get_empty_neighbours());
 	if (empty_neighbours.none()) {
-		throw std::runtime_error("Error. No more empty tiles");
+		fprintf(stderr, "Error. no more empty tiles\n");
+		exit(1);
+//		throw std::runtime_error("Error. No more empty tiles");
 	}
 
 	for (unsigned int idx = 0; idx < REALBOARDSIZE; idx++) {
 		if (!empty_neighbours.bitboard_get(idx) || Bitboard::isSeperatingBitIndex(idx))
 			continue;
 		next_moves.emplace_back(idx, this->player);
+		++g_moves;
 	}
 	return (next_moves);
 }
 
 void Gamestate::apply_move(const Move &mv) {
+	++g_applied_moves;
 	this->set(mv.move_idx, this->player);
 	if (!this->perform_captures(mv.move_idx)) {
 		// check double threes
@@ -174,8 +118,11 @@ void	Gamestate::write_to_file() const {
 	ss << "/Users/pde-bakk/PycharmProjects/gomoku/algo/tests/log/gamestate_" << idx++;
 	std::fstream fs(ss.str(), std::fstream::out | std::fstream::trunc);
 
-	if (!fs.is_open())
-		throw std::runtime_error("Couldn't write to logfile");
+	if (!fs.is_open()) {
+		fprintf(stderr, "Couldnt write to logfile\n");
+		exit(1);
+//		throw std::runtime_error("Couldn't write to logfile");
+	}
 //	fs << Heuristic::hash_fn(this->board) << '\n';
 	fs << "Heuristic value: " << this->h << '\n';
 	print_board(fs, false);
@@ -241,4 +188,16 @@ const Gamestate *Gamestate::get_parent() {
 
 int Gamestate::isTactical() const {
 	return (this->tactical);
+}
+
+bool Gamestate::has_children() const {
+	return (this->children.empty() == false);
+}
+
+void Gamestate::sort_children() {
+		static compareFunc compareFuncs[] = {
+			compareGamestates, compareGamestatesReverse
+	};
+	assert(!children.empty());
+	std::sort(children.begin(), children.end(), compareFuncs[this->get_player()]);
 }

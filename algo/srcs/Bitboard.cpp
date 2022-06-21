@@ -102,8 +102,11 @@ bool Bitboard::tile_is_empty(unsigned int idx) const {
 }
 
 unsigned int Bitboard::at(size_t n) const {
-	if (n >= BOARDSIZE)
-		throw std::out_of_range("Bitboard::at() => out of range");
+	if (n >= BOARDSIZE) {
+		fprintf(stderr, "Bitboard out of range\n");
+		exit(1);
+//		throw std::out_of_range("Bitboard::at() => out of range");
+	}
 	return (this->bitboard_get(n));
 }
 

@@ -38,7 +38,7 @@ TEST_CASE("Alphabeta Test", "[MinimaxTests]") {
 	place_stones(gs);
 
 	start_time = std::chrono::steady_clock::now();
-	Gamestate *ab_res = alphabeta(gs, DEPTH, gs->get_player());
+	Gamestate *ab_res = minimax_alphabeta_start(gs, DEPTH, gs->get_player());
 	REQUIRE(ab_res);
 	auto end_time = std::chrono::steady_clock::now();
 	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
@@ -61,7 +61,7 @@ TEST_CASE("Compare minimax with AB-pruning", "[MinimaxTests]") {
 	minimax_res->print_heuristic(std::cerr);
 
 	start_time = std::chrono::steady_clock::now();
-	Gamestate *ab_res = alphabeta(gs2, DEPTH, gs2->get_player());
+	Gamestate *ab_res = minimax_alphabeta_start(gs2, DEPTH, gs2->get_player());
 	end_time = std::chrono::steady_clock::now();
 	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 	std::cerr << _PURPLE "Alpha-Beta pruning took " << elapsed_time.count() << " ms\n" _END;

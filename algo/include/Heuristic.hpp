@@ -24,8 +24,8 @@ std::ostream&	operator<<(std::ostream& o, const LineValue& lv);
 
 class Heuristic : public Bitboard {
 protected:
-//	static std::hash<bitboard> hash_fn;
-//	static std::unordered_map<std::bitset<BOARDSIZE>, int> tt;
+	static std::hash<bitboard> hash_fn;
+	static std::unordered_map<std::bitset<BOARDSIZE>, int> tt;
 
 	std::array<std::array<int, 7>, 2> values{};
 	int h{};

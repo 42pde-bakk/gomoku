@@ -12,7 +12,9 @@
 void	Client::error(const char* str) {
 	this->closeClient();
 	std::cout << _RED _BOLD << str << _END "\n"; // cerr
-	throw std::runtime_error(strerror(errno));
+	perror("Client error");
+	exit(1);
+//	throw std::runtime_error(strerror(errno));
 }
 
 Client::Client(Server *s) : parent(s) {
