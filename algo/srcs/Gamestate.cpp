@@ -38,14 +38,9 @@ bool compareGamestatesByTacticalMove(const Gamestate* a, const Gamestate* b) { r
 
 // https://core.ac.uk/download/pdf/33500946.pdf
 void Gamestate::generate_children() {
-	static const compareFunc compareFuncs[] = {
-			compareGamestates, compareGamestatesReverse
-	};
-
 	if (!this->children.empty() || this->has_winner()) {
 		return ;
 	}
-
 	if (this->board.none()) {
 		int idx = 20 * 9 + 9;
 		auto	*middle = new Gamestate(*this);
@@ -64,11 +59,11 @@ void Gamestate::generate_children() {
 			continue;
 		auto	*child = new Gamestate(*this);
 		child->place_stone(i);
+		child->calcH();
 		this->children.emplace_back(child);
 	}
 
-	// We want to sort not by heuristic value, but by whether the move is a tactical one
-	std::sort(children.begin(), children.end(), compareFuncs[this->get_player()]);
+	this->sort_children();
 }
 
 unsigned int g_moves = 0;
@@ -200,4 +195,8 @@ void Gamestate::sort_children() {
 	};
 	assert(!children.empty());
 	std::sort(children.begin(), children.end(), compareFuncs[this->get_player()]);
+}
+
+Move Gamestate::get_move() const {
+	return (this->lastmove);
 }

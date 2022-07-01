@@ -33,6 +33,7 @@ public:
 	void generate_children();
 	std::vector<Move>	generate_moves() const;
 	void	apply_move(const Move& move);
+
 	std::vector<Gamestate*>& get_children() { return (this->children); }
 
 	bool	operator==(const Gamestate& rhs) const { return (this->board == rhs.board); }
@@ -44,6 +45,7 @@ public:
 	bool	operator>=(const Gamestate& rhs) const { return !(*this < rhs); }
 
 	[[nodiscard]] const Move &get_first_move(const Gamestate *root) const;
+	[[nodiscard]] Move		get_move() const;
 
 	void	place_stone(unsigned int move_idx);
 	void	clear_children();

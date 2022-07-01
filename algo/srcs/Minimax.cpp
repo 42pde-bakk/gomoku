@@ -185,7 +185,6 @@ Gamestate *minimax_ab(Gamestate *state, int depth, int alpha, int beta, bool max
 		// return quiescence search
 	}
 	return (ab_generate_gamestates(state, depth, alpha, beta, maximizing_player));
-//	return (best_state);
 }
 
 Gamestate *minimax_alphabeta_start(Gamestate *state, int depth, bool maximizing_player) {
