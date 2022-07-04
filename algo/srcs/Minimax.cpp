@@ -36,7 +36,7 @@ Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 	}
 	check_thinking_time_left();
 	if (depth == 0 || state->has_winner()) // Terminal gamestate
-		return (state->calcH());
+		return (state);
 
 	Gamestate	*best_state = nullptr;
 	int			best_state_value;
@@ -186,7 +186,7 @@ Gamestate *minimax_ab(Gamestate *state, int depth, int alpha, int beta, bool max
 	if (state->has_winner())
 		return (state);
 	else if (depth == 0) {
-		return (state->calcH());
+		return (state);
 		// return quiescence search
 	}
 	return (ab_generate_gamestates(state, depth, alpha, beta, maximizing_player));
