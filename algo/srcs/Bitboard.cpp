@@ -7,6 +7,7 @@
 #include "Colours.hpp"
 #include "Directions.hpp"
 #include <cassert>
+#include <limits>
 
 Bitboard::Bitboard() : board() {
 }
@@ -49,7 +50,7 @@ static void	print_item(std::ostream& o, bool print_colours, unsigned int item) {
 			_RED _BOLD,
 			_GREEN _BOLD // 3 is used only when bitshifting to discover neighbours
 	};
-	if (item == std::numeric_limits<unsigned int>::max())
+	if (item == std::numeric_limits<uint32_t>::max())
 		item = 0;
 	if (print_colours)
 		o << colours[item];

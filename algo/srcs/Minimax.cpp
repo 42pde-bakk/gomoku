@@ -7,6 +7,7 @@
 #include <limits>
 #include <chrono>
 #include "Colours.hpp"
+#include <assert.h>
 
 #define OUT_OF_TIME 1
 #define HAS_TIME_LEFT 0
