@@ -14,4 +14,3 @@ std::ostream&	operator<<(std::ostream& o, const Move& m) {
 	o << "Move (p" << m.player << "), y: " << y << ", x: " << x << "\n";
 	return (o);
 }
-

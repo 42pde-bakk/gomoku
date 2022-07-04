@@ -12,7 +12,9 @@
 static void	error(const char* str) {
 	std::cout << "server error\n"; // cerr
 	std::cout << _RED _BOLD << str << "\n" _END; // cerr
-	throw std::runtime_error(strerror(errno));
+	perror("Server::error");
+	exit(1);
+//	throw std::runtime_error(strerror(errno));
 }
 
 Server::Server() : port(4242u) {

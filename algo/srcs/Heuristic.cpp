@@ -8,8 +8,8 @@
 #include <iostream>
 #include <cassert>
 
-//std::hash<bitboard> Heuristic::hash_fn;
-//std::unordered_map<std::bitset<BOARDSIZE>, int> Heuristic::tt;
+std::hash<bitboard> Heuristic::hash_fn;
+std::unordered_map<std::bitset<BOARDSIZE>, int> Heuristic::tt;
 //std::unordered_map<int, unsigned int> g_checkedTiles;
 
 int Heuristic::get_h() const {
@@ -158,7 +158,7 @@ int Heuristic::set_h() {
 	static const int winner_values[3] = {0, -2000000, 2000000};
 
 //	auto hash = hash_fn(this->board);
-//	this->h = 0;
+	this->h = 0;
 //	if (tt.find(hash) != tt.end()) {
 //		this->h = tt[hash];
 //		return (this->h);

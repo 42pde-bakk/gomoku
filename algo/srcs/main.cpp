@@ -14,7 +14,7 @@
 
 
 int fmain() {
-	try {
+//	try {
 #if THREADED
 # include "Threadpool.hpp"
 # include "AsyncQueue.hpp"
@@ -26,23 +26,24 @@ int fmain() {
 
 		std::cout << "Welcome to Gomokubot! Connect on port " << server.getport() << "\n";
 		std::cout << "Waiting for client to connect\n";
+		std::cout << "Sizeof gamestate = " << sizeof(Bitboard) << ", " << sizeof(Heuristic) << ", " << sizeof(Gamestate) << "\n";
 
 		while (true) {
 			Client	client(&server);
-			try {
+//			try {
 				while (client.isAlive()) {
 					std::cout << "Lets receive a gamestate\n";
 					Gamestate gs = client.receiveGamestate();
 					std::cout << "got the gamestate\n";
 					Gamestate *result = iterative_deepening(&gs, gs.get_player());
-					Move move = result->get_first_move();
+					Move move = result->get_first_move(&gs);
 					std::cout << "Move: " << move;
 					std::cout << "Result gamestate: h=" << result->get_h() << ".\n";
 					current_time = std::chrono::steady_clock::now();
 					auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time);
 					std::cout << _PURPLE "Calculating move took " << elapsed_time.count() << " ms.\n" _END;
 					client.send_move(move);
-					result->print_history(std::cout, true);
+//					result->print_history(std::cout, true);
 				#if THREADED
 					std::cout << "lets wait for the workers\n";
 					threadpool.WaitForWorkers();
@@ -51,15 +52,15 @@ int fmain() {
 				#endif
 					std::cout << "end of while loop\n";
 				}
-			} catch (const std::exception& e) {
-				std::cerr << _RED _BOLD << e.what() << _END << '\n';
-			}
+//			} catch (const std::exception& e) {
+//				std::cerr << _RED _BOLD << e.what() << _END << '\n';
+//			}
 		}
-	}
-	catch (const std::exception& e) {
-		std::cerr << _RED _BOLD << e.what() << _END << '\n';
-		return (1);
-	}
+//	}
+//	catch (const std::exception& e) {
+//		std::cerr << _RED _BOLD << e.what() << _END << '\n';
+//		return (1);
+//	}
 	return (0);
 }
 

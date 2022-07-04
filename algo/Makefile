@@ -39,7 +39,7 @@ ifdef SINGLETHREADED
  CFLAGS += -D THREADED=0
 endif
 ifdef SPEED
- CFLAGS += -Ofast
+ CFLAGS += -Ofast -fno-exceptions
 endif
 
 SHELL := /bin/bash

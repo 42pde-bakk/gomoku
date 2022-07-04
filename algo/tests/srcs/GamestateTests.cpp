@@ -11,6 +11,35 @@
 
 const int middle_idx = 9 * 20 + 9;
 
+TEST_CASE("Gamestate:: sorting_children", "[GamestateTests]") {
+	auto *gs = new Gamestate();
+
+	gs->set(middle_idx, 0);
+	gs->place_stone(middle_idx + 1);
+//	gs->set(middle_idx + 1, 0);
+//	gs->place_stone(middle_idx);
+//	gs->place_stone(0);
+//	gs->place_stone(middle_idx + 1);
+//	std::cerr << Bitboard(gs->get_empty_neighbours()) << "\n";
+	std::cerr << *gs << "\n";
+	gs->generate_children();
+	auto children = gs->get_children();
+	auto move = children[0]->get_move();
+
+	for (int i = 0; i < children.size(); i++) {
+		std::cerr << "[ " << i << " ]\n";
+		std::cerr << "Move: " << children[i]->get_move();
+		std::cerr << "heuristic: " << children[i]->get_h() << '\n';
+		std::cerr << *children[i] << "\n";
+	}
+
+//	REQUIRE(move.move_idx == middle_idx - 1 || move.move_idx == middle_idx + 2);
+
+	std::cerr << "heyooo\n";
+
+	delete gs;
+}
+
 TEST_CASE("Gamestate:: generate children", "[GamestateTests]") {
 	auto *gs = new Gamestate();
 

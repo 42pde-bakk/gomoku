@@ -14,9 +14,11 @@ public:
 		player;
 	bool tacticalMove;
 
+	Move() = default;
+	Move(int idx, int player, bool isTactical = false);
+
 	// Allows the operator<< to access the private vars
 	friend std::ostream&	operator<<(std::ostream& o, const Move& m);
-	Move(int idx, int player, bool isTactical = false);
 };
 
 

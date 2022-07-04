@@ -50,3 +50,25 @@ TEST_CASE("Bitboard empty neighbours", "[BitboardTests]") {
 	REQUIRE(empty_neighbours == bb2);
 	std::cerr << empty_neighbours;
 }
+
+TEST_CASE("Bitboard empty neighbours2", "[BitboardTests]") {
+	unsigned int idx = 9 * 20 + 9;
+	unsigned int p = 1; // 0 or 1
+	Bitboard bb;
+	bb.set(idx, p);
+	bb.print_board(std::cerr, false);
+	std::cerr << "\n\n";
+
+	Bitboard bb2;
+	bb2.set(idx - 1, p);
+	bb2.set(idx + 1, p);
+	bb2.set(idx + 20 - 1, p);
+	bb2.set(idx + 20, p);
+	bb2.set(idx + 20 + 1, p);
+	bb2.set(idx - 20 - 1, p);
+	bb2.set(idx - 20, p);
+	bb2.set(idx - 20 + 1, p);
+	Bitboard empty_neighbours(bb.get_empty_neighbours());
+	REQUIRE(empty_neighbours == bb2);
+	std::cerr << empty_neighbours;
+}
