@@ -11,8 +11,10 @@
 
 void	Client::error(const char* str) {
 	this->closeClient();
-	std::cerr << _RED _BOLD << str << "\n" _END;
-	throw std::runtime_error(strerror(errno));
+	std::cout << _RED _BOLD << str << _END "\n"; // cerr
+	perror("Client error");
+	exit(1);
+//	throw std::runtime_error(strerror(errno));
 }
 
 Client::Client(Server *s) : parent(s) {
@@ -20,7 +22,7 @@ Client::Client(Server *s) : parent(s) {
 	socklen_t size = sizeof(this->addr);
 	if ((this->fd = accept(this->parent->getsocketFd(), (struct sockaddr *)&this->addr, &size)) == -1)
 		error("Error accepting client");
-	std::cerr << "Accepted a client at fd " << this->fd << "\n";
+	std::cout << "Accepted a client at fd " << this->fd << "\n"; // cerr
 }
 
 Client::~Client() {
@@ -51,6 +53,8 @@ Gamestate Client::receiveGamestate() {
 	turn = this->receive(4)[0];
 	gs.player = turn % 2;
 	gs.depth = 0;
+	std::vector<int>	captures = this->receive(8);
+	std::copy_n(captures.begin(), 2, gs.captures.begin());
 
 	stones_amount = this->receive(4)[0];
 	for (int i = 0; i < stones_amount; i++) {
@@ -72,16 +76,16 @@ void Client::send_move(const Move &move) {
 	const int x = move.move_idx % REALBOARDWIDTH;
 	const int player = move.player + 1;
 
-	dprintf(2, "move_idx = %d, y,x=[%d, %d], player=%d\n", move.move_idx, y, x, player);
+//	dprintf(2, "move_idx = %d, y,x=[%d, %d], player=%d\n", move.move_idx, y, x, player);
 
 	bzero(buff, sizeof(buff));
 	memcpy(buff, (void *)&y, sizeof(int));
 	memcpy(buff + sizeof(int), (void *)&x, sizeof(int));
 	memcpy(buff + 2 * sizeof(int), (void *)&player, sizeof(int));
-	for (int i = 0; i < 12; i++) {
-		std::cerr << "\\x" << (int)(buff[i]) << ' ';
-	}
-	std::cerr << "\n";
+//	for (int i = 0; i < 12; i++) {
+//		std::cerr << "\\x" << (int)(buff[i]) << ' ';
+//	}
+//	std::cerr << "\n";
 	int sendRet = write(fd, buff, sizeof(int) * 3);
 	if (sendRet <= 0)
 		error("Error sending move");

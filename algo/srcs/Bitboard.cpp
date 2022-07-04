@@ -7,6 +7,7 @@
 #include "Colours.hpp"
 #include "Directions.hpp"
 #include <cassert>
+#include <limits>
 
 Bitboard::Bitboard() : board() {
 }
@@ -49,6 +50,8 @@ static void	print_item(std::ostream& o, bool print_colours, unsigned int item) {
 			_RED _BOLD,
 			_GREEN _BOLD // 3 is used only when bitshifting to discover neighbours
 	};
+	if (item == std::numeric_limits<uint32_t>::max())
+		item = 0;
 	if (print_colours)
 		o << colours[item];
 	o << item;
@@ -82,8 +85,10 @@ void	Bitboard::print_board(std::ostream& o, bool colours) const {
 }
 
 unsigned int Bitboard::bitboard_get(unsigned int idx) const {
-	if (idx >= REALBOARDSIZE)
+	if (!isvalid_tile(idx))
 		return (-1);
+//	if (idx >= REALBOARDSIZE)
+//		return (-1);
 	const unsigned int real_idx = idx * 2;
 	unsigned int ret = this->board[real_idx];
 
@@ -98,8 +103,11 @@ bool Bitboard::tile_is_empty(unsigned int idx) const {
 }
 
 unsigned int Bitboard::at(size_t n) const {
-	if (n >= BOARDSIZE)
-		throw std::out_of_range("Bitboard::at() => out of range");
+	if (n >= BOARDSIZE) {
+		fprintf(stderr, "Bitboard out of range\n");
+		exit(1);
+//		throw std::out_of_range("Bitboard::at() => out of range");
+	}
 	return (this->bitboard_get(n));
 }
 
@@ -110,11 +118,11 @@ unsigned int Bitboard::operator[](size_t n) const {
 void Bitboard::set(unsigned int idx, unsigned int player) {
 	assert(idx <= BOARDSIZE / 2);
 	assert(player < 2);
+	assert(!isSeperatingBitIndex(idx));
 	const unsigned int real_idx = idx * 2;
 	this->board[real_idx] = player;
 	this->board[real_idx + 1] = !player;
 }
-
 
 void Bitboard::clear_tile(unsigned int idx) {
 	const unsigned int real_idx = idx * 2;
@@ -129,13 +137,9 @@ bitboard	Bitboard::get_empty_neighbours() const {
 		if (!this->tile_is_empty(n))
 			empty_cells.clear_tile(n);
 	}
-//	std::cerr << "emptycells: \n" << empty_cells << '\n' << ", count = " << empty_cells.board.count() << '\n';
 	bitboard	neighbours = SHIFT_N(board) | SHIFT_W(board) | SHIFT_S(board) | SHIFT_E(board) \
 							| SHIFT_NE(board) | SHIFT_NW(board) | SHIFT_SE(board) | SHIFT_SW(board);
-//	Bitboard n(neighbours);
-//	std::cerr << "n::::: \n" << n << '\n';
-	bitboard	empty_neighbours = neighbours & empty_cells.board;
-	return (empty_neighbours);
+	return (neighbours & empty_cells.board);
 }
 
 bool Bitboard::isSeperatingBitIndex(unsigned int idx) {
@@ -152,8 +156,11 @@ const bitboard &Bitboard::get() const {
 
 unsigned int Bitboard::count() const {
 	unsigned int res = 0;
-	for (unsigned int i = 0; i < REALBOARDSIZE; i++)
-		res += (this->bitboard_get(i) > 0);
+	unsigned int tmp;
+	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
+		tmp = this->bitboard_get(i);
+		res += (tmp > 0 && tmp <= 3);
+	}
 	return (res);
 }
 

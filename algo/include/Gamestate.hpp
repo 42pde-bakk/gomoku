@@ -18,11 +18,9 @@ class Client;
 class Gamestate : public Heuristic {
 	Gamestate& operator=(const Gamestate& x);
 protected:
-	std::vector<Move>	moves;
+	Move	lastmove;
 	const Gamestate	*parent{};
 	std::vector<Gamestate*> children;
-	int depth{},
-		player{};
 
 	friend Client;
 public:
@@ -31,9 +29,11 @@ public:
 	~Gamestate();
 
 //	void	update_heuristic(unsigned int move_idx);
-	static unsigned int get_opponent_stone(unsigned int stone);
 
 	void generate_children();
+	std::vector<Move>	generate_moves() const;
+	void	apply_move(const Move& move);
+
 	std::vector<Gamestate*>& get_children() { return (this->children); }
 
 	bool	operator==(const Gamestate& rhs) const { return (this->board == rhs.board); }
@@ -44,20 +44,26 @@ public:
 	bool	operator<=(const Gamestate& rhs) const { return !(rhs < *this); }
 	bool	operator>=(const Gamestate& rhs) const { return !(*this < rhs); }
 
-	[[nodiscard]] int		get_player() const;
+	[[nodiscard]] const Move &get_first_move(const Gamestate *root) const;
+	[[nodiscard]] Move		get_move() const;
 
-	[[nodiscard]] const Move& get_first_move() const;
-
-	void	place_stone(int move_idx);
+	void	place_stone(unsigned int move_idx);
 	void	clear_children();
 
-	void	print_history(std::ostream& o) const;
+	void	add_child(Gamestate* child);
+	bool	has_children() const;
+	void	sort_children();
+	Gamestate*	calcH();
+	const Gamestate*	get_parent();
+	[[nodiscard]] int	isTactical() const;
+
+	void	print_history(std::ostream& o, bool colours) const;
 protected:
 	int		change_player();
 	void	write_to_file() const;
 	// Captures.cpp
-	unsigned int perform_captures(int pos);
-	unsigned int capture_check_dir(int idx, int dir);
+	unsigned int perform_captures(unsigned int pos);
+	unsigned int capture_check_dir(unsigned int idx, unsigned int dir);
 };
 
 typedef bool (*compareFunc)(const Gamestate* a, const Gamestate* b);

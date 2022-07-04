@@ -14,6 +14,8 @@ class BotSocket:
 	def send_gamestate(self, gs: Gamestate) -> None:
 		print(f'gs.turn = {gs.turn}')
 		self.s.sendall(struct.pack('i', gs.turn))  # Turn number
+
+		self.s.sendall(struct.pack('ii', gs.captures[0], gs.captures[1]))
 		stones = np.argwhere(gs.board.arr != 0)
 		print(f'stones_amount = {len(stones)}')
 		self.s.sendall(struct.pack('i', len(stones)))  # Amount of stones on the board

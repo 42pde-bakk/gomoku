@@ -1,5 +1,5 @@
 NAME = gomokubot
-INCLUDE = -Iinclude -Iinclude/Gamerules -Iinclude/IO
+INCLUDE = -Iinclude -Iinclude/Gamerules -Iinclude/IO -Iinclude/Async
 HEADER = $(shell find "include" -type f -name "*.hpp")
 
 SRC_DIR = srcs
@@ -21,7 +21,7 @@ RED = \x1b[31;01m
 WHITE = \x1b[31;37m
 RESET = \x1b[0m
 
-CFLAGS = -Wall -Werror -Wextra --std=c++17
+CFLAGS = -Wall -Werror -Wextra --std=c++2a -pthread
 
 ifdef DEBUG
  CFLAGS += -g3
@@ -30,10 +30,16 @@ ifdef LEAKS
  CFLAGS += -g3 -fsanitize=address
 endif
 ifdef PROFILING
- CFLAGS += -g3 -pg
+ CFLAGS += -pg
+endif
+ifdef THREAD_DEBUG
+ CFLAGS += -g3 -fsanitize=thread
+endif
+ifdef SINGLETHREADED
+ CFLAGS += -D THREADED=0
 endif
 ifdef SPEED
- CFLAGS += -Ofast
+ CFLAGS += -Ofast -fno-exceptions
 endif
 
 SHELL := /bin/bash

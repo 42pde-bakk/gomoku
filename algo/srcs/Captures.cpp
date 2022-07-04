@@ -6,14 +6,15 @@
 #include "Directions.hpp"
 #include <cassert>
 
-unsigned int Gamestate::capture_check_dir(int idx, int dir) {
-	const unsigned int player_stone = this->get_player() + 1;
-	const unsigned int opp_stone = !this->get_player() + 1;
-	const int	pos[3] = {idx + dir, idx + 2 * dir, idx + 3 * dir };
+unsigned int Gamestate::capture_check_dir(unsigned int idx, unsigned int dir) {
+	static const int winner_values[2] = {-2100000, 2100000};
+	const unsigned int player_stone = this->player + 1;
+	const unsigned int opp_stone = !this->player + 1;
+	const unsigned int	pos[3] = {idx + dir, idx + 2 * dir, idx + 3 * dir };
 
 	assert(!Bitboard::isSeperatingBitIndex(idx));
-	for (int po : pos) {
-		if (po < 0 || po >= BOARDSIZE || isSeperatingBitIndex(po)) {
+	for (unsigned int po : pos) {
+		if (po >= BOARDSIZE || isSeperatingBitIndex(po)) {
 			return (0);
 		}
 	}
@@ -22,15 +23,18 @@ unsigned int Gamestate::capture_check_dir(int idx, int dir) {
 	if (values[0] == opp_stone && values[1] == opp_stone && values[2] == player_stone) {
 		this->clear_tile(pos[0]);
 		this->clear_tile(pos[1]);
-		this->captures[this->get_player()] += 2;
-//		if (this->captures[this->get_player()] >= 10)
-//			this->winner = this->get_player() + 1; // 1 or 2
+		this->captures[this->player] += 2;
+		this->tactical = 1;
+		if (this->captures[this->player] >= 10) {
+			this->winner = this->player + 1;
+			this->h = winner_values[this->player];
+		}
 		return (1);
 	}
 	return (0);
 }
 
-unsigned int Gamestate::perform_captures(int pos) {
+unsigned int Gamestate::perform_captures(unsigned int pos) {
 	unsigned int ret = 0;
 	static const std::array<int, 8>	dirs = setup_all_dirs_singular();
 	assert(pos < REALBOARDSIZE);

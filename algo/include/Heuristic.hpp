@@ -25,9 +25,14 @@ std::ostream&	operator<<(std::ostream& o, const LineValue& lv);
 class Heuristic : public Bitboard {
 protected:
 	static std::hash<bitboard> hash_fn;
+	static std::unordered_map<std::bitset<BOARDSIZE>, int> tt;
+
 	std::array<std::array<int, 7>, 2> values{};
 	int h{};
 	int winner{};
+	int depth{},
+		player{};
+	int tactical{false};
 	std::array<int, 2>	captures{};
 
 	int set_h();
@@ -36,14 +41,12 @@ protected:
 	[[nodiscard]] bool canGetCaptured(unsigned int start_idx, int dir) const;
 
 private:
-	static std::unordered_map<std::bitset<BOARDSIZE>, int> tt;
-
-	unsigned int get_length(unsigned int *idx, unsigned int stone_p, unsigned int d) const;
+	unsigned int get_length(unsigned int *idx, unsigned int stone_p, unsigned int d, std::array<unsigned int, REALBOARDSIZE>& g_checkedTiles) const;
 	[[nodiscard]] unsigned int count_open_sides(unsigned int prev, unsigned int next) const;
 	[[nodiscard]] static LineValue	calc_linevalue(unsigned int length, unsigned int open_sides);
-	void tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int next, const int dir, unsigned int stone_p) const;
+	void	tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int next, int dir, unsigned int stone_p) const;
 	void	calculate_heuristic();
-	void	count_lines(unsigned int start_idx, unsigned int stone_p);
+	void	count_lines(unsigned int start_idx, unsigned int stone_p, std::array<unsigned int, REALBOARDSIZE>& checkedTiles);
 	void	loop_over_tiles();
 	Heuristic& operator=(const Heuristic& x);
 
@@ -52,12 +55,15 @@ public:
 	~Heuristic();
 	Heuristic(const Heuristic& x);
 
-	[[nodiscard]] int get_h() const;
+	[[nodiscard]] int	get_h() const;
 	[[nodiscard]] bool	has_winner() const;
 	[[nodiscard]] int	get_winner() const;
+	[[nodiscard]] int	get_player() const;
 
 	void	print_heuristic(std::ostream& o) const;
-};
+	static unsigned int get_opponent_stone(unsigned int stone);
 
+	std::array<int, 2>	get_captures() const;
+};
 
 #endif //GOMOKUBOT_HEURISTIC_HPP

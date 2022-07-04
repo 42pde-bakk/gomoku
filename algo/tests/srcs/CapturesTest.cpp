@@ -21,6 +21,11 @@ TEST_CASE_METHOD(Gamestate, "Capture-W", "[CaptureTests]") { // p1 captures p0
 
 	REQUIRE_FALSE(bitboard_get(start_idx));
 	REQUIRE_FALSE(bitboard_get(start_idx + direction));
+	REQUIRE(this->captures[1] == 2);
+	dprintf(2, "captures: [%d, %d]\n", captures[0], captures[1]);
+	this->generate_children();
+	for (auto child : children)
+		REQUIRE(child->get_captures()[1] == 2);
 }
 
 TEST_CASE_METHOD(Gamestate, "Capture-E", "[CaptureTests]") { // p1 captures p0
@@ -34,6 +39,8 @@ TEST_CASE_METHOD(Gamestate, "Capture-E", "[CaptureTests]") { // p1 captures p0
 
 	REQUIRE_FALSE(bitboard_get(start_idx));
 	REQUIRE_FALSE(bitboard_get(start_idx + direction));
+	REQUIRE(this->captures[1] == 2);
+	dprintf(2, "captures: [%d, %d]\n", captures[0], captures[1]);
 }
 
 TEST_CASE_METHOD(Gamestate, "Capture-N", "[CaptureTests]") { // p1 captures p0
@@ -46,6 +53,8 @@ TEST_CASE_METHOD(Gamestate, "Capture-N", "[CaptureTests]") { // p1 captures p0
 
 	REQUIRE_FALSE(bitboard_get(start_idx));
 	REQUIRE_FALSE(bitboard_get(start_idx + direction));
+	REQUIRE(this->captures[1] == 2);
+	dprintf(2, "captures: [%d, %d]\n", captures[0], captures[1]);
 }
 
 TEST_CASE_METHOD(Gamestate, "Capture-S", "[CaptureTests]") { // p1 captures p0
@@ -59,6 +68,8 @@ TEST_CASE_METHOD(Gamestate, "Capture-S", "[CaptureTests]") { // p1 captures p0
 
 	REQUIRE_FALSE(bitboard_get(start_idx));
 	REQUIRE_FALSE(bitboard_get(start_idx + direction));
+	REQUIRE(this->captures[1] == 2);
+	dprintf(2, "captures: [%d, %d]\n", captures[0], captures[1]);
 }
 
 TEST_CASE_METHOD(Gamestate, "Capture-NE", "[CaptureTests]") { // p1 captures p0
@@ -72,6 +83,8 @@ TEST_CASE_METHOD(Gamestate, "Capture-NE", "[CaptureTests]") { // p1 captures p0
 
 	REQUIRE_FALSE(bitboard_get(start_idx));
 	REQUIRE_FALSE(bitboard_get(start_idx + direction));
+	REQUIRE(this->captures[1] == 2);
+	dprintf(2, "captures: [%d, %d]\n", captures[0], captures[1]);
 }
 
 TEST_CASE_METHOD(Gamestate, "Capture-NW", "[CaptureTests]") { // p1 captures p0
@@ -85,6 +98,8 @@ TEST_CASE_METHOD(Gamestate, "Capture-NW", "[CaptureTests]") { // p1 captures p0
 
 	REQUIRE_FALSE(bitboard_get(start_idx));
 	REQUIRE_FALSE(bitboard_get(start_idx + direction));
+	REQUIRE(this->captures[1] == 2);
+	dprintf(2, "captures: [%d, %d]\n", captures[0], captures[1]);
 }
 
 TEST_CASE_METHOD(Gamestate, "Capture-SW", "[CaptureTests]") { // p1 captures p0
@@ -98,6 +113,8 @@ TEST_CASE_METHOD(Gamestate, "Capture-SW", "[CaptureTests]") { // p1 captures p0
 
 	REQUIRE_FALSE(bitboard_get(start_idx));
 	REQUIRE_FALSE(bitboard_get(start_idx + direction));
+	REQUIRE(this->captures[1] == 2);
+	dprintf(2, "captures: [%d, %d]\n", captures[0], captures[1]);
 }
 
 TEST_CASE_METHOD(Gamestate, "Capture-SE", "[CaptureTests]") { // p1 captures p0
@@ -111,6 +128,8 @@ TEST_CASE_METHOD(Gamestate, "Capture-SE", "[CaptureTests]") { // p1 captures p0
 
 	REQUIRE_FALSE(bitboard_get(start_idx));
 	REQUIRE_FALSE(bitboard_get(start_idx + direction));
+	REQUIRE(this->captures[1] == 2);
+	dprintf(2, "captures: [%d, %d]\n", captures[0], captures[1]);
 }
 
 TEST_CASE_METHOD(Gamestate, "Capture-0", "[CaptureTests]") { // p1 captures p0
@@ -124,6 +143,8 @@ TEST_CASE_METHOD(Gamestate, "Capture-0", "[CaptureTests]") { // p1 captures p0
 
 	REQUIRE_FALSE(bitboard_get(start_idx));
 	REQUIRE_FALSE(bitboard_get(start_idx - direction));
+	REQUIRE(this->captures[1] == 2);
+	dprintf(2, "captures: [%d, %d]\n", captures[0], captures[1]);
 }
 
 TEST_CASE_METHOD(Gamestate, "Capture-19", "[CaptureTests]") { // p1 captures p0
@@ -137,6 +158,8 @@ TEST_CASE_METHOD(Gamestate, "Capture-19", "[CaptureTests]") { // p1 captures p0
 
 	REQUIRE_FALSE(bitboard_get(start_idx));
 	REQUIRE_FALSE(bitboard_get(start_idx + direction));
+	REQUIRE(this->captures[1] == 2);
+	dprintf(2, "captures: [%d, %d]\n", captures[0], captures[1]);
 }
 
 TEST_CASE_METHOD(Gamestate, "Capture-19-false", "[CaptureTests]") { // p1 captures p0

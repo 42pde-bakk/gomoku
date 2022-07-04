@@ -35,6 +35,7 @@ class Game(tk.Frame):
 		self.frm_position = []
 		self.size = size
 		self.player = 1
+		self.previous_player = 0
 		self.minimax = Minimax()
 		self.game_mode = game_mode
 		self.frm_board = None
@@ -85,9 +86,17 @@ class Game(tk.Frame):
 				))
 				self.buttons[row * self.size + col].pack()
 
-	def handle_click(self, args):
+	def handle_click(self, args) -> None:
 		row, col = args
 		print(f"Clicked on row: {row}, col: {col}")
+		if self.game_mode == GameMode.VERSUS_AI:
+			if self.player == 2:
+				print(f"Not your turn. Current player: {self.player}")
+				return
+		if self.game_mode == GameMode.HOTSEAT:
+			if self.player == self.previous_player:
+				return
+		self.previous_player = self.player
 		self.play_game(row, col)
 
 	def pick_color(self, row: int, col: int):
@@ -116,11 +125,13 @@ class Game(tk.Frame):
 		if self.gamestate.board.get(row, col) == 0:
 			if not Game.rules.is_legal_move(row, col, self.player, self.gamestate.board):
 				print("Illegal move")
+				self.previous_player = Gamestate.get_other_player(self.player)
 				return
 			self.gamestate.place_stone(y=row, x=col, stone=self.player)
 			self.update_button(row, col)
 		else:
 			print("Position taken")
+			self.previous_player = Gamestate.get_other_player(self.player)
 			return
 		if not self.after_move_check(row, col):
 			self.change_player()
@@ -177,8 +188,7 @@ class Game(tk.Frame):
 		self.change_player()
 
 	def play_bot_pot(self):
-		pass
-		self.gamestate.place_stone(y=0, x=0, stone=self.player)
+		self.gamestate.place_stone(y=10, x=10, stone=self.player)
 		self.update_button(0, 0)
 		self.change_player()
 		while self.game_mode == GameMode.BOT_POT:
@@ -195,6 +205,7 @@ class Game(tk.Frame):
 		self.gamestate = Gamestate()
 		self.reset_pieces()
 		self.update_captures()
+		self.previous_player = 0
 
 	def new_game_bt(self, frm_options):
 		bt_new_game = ttk.Button(
@@ -208,11 +219,12 @@ class Game(tk.Frame):
 	def change_game_mode(self, choice) -> None:
 		if choice == GameMode.BOT_POT.__str__():
 			self.game_mode = GameMode.BOT_POT
+			self.play_bot_pot()
 		elif choice == GameMode.HOTSEAT.__str__():
 			self.game_mode = GameMode.HOTSEAT
 		else:
 			self.game_mode = GameMode.VERSUS_AI
-		# 3. reset board ?
+		self.previous_player = 0
 
 	def choose_different_game_om(self, frm_options):
 		lbl_choose_game_mode = ttk.Label(frm_options, text=f"Change Game Mode").pack()

@@ -13,12 +13,16 @@ TEST_CASE_METHOD(Gamestate, "Two", "[HeuristicTests]") {
 	const int start_idx = middle_idx;
 
 	place_stone(start_idx); // p0
+	this->set_h();
 	REQUIRE(get_h() == 0);
 	place_stone(start_idx + 20); // p1
+	this->set_h();
 	REQUIRE(get_h() == 0);
 	place_stone(start_idx + 1); // p0
+	this->set_h();
 	REQUIRE(get_h() == -10);
 	place_stone(start_idx + 22); // p1
+	this->set_h();
 //	std::cerr << *this << "\n";
 //	print_heuristic(std::cerr);
 	REQUIRE(h == -10);
@@ -36,6 +40,21 @@ TEST_CASE_METHOD(Gamestate, "Three", "[HeuristicTests]") {
 	set(start_idx - 19, 1);
 	REQUIRE(set_h() == -1000);
 }
+
+TEST_CASE_METHOD(Gamestate, "Blocked Three", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+
+	place_stone(start_idx);
+	place_stone(start_idx + 1);
+	place_stone(start_idx + 2);
+	place_stone(start_idx + 2 + 20);
+	place_stone(start_idx + 3);
+
+	std::cerr << *this;
+
+	REQUIRE(h == 0);
+}
+
 
 TEST_CASE_METHOD(Gamestate, "Three at the top wall", "[HeuristicTests]") {
 	const int start_idx = 5;
@@ -159,7 +178,7 @@ TEST_CASE_METHOD(Gamestate, "2 fours", "[HeuristicTests]") {
 		this->set(start_idx - i * 19, 0);
 	}
 	this->set_h();
-	REQUIRE(this->h == -30000);
+	REQUIRE(this->h == -15000); // 2 open fours is not more valuable than 1
 }
 
 TEST_CASE_METHOD(Gamestate, "BLOCKED BY JAMES", "[HeuristicTests]") {
@@ -214,32 +233,29 @@ TEST_CASE_METHOD(Gamestate, "MinimaxHeuristicReturn", "[HeuristicTests]") {
 TEST_CASE_METHOD(Gamestate, "Block", "[HeuristicTests]") {
 	const int start_idx = middle_idx;
 
-	this->set(start_idx, 0);
-	for (int i = 1; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		this->set(start_idx - i * 21, 0);
-		this->set(start_idx - i * 19, 0);
 	}
 	this->set_h();
-	REQUIRE(this->h == -30000);
+	REQUIRE(this->h == -15000);
 	this->set(105, 1);
 	this->set_h();
-	REQUIRE(this->get_h() == -22500);
+	REQUIRE(this->get_h() == -7500);
 	this->clear_tile(105);
 
 	this->set(113, 1);
 	this->set_h();
-	REQUIRE(this->get_h() == -22500);
+	REQUIRE(this->get_h() == -15000);
 	this->clear_tile(113);
-
-	this->set(start_idx + 19, 1);
-	this->set_h();
-	REQUIRE(this->get_h() == -22500);
-	this->clear_tile(start_idx + 19);
 
 	this->set(start_idx + 21, 1);
 	this->set_h();
-	REQUIRE(this->get_h() == -22500);
-	this->clear_tile(start_idx + 21);
+	REQUIRE(this->get_h() == -7500);
+
+	this->set(start_idx - (21 * 4), 1);
+	this->set_h();
+	std::cerr << *this;
+	REQUIRE(this->get_h() == 0);
 }
 
 TEST_CASE_METHOD(Gamestate, "Upgrade 3-1 W-E", "[HeuristicTests]") {

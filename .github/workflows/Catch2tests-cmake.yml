@@ -33,8 +33,11 @@ jobs:
     - name: Build Tests
       run: cmake --build tests
 
-    - name: Run tests
-      run: ./tests/Catch_tests_run
+    - name: Run unit tests
+      run: ./tests/Gomokutests.out
+
+    - name: Run integration tests
+      run: ./tests/Minimaxtests.out
 
   macos:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
@@ -58,5 +61,8 @@ jobs:
     - name: Build Tests
       run: cmake --build tests
 
-    - name: Run tests
-      run: ./tests/Catch_tests_run
+    - name: Run unit tests
+      run: ./tests/Gomokutests.out
+
+    - name: Run integration tests
+      run: ./tests/Minimaxtests.out
