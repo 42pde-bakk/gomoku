@@ -46,6 +46,8 @@ Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 		best_state_value = std::numeric_limits<int>::min();
 		for (auto& child : state->get_children()) {
 			new_state = minimax(child, depth - 1, false);
+			if (!new_state)
+				break ;
 			if (new_state->get_h() > best_state_value) {
 				best_state = new_state;
 				best_state_value = new_state->get_h();
@@ -55,6 +57,8 @@ Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 		best_state_value = std::numeric_limits<int>::max();
 		for (auto& child : state->get_children()) {
 			new_state = minimax(child, depth - 1, true);
+			if (!new_state)
+				break ;
 			if (new_state->get_h() < best_state_value) {
 				best_state = new_state;
 				best_state_value = new_state->get_h();

@@ -25,7 +25,6 @@ TEST_CASE("Basic Minimax test", "[MinimaxTests]") {
 
 	start_time = std::chrono::steady_clock::now();
 	Gamestate *minimax_res = minimax(gs, DEPTH, gs->get_player());
-	std::cerr << _PURPLE "Minimax took " << elapsed_time << " ms. to find " << minimax_res << "\n" _END;
 	REQUIRE(minimax_res);
 	auto end_time = std::chrono::steady_clock::now();
 	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
