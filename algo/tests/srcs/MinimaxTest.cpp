@@ -57,17 +57,20 @@ TEST_CASE("Compare minimax with AB-pruning", "[MinimaxTests]") {
 	elapsed_time = 0;
 
 	start_time = std::chrono::steady_clock::now();
-	Gamestate *minimax_res = minimax(gs, DEPTH, gs->get_player());
+	Gamestate *minimax_res = minimax(gs, 3, gs->get_player());
 	auto end_time = std::chrono::steady_clock::now();
 	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 	std::cerr << _PURPLE "Minimax took " << elapsed_time << " ms\n" _END;
+	REQUIRE(minimax_res);
 	minimax_res->print_heuristic(std::cerr);
 
 	start_time = std::chrono::steady_clock::now();
-	Gamestate *ab_res = minimax_alphabeta_start(gs2, DEPTH, gs2->get_player());
+	elapsed_time = 0;
+	Gamestate *ab_res = minimax_alphabeta_start(gs2, 3, gs2->get_player());
 	end_time = std::chrono::steady_clock::now();
 	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 	std::cerr << _PURPLE "Alpha-Beta pruning took " << elapsed_time << " ms\n" _END;
+	REQUIRE(ab_res);
 	ab_res->print_heuristic(std::cerr);
 
 	std::cerr << "minimax_res:\n" << *minimax_res;
