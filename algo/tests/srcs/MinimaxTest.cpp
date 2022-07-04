@@ -116,6 +116,7 @@ TEST_CASE_METHOD(Gamestate, "Faulty", "[MinimaxTests]") {
 	auto end_time = std::chrono::steady_clock::now();
 	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 	std::cerr << _PURPLE "Iterative deepening pruning took " << elapsed_time << " ms\n" _END;
+	REQUIRE(result);
 	std::cerr << "endresult = " << *result << "\n\n";
 //	std::cerr << "History:\n";
 //	result->print_history(std::cerr, false);
@@ -160,7 +161,7 @@ TEST_CASE_METHOD(Gamestate, "Not fucking blocking", "[MinimaxTests]") {
 
 	std::cerr << *this << '\n';
 	auto result = minimax(this, 2, this->player);
-
+	REQUIRE(result);
 	std::cerr << *result;
 	result->print_heuristic(std::cerr);
 
