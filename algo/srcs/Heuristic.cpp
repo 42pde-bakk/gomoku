@@ -4,7 +4,6 @@
 
 #include "Heuristic.hpp"
 #include "Directions.hpp"
-#include "Gomoku.hpp"
 #include <iostream>
 #include <cassert>
 
@@ -104,7 +103,7 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::a
 		if (linevalue < HALF_OPEN_FOUR)
 			tryUpgradeLineVal(linevalue, prev, next, dir, stone_p);
 
-		this->values[p][linevalue] += 1u;
+		this->values[p][linevalue]++;
 		if (linevalue == LineValue::FIVE && this->isUnbreakable(start_idx, next - dir, dir)) {
 			this->winner = static_cast<int>(stone_p);
 		}
@@ -127,7 +126,7 @@ void Heuristic::calculate_heuristic() {
 	static const int	minus[2] = {
 			-1, 1
 	};
-	static const int	toppertjes[] = {
+	static const unsigned int	toppertjes[] = {
 			0, // LineValue::NONE
 			10, // LineValue::TWO
 			1000, // LineValue::HALF_OPEN_THREE
@@ -148,7 +147,7 @@ void Heuristic::calculate_heuristic() {
 	else if (this->values[player][OPEN_FOUR]) {
 		this->h = (minus[player] * toppertjes[OPEN_FOUR]);
 	} else {
-		for (int i = LineValue::TWO; i <= LineValue::FIVE; ++i) {
+		for (unsigned int i = LineValue::TWO; i <= LineValue::FIVE; ++i) {
 			this->h += (this->values[1][i] - this->values[0][i]) * toppertjes[i];
 		}
 	}
@@ -156,6 +155,11 @@ void Heuristic::calculate_heuristic() {
 
 int Heuristic::set_h() {
 	static const int winner_values[3] = {0, -2000000, 2000000};
+
+	if (this->has_winner()) {
+		this->h = winner_values[this->get_winner()];
+		return (this->h);
+	}
 
 //	auto hash = hash_fn(this->board);
 	this->h = 0;
@@ -175,8 +179,6 @@ int Heuristic::set_h() {
 		this->h = std::min(std::max(h, -1900000), 1900000);
 
 //	tt[hash] = this->h;
-
-
 
 	return (this->h);
 }

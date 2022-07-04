@@ -27,7 +27,7 @@ protected:
 	static std::hash<bitboard> hash_fn;
 	static std::unordered_map<std::bitset<BOARDSIZE>, int> tt;
 
-	std::array<std::array<int, 7>, 2> values{};
+	std::array<std::array<short int, 7>, 2> values{};
 	int h{};
 	int winner{};
 	int depth{},

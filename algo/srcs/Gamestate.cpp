@@ -34,7 +34,6 @@ Gamestate::~Gamestate() {
 
 bool compareGamestates(const Gamestate* a, const Gamestate* b) { return (*a < *b); }
 bool compareGamestatesReverse(const Gamestate* a, const Gamestate* b) { return (*b < *a); }
-bool compareGamestatesByTacticalMove(const Gamestate* a, const Gamestate* b) { return (a->isTactical() < b->isTactical()); }
 
 // https://core.ac.uk/download/pdf/33500946.pdf
 void Gamestate::generate_children() {
@@ -45,6 +44,7 @@ void Gamestate::generate_children() {
 		int idx = 20 * 9 + 9;
 		auto	*middle = new Gamestate(*this);
 		middle->place_stone(idx);
+		middle->calcH();
 		this->children.emplace_back(middle);
 		return ;
 	}
@@ -54,10 +54,11 @@ void Gamestate::generate_children() {
 		assert(!empty_neighbours.none());
 	}
 
+	Gamestate *child;
 	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
 		if (!empty_neighbours.bitboard_get(i) || Bitboard::isSeperatingBitIndex(i))
 			continue;
-		auto	*child = new Gamestate(*this);
+		child = new Gamestate(*this);
 		child->place_stone(i);
 		child->calcH();
 		this->children.emplace_back(child);
@@ -101,6 +102,10 @@ void Gamestate::apply_move(const Move &mv) {
 		// check double threes
 		// It is important to note that it is not forbidden to introduce
 		// a double-three by capturing a pair.
+		const int created_open_threes = this->values[player][OPEN_THREE] - this->parent->values[player][OPEN_THREE];
+		if (created_open_threes >= 2) {
+			this->winner = !this->player;
+		}
 	}
 	++depth;
 	this->change_player();
@@ -134,6 +139,10 @@ void Gamestate::place_stone(unsigned int move_idx) {
 		// check double threes
 		// It is important to note that it is not forbidden to introduce
 		// a double-three by capturing a pair.
+		const int created_open_threes = this->values[player][OPEN_THREE] - this->parent->values[player][OPEN_THREE];
+		if (created_open_threes >= 2) {
+			this->winner = !this->player;
+		}
 	}
 	++depth;
 	this->change_player();
@@ -153,7 +162,7 @@ const Move & Gamestate::get_first_move(const Gamestate *root) const {
 void Gamestate::clear_children() {
 	for (auto child : this->children) {
 		delete child;
-		child = nullptr;
+//		child = nullptr;
 	}
 	this->children.clear();
 }
