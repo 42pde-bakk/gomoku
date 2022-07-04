@@ -12,6 +12,8 @@ class Rules:
 
 	def is_legal_move(self, row: int, col: int, player: int, board: Board) -> bool:
 		if self.is_two_open_threes(row, col, player, board):
+			if self.is_capturing(row, col, player, board):
+				return True
 			return False
 		return True
 
