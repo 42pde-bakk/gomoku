@@ -19,5 +19,6 @@ Gamestate	*iterative_deepening(Gamestate *gs, int player);
 
 extern std::chrono::time_point<std::chrono::steady_clock> start_time;
 extern std::chrono::time_point<std::chrono::steady_clock> current_time;
+extern long long int elapsed_time;
 
 #endif //ALGO_MINIMAX_HPP

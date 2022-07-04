@@ -21,13 +21,15 @@ void	place_stones(Gamestate *gs) {
 TEST_CASE("Basic Minimax test", "[MinimaxTests]") {
 	auto *gs = new Gamestate();
 	place_stones(gs);
+	elapsed_time = 0;
 
 	start_time = std::chrono::steady_clock::now();
 	Gamestate *minimax_res = minimax(gs, DEPTH, gs->get_player());
+	std::cerr << _PURPLE "Minimax took " << elapsed_time << " ms. to find " << minimax_res << "\n" _END;
 	REQUIRE(minimax_res);
 	auto end_time = std::chrono::steady_clock::now();
-	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-	std::cerr << _PURPLE "Minimax took " << elapsed_time.count() << " ms. to find " << minimax_res << "\n" _END;
+	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+	std::cerr << _PURPLE "Minimax took " << elapsed_time << " ms. to find " << minimax_res << "\n" _END;
 	std::cerr << "Minimax returned:\n" << *minimax_res << "\n";
 
 	delete gs;
@@ -36,13 +38,14 @@ TEST_CASE("Basic Minimax test", "[MinimaxTests]") {
 TEST_CASE("Alphabeta Test", "[MinimaxTests]") {
 	auto *gs = new Gamestate();
 	place_stones(gs);
+	elapsed_time = 0;
 
 	start_time = std::chrono::steady_clock::now();
 	Gamestate *ab_res = alphabeta(gs, DEPTH, gs->get_player());
 	REQUIRE(ab_res);
 	auto end_time = std::chrono::steady_clock::now();
-	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-	std::cerr << _PURPLE "Alpha-Beta pruning took " << elapsed_time.count() << " ms\n" _END;
+	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+	std::cerr << _PURPLE "Alpha-Beta pruning took " << elapsed_time << " ms\n" _END;
 }
 
 TEST_CASE("Compare minimax with AB-pruning", "[MinimaxTests]") {
@@ -52,19 +55,20 @@ TEST_CASE("Compare minimax with AB-pruning", "[MinimaxTests]") {
 	place_stones(gs);
 	place_stones(gs2);
 	std::cerr << "original:\n" << *gs << '\n';
+	elapsed_time = 0;
 
 	start_time = std::chrono::steady_clock::now();
 	Gamestate *minimax_res = minimax(gs, DEPTH, gs->get_player());
 	auto end_time = std::chrono::steady_clock::now();
-	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-	std::cerr << _PURPLE "Minimax took " << elapsed_time.count() << " ms\n" _END;
+	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+	std::cerr << _PURPLE "Minimax took " << elapsed_time << " ms\n" _END;
 	minimax_res->print_heuristic(std::cerr);
 
 	start_time = std::chrono::steady_clock::now();
 	Gamestate *ab_res = alphabeta(gs2, DEPTH, gs2->get_player());
 	end_time = std::chrono::steady_clock::now();
-	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-	std::cerr << _PURPLE "Alpha-Beta pruning took " << elapsed_time.count() << " ms\n" _END;
+	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+	std::cerr << _PURPLE "Alpha-Beta pruning took " << elapsed_time << " ms\n" _END;
 	ab_res->print_heuristic(std::cerr);
 
 	std::cerr << "minimax_res:\n" << *minimax_res;
@@ -76,19 +80,21 @@ TEST_CASE("Compare minimax with AB-pruning", "[MinimaxTests]") {
 
 TEST_CASE("Whoo", "[MinimaxTests]") {
 	auto *gs = new Gamestate();
+	elapsed_time = 0;
 
 	place_stones(gs);
 
 	iterative_deepening(gs, gs->get_player());
 	auto end_time = std::chrono::steady_clock::now();
-	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-	std::cerr << _PURPLE "Iterative deepening pruning took " << elapsed_time.count() << " ms\n" _END;
+	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+	std::cerr << _PURPLE "Iterative deepening pruning took " << elapsed_time << " ms\n" _END;
 
 	delete gs;
 }
 
 TEST_CASE_METHOD(Gamestate, "Faulty", "[MinimaxTests]") {
 	place_stone(middle_idx); //p0
+	elapsed_time = 0;
 	change_player();
 	place_stone(middle_idx - 1); //p1
 	this->place_stone(middle_idx + 20); //p0
@@ -106,8 +112,8 @@ TEST_CASE_METHOD(Gamestate, "Faulty", "[MinimaxTests]") {
 	Gamestate *result = minimax(this, 1, player);
 //	Gamestate*	result = iterative_deepening(this, this->get_player());
 	auto end_time = std::chrono::steady_clock::now();
-	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-	std::cerr << _PURPLE "Iterative deepening pruning took " << elapsed_time.count() << " ms\n" _END;
+	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+	std::cerr << _PURPLE "Iterative deepening pruning took " << elapsed_time << " ms\n" _END;
 	std::cerr << "endresult = " << *result << "\n\n";
 //	std::cerr << "History:\n";
 //	result->print_history(std::cerr, false);
@@ -119,6 +125,7 @@ TEST_CASE_METHOD(Gamestate, "Faulty", "[MinimaxTests]") {
 }
 
 TEST_CASE_METHOD(Gamestate, "Not fucking blocking", "[MinimaxTests]") {
+	elapsed_time = 0;
 	const unsigned int bottom_right = 378;
 	this->set(bottom_right, 0);
 	this->set(bottom_right - 1, 0);
