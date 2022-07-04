@@ -13,12 +13,16 @@ TEST_CASE_METHOD(Gamestate, "Two", "[HeuristicTests]") {
 	const int start_idx = middle_idx;
 
 	place_stone(start_idx); // p0
+	this->set_h();
 	REQUIRE(get_h() == 0);
 	place_stone(start_idx + 20); // p1
+	this->set_h();
 	REQUIRE(get_h() == 0);
 	place_stone(start_idx + 1); // p0
+	this->set_h();
 	REQUIRE(get_h() == -10);
 	place_stone(start_idx + 22); // p1
+	this->set_h();
 //	std::cerr << *this << "\n";
 //	print_heuristic(std::cerr);
 	REQUIRE(h == -10);
