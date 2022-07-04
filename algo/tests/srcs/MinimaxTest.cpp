@@ -97,6 +97,7 @@ TEST_CASE("Whoo", "[MinimaxTests]") {
 TEST_CASE_METHOD(Gamestate, "Faulty", "[MinimaxTests]") {
 	place_stone(middle_idx); //p0
 	elapsed_time = 0;
+	start_time = std::chrono::steady_clock::now();
 	change_player();
 	place_stone(middle_idx - 1); //p1
 	this->place_stone(middle_idx + 20); //p0
@@ -129,6 +130,7 @@ TEST_CASE_METHOD(Gamestate, "Faulty", "[MinimaxTests]") {
 
 TEST_CASE_METHOD(Gamestate, "Not fucking blocking", "[MinimaxTests]") {
 	elapsed_time = 0;
+	start_time = std::chrono::steady_clock::now();
 	const unsigned int bottom_right = 378;
 	this->set(bottom_right, 0);
 	this->set(bottom_right - 1, 0);
