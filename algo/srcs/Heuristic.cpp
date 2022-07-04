@@ -140,13 +140,13 @@ void Heuristic::calculate_heuristic() {
 	if (this->values[player][FIVE]) {
 		// if p0, -100000
 		// else, +100000
-		this->h += (minus[player] * toppertjes[FIVE]);
+		this->h = (minus[player] * toppertjes[FIVE]);
 	}
 	else if (this->values[opp][OPEN_FOUR]) {
-		this->h += (minus[opp] * toppertjes[OPEN_FOUR]);
+		this->h = (minus[opp] * toppertjes[OPEN_FOUR]);
 	}
 	else if (this->values[player][OPEN_FOUR]) {
-		this->h += (minus[player] * toppertjes[OPEN_FOUR]);
+		this->h = (minus[player] * toppertjes[OPEN_FOUR]);
 	} else {
 		for (int i = LineValue::TWO; i <= LineValue::FIVE; ++i) {
 			this->h += (this->values[1][i] - this->values[0][i]) * toppertjes[i];
@@ -166,6 +166,7 @@ int Heuristic::set_h() {
 	for (int i = 0; i < 2; ++i)
 		this->values[i].fill(0);
 	this->loop_over_tiles();
+	this->h = 0;
 	this->calculate_heuristic();
 
 	if (this->has_winner())
@@ -174,6 +175,8 @@ int Heuristic::set_h() {
 		this->h = std::min(std::max(h, -1900000), 1900000);
 
 //	tt[hash] = this->h;
+
+
 
 	return (this->h);
 }
