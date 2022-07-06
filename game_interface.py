@@ -33,6 +33,7 @@ class Game(tk.Frame):
 		self.gamestate = Gamestate()
 		self.buttons = []
 		self.frm_position = []
+		self.ordered_moves = []
 		self.size = size
 		self.player = 1
 		self.previous_player = 0
@@ -58,6 +59,7 @@ class Game(tk.Frame):
 	def create_options_window(self):
 		frm_options = ttk.Frame(self, relief=tk.RIDGE, borderwidth=10).pack(padx=25, pady=25)
 		self.display_captures(frm_options)
+		self.undo_move_bt(frm_options)
 		self.new_game_bt(frm_options)
 		self.choose_different_game_om(frm_options)
 
@@ -110,6 +112,7 @@ class Game(tk.Frame):
 
 	def update_button(self, row: int, col: int) -> None:
 		print(f"placing a new button at row: {row}, col: {col}")
+		self.
 		button_img = self.pick_color(row, col)
 		self.buttons[row * self.size + col].config(image=button_img)
 		self.update()
@@ -274,3 +277,15 @@ class Game(tk.Frame):
 
 	def update_board(self, row, col):
 		print(f'updating board, row={row}, h={col}')
+
+	def undo_move():
+		pass
+
+	def undo_move_bt(self, frm_options):
+		bt_undo_move = ttk.Button(
+			master=frm_options,
+			text="NEW GAME",
+			command=self.undo_move,
+			width=15,
+		)
+		bt_undo_move.pack()
