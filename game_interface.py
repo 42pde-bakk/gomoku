@@ -19,6 +19,13 @@ class GameMode(enum.IntEnum):
 		return f"{self.name.capitalize().replace('_', ' ')}"
 
 
+class MoveSnapshot(Move):
+	def __init__(self, row: int, col: int, player: int):
+		super().__init__(row, col, player)
+		self.capturing = False
+		self.capture_indices = []
+
+
 def get_portnb(fname: str) -> int:
 	with open(fname, 'r') as f:
 		return int(f.read())
@@ -112,7 +119,7 @@ class Game(tk.Frame):
 
 	def update_button(self, row: int, col: int) -> None:
 		print(f"placing a new button at row: {row}, col: {col}")
-		self.ordered_moves.append((row, col))
+		self.ordered_moves.append(MoveSnapshot(row, col, self.player))
 		button_img = self.pick_color(row, col)
 		self.buttons[row * self.size + col].config(image=button_img)
 		self.update()
@@ -245,12 +252,15 @@ class Game(tk.Frame):
 	def handle_captures(self, row, col) -> None:
 		capture_check = Game.rules.is_capturing(row, col, self.player, self.gamestate.board)
 		if capture_check is not None:
+			self.ordered_moves[-1].capturing = True
 			for i in range(int(len(capture_check) // 2)):
 				i = i * 2
 				self.gamestate.capture(capture_check[i], capture_check[i + 1], self.player)
 				self.remove_captured(capture_check[i], capture_check[i + 1])
 				self.update_captures()
 				self.update()
+				self.ordered_moves[-1].capture_indices.append(capture_check[i])
+				self.ordered_moves[-1].capture_indices.append(capture_check[i + 1])
 
 	def remove_captured(self, pos1: tuple, pos2: tuple):
 		pos1_row, pos1_col = pos1
@@ -278,20 +288,31 @@ class Game(tk.Frame):
 	def update_board(self, row, col):
 		print(f'updating board, row={row}, h={col}')
 
+	def recreate_captured(self, captured, opponent):
+		for stone in captured:
+			row, col = stone
+			self.gamestate.board.set(row, col, opponent)
+			stone_color = self.pick_color(row, col)
+			self.buttons[row * self.size + col].config(image=stone_color)
+			self.update()
+
 	def undo_move(self):
-		# Save moves in a move object.
 		if self.ordered_moves:
 			last_move = self.ordered_moves.pop()
-			row, col = last_move
+			row, col = last_move.y, last_move.x
 			self.gamestate.board.set(row, col, Stone.EMPTY.value)
 			self.buttons[row * self.size + col].config(image=self.gray)
-			
-
+			if last_move.capturing:
+				self.recreate_captured(last_move.capture_indices, self.gamestate.get_other_player(last_move.player))
+				num_captured = len(last_move.capture_indices)
+				self.gamestate.captures[last_move.player - 1] -= num_captured
+				self.update_captures()
+			self.change_player()
 
 	def undo_move_bt(self, frm_options):
 		bt_undo_move = ttk.Button(
 			master=frm_options,
-			text="NEW GAME",
+			text="UNDO MOVE",
 			command=self.undo_move,
 			width=15,
 		)
