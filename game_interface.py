@@ -112,7 +112,7 @@ class Game(tk.Frame):
 
 	def update_button(self, row: int, col: int) -> None:
 		print(f"placing a new button at row: {row}, col: {col}")
-		self.
+		self.ordered_moves.append((row, col))
 		button_img = self.pick_color(row, col)
 		self.buttons[row * self.size + col].config(image=button_img)
 		self.update()
@@ -278,8 +278,15 @@ class Game(tk.Frame):
 	def update_board(self, row, col):
 		print(f'updating board, row={row}, h={col}')
 
-	def undo_move():
-		pass
+	def undo_move(self):
+		# Save moves in a move object.
+		if self.ordered_moves:
+			last_move = self.ordered_moves.pop()
+			row, col = last_move
+			self.gamestate.board.set(row, col, Stone.EMPTY.value)
+			self.buttons[row * self.size + col].config(image=self.gray)
+			
+
 
 	def undo_move_bt(self, frm_options):
 		bt_undo_move = ttk.Button(
