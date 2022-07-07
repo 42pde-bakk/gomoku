@@ -111,7 +111,7 @@ class Game(tk.Frame):
 	def pick_color(self, row: int, col: int):
 		if self.gamestate.board.get(row, col) == 0:
 			button_img = self.gray
-		elif self.gamestate.board.get(row, col) == 1:
+		elif self.gamestate.board.get(row, col) == 2:
 			button_img = self.white
 		else:
 			button_img = self.black
@@ -119,7 +119,6 @@ class Game(tk.Frame):
 
 	def update_button(self, row: int, col: int) -> None:
 		print(f"placing a new button at row: {row}, col: {col}")
-		self.ordered_moves.append(MoveSnapshot(row, col, self.player))
 		button_img = self.pick_color(row, col)
 		self.buttons[row * self.size + col].config(image=button_img)
 		self.update()
@@ -137,6 +136,7 @@ class Game(tk.Frame):
 				print("Illegal move")
 				self.previous_player = Gamestate.get_other_player(self.player)
 				return
+			self.ordered_moves.append(MoveSnapshot(row, col, self.player))
 			self.gamestate.place_stone(y=row, x=col, stone=self.player)
 			self.update_button(row, col)
 		else:
@@ -189,6 +189,7 @@ class Game(tk.Frame):
 		print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}')
 		if self.gamestate.board.get(y=row, x=col) == 0:
 			# Handle rules here -> not Game.rules.is_legal_move
+			self.ordered_moves.append(MoveSnapshot(row, col, self.player))
 			self.gamestate.place_stone(y=row, x=col, stone=self.player)
 			self.update_button(row, col)
 			if self.after_move_check(row, col):
@@ -297,6 +298,9 @@ class Game(tk.Frame):
 			self.update()
 
 	def undo_move(self):
+		print(self.game_mode)
+		if self.game_mode == GameMode.BOT_POT:
+			return
 		if self.ordered_moves:
 			last_move = self.ordered_moves.pop()
 			row, col = last_move.y, last_move.x
@@ -307,6 +311,8 @@ class Game(tk.Frame):
 				num_captured = len(last_move.capture_indices)
 				self.gamestate.captures[last_move.player - 1] -= num_captured
 				self.update_captures()
+			if self.game_mode == GameMode.HOTSEAT:
+				self.previous_player = self.player
 			self.change_player()
 
 	def undo_move_bt(self, frm_options):
