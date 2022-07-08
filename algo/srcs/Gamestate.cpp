@@ -44,7 +44,6 @@ void Gamestate::generate_children() {
 		int idx = 20 * 9 + 9;
 		auto	*middle = new Gamestate(*this);
 		middle->place_stone(idx);
-//		middle->calcH();
 		this->children.emplace_back(middle);
 		return ;
 	}
@@ -59,11 +58,13 @@ void Gamestate::generate_children() {
 		if (!empty_neighbours.bitboard_get(i) || Bitboard::isSeperatingBitIndex(i))
 			continue;
 		child = new Gamestate(*this);
-		child->place_stone(i);
-//		child->calcH();
-		this->children.emplace_back(child);
+		if (child->place_stone(i) == false) {
+			// invalid move
+			delete child;
+		} else {
+			this->children.emplace_back(child);
+		}
 	}
-
 	this->sort_children();
 }
 
@@ -128,7 +129,7 @@ void Gamestate::apply_move(const Move &mv) {
 //	print_board(fs, false);
 //}
 
-void Gamestate::place_stone(unsigned int move_idx) {
+bool Gamestate::place_stone(unsigned int move_idx) {
 	assert(move_idx < BOARDSIZE);
 	assert (this->tile_is_empty(move_idx));
 
@@ -139,7 +140,7 @@ void Gamestate::place_stone(unsigned int move_idx) {
 	//TODO: incorporate calcH() in this function and ensure changing players happens at the right time!
 	if (this->has_winner()) {
 		// no need to calculate heuristic value if we already got a winner by captures!
-		return ;
+		return (true);
 	}
 	this->calcH();
 	if (!captures_happened) {
@@ -150,11 +151,13 @@ void Gamestate::place_stone(unsigned int move_idx) {
 			const int created_open_threes = this->values[player][OPEN_THREE] - this->parent->values[player][OPEN_THREE];
 			if (created_open_threes >= 2) {
 				this->set_winner(!this->player);
+				return (false);
 			}
 		}
 	}
 	++depth;
 	this->change_player();
+	return (true);
 }
 
 int Gamestate::change_player() {

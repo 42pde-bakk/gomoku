@@ -8,7 +8,7 @@
 
 const int middle_idx = 9 * 20 + 9;
 
-TEST_CASE_METHOD(Gamestate, "DoubleOpenThreeTest 1","[DoubleOpenThreeTests") {
+TEST_CASE_METHOD(Gamestate, "DoubleOpenThreeTest 1","[DoubleOpenThreeTests]") {
 	set(middle_idx + 20, 0);
 	set(middle_idx + 40, 0);
 	set(middle_idx + 1, 0);
@@ -18,11 +18,11 @@ TEST_CASE_METHOD(Gamestate, "DoubleOpenThreeTest 1","[DoubleOpenThreeTests") {
 	auto child = new Gamestate(*this);
 
 	child->place_stone(0);
-	child->place_stone(middle_idx);
+	REQUIRE(child->place_stone(middle_idx) == false);
 	std::cerr << "\n\n" << *child << "\n";
 	std::cerr << child->get_h() << "\n";
 	child->print_heuristic(std::cerr);
 	REQUIRE(child->get_h() == 2000000);
 	// Invalid move, so player 2 would have won
-	// Perhaps I should not have them saved so its children wont be generated tho
+	// Perhaps I should not have them saved so its children won't be generated tho
 }

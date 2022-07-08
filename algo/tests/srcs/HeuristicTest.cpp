@@ -44,20 +44,13 @@ TEST_CASE_METHOD(Gamestate, "Three", "[HeuristicTests]") {
 TEST_CASE_METHOD(Gamestate, "Blocked Three", "[HeuristicTests]") {
 	const int start_idx = middle_idx;
 
-	std::cerr << "lets go\n";
 	place_stone(start_idx);
-	std::cerr << "lets go\n";
 	place_stone(start_idx + 1);
-	std::cerr << "lets go\n";
 	place_stone(start_idx + 2);
-	std::cerr << "lets go\n";
 	place_stone(start_idx + 2 + 20);
-	std::cerr << "lets go\n";
 	place_stone(start_idx + 3);
-	std::cerr << "lets go\n";
 
 	std::cerr << *this;
-	std::cerr << "lets go\n";
 
 	REQUIRE(h == 0);
 }
