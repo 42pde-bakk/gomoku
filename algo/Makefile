@@ -46,7 +46,7 @@ SHELL := /bin/bash
 export SHELL
 export DEBUG
 
-all: directories $(NAME)
+all: $(NAME)
 
 directories:
 	@mkdir -p $(BUILD_DIR)

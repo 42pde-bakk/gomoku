@@ -139,9 +139,11 @@ void Gamestate::place_stone(unsigned int move_idx) {
 		// check double threes
 		// It is important to note that it is not forbidden to introduce
 		// a double-three by capturing a pair.
-		const int created_open_threes = this->values[player][OPEN_THREE] - this->parent->values[player][OPEN_THREE];
-		if (created_open_threes >= 2) {
-			this->winner = !this->player;
+		if (this->parent) {
+			const int created_open_threes = this->values[player][OPEN_THREE] - this->parent->values[player][OPEN_THREE];
+			if (created_open_threes >= 2) {
+				this->winner = !this->player;
+			}
 		}
 	}
 	++depth;

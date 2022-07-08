@@ -25,7 +25,7 @@ TEST_CASE_METHOD(Gamestate, "Two", "[HeuristicTests]") {
 	this->set_h();
 //	std::cerr << *this << "\n";
 //	print_heuristic(std::cerr);
-	REQUIRE(h == -10);
+	REQUIRE(h == -LineValues.at(TWO));
 }
 
 TEST_CASE_METHOD(Gamestate, "Three", "[HeuristicTests]") {
@@ -36,21 +36,28 @@ TEST_CASE_METHOD(Gamestate, "Three", "[HeuristicTests]") {
 	set(start_idx + 19 * 2, 0);
 
 	set_h();
-	REQUIRE(get_h() == -5000);
+	REQUIRE(get_h() == -LineValues.at(OPEN_THREE));
 	set(start_idx - 19, 1);
-	REQUIRE(set_h() == -1000);
+	REQUIRE(set_h() == -LineValues.at(HALF_OPEN_THREE));
 }
 
 TEST_CASE_METHOD(Gamestate, "Blocked Three", "[HeuristicTests]") {
 	const int start_idx = middle_idx;
 
+	std::cerr << "lets go\n";
 	place_stone(start_idx);
+	std::cerr << "lets go\n";
 	place_stone(start_idx + 1);
+	std::cerr << "lets go\n";
 	place_stone(start_idx + 2);
+	std::cerr << "lets go\n";
 	place_stone(start_idx + 2 + 20);
+	std::cerr << "lets go\n";
 	place_stone(start_idx + 3);
+	std::cerr << "lets go\n";
 
 	std::cerr << *this;
+	std::cerr << "lets go\n";
 
 	REQUIRE(h == 0);
 }
@@ -64,7 +71,7 @@ TEST_CASE_METHOD(Gamestate, "Three at the top wall", "[HeuristicTests]") {
 	set(start_idx + 2 * dir, 0);
 
 	set_h();
-	REQUIRE(get_h() == -1000);
+	REQUIRE(get_h() == -LineValues.at(HALF_OPEN_THREE));
 	set(start_idx + 3 * dir, 1);
 	set_h();
 	REQUIRE(get_h() == 0);
@@ -80,7 +87,7 @@ TEST_CASE_METHOD(Gamestate, "Three at the bottom wall", "[HeuristicTests]") {
 	set(start_idx + 2 * dir, 0);
 
 	set_h();
-	REQUIRE(get_h() == -1000);
+	REQUIRE(get_h() == -LineValues.at(HALF_OPEN_THREE));
 	set(start_idx + 3 * dir, 1);
 	set_h();
 	REQUIRE(get_h() == 0);
@@ -96,7 +103,7 @@ TEST_CASE_METHOD(Gamestate, "Three at the left wall", "[HeuristicTests]") {
 	set(start_idx + 2 * dir, 0);
 
 	set_h();
-	REQUIRE(get_h() == -1000);
+	REQUIRE(get_h() == -LineValues.at(HALF_OPEN_THREE));
 	set(start_idx + 3 * dir, 1);
 	set_h();
 	REQUIRE(get_h() == 0);
@@ -114,7 +121,7 @@ TEST_CASE_METHOD(Gamestate, "Three at the right wall", "[HeuristicTests]") {
 	set_h();
 	std::cerr << *this;
 	print_heuristic(std::cerr);
-	REQUIRE(get_h() == -1000);
+	REQUIRE(get_h() == -LineValues.at(HALF_OPEN_THREE));
 	set(start_idx + 3 * dir, 1);
 	set_h();
 	REQUIRE(get_h() == 0);
@@ -129,7 +136,7 @@ TEST_CASE_METHOD(Gamestate, "Three plus one", "[HeuristicTests]") {
 	set(start_idx - dir, 1);
 
 	set_h();
-	REQUIRE(get_h() == -1000);
+	REQUIRE(get_h() == -LineValues.at(HALF_OPEN_THREE));
 	set(start_idx + 3 * dir, 1);
 	set_h();
 	std::cerr << *this;
@@ -146,12 +153,12 @@ TEST_CASE_METHOD(Gamestate, "four", "[HeuristicTests]") {
 	this->set(start_idx - 2 * dir, 1);
 	this->set(start_idx - 3 * dir, 1);
 	this->set_h();
-	REQUIRE(this->h == 15000);
+	REQUIRE(this->h == LineValues.at(OPEN_FOUR));
 
 	this->set(start_idx + dir, 0);
 	this->set_h();
 
-	REQUIRE(this->h == 7500);
+	REQUIRE(this->h == LineValues.at(HALF_OPEN_FOUR));
 }
 
 TEST_CASE_METHOD(Gamestate, "five", "[HeuristicTests]") {
@@ -178,7 +185,7 @@ TEST_CASE_METHOD(Gamestate, "2 fours", "[HeuristicTests]") {
 		this->set(start_idx - i * 19, 0);
 	}
 	this->set_h();
-	REQUIRE(this->h == -15000); // 2 open fours is not more valuable than 1
+	REQUIRE(this->h == -LineValues.at(OPEN_FOUR)); // 2 open fours is not more valuable than 1
 }
 
 TEST_CASE_METHOD(Gamestate, "BLOCKED BY JAMES", "[HeuristicTests]") {
@@ -192,7 +199,7 @@ TEST_CASE_METHOD(Gamestate, "BLOCKED BY JAMES", "[HeuristicTests]") {
 	this->set(start_idx + 21, 1);
 	this->set_h();
 
-	REQUIRE(this->h == 0);
+	REQUIRE(this->h == LineValues.at(NONE));
 }
 
 TEST_CASE_METHOD(Gamestate, "BLOCK4", "[HeuristicTests]") {
@@ -208,7 +215,7 @@ TEST_CASE_METHOD(Gamestate, "BLOCK4", "[HeuristicTests]") {
 	print_board(std::cerr, false);
 	print_heuristic(std::cerr);
 
-	REQUIRE(this->h == 0);
+	REQUIRE(this->h == LineValues.at(NONE));
 }
 
 TEST_CASE_METHOD(Gamestate, "MinimaxHeuristicReturn", "[HeuristicTests]") {
@@ -223,11 +230,11 @@ TEST_CASE_METHOD(Gamestate, "MinimaxHeuristicReturn", "[HeuristicTests]") {
 	print_board(std::cerr, false);
 	print_heuristic(std::cerr);
 	std::cerr << '\n';
-	REQUIRE(this->h == 7500);
+	REQUIRE(this->h == LineValues.at(HALF_OPEN_FOUR));
 	this->player = 0;
 	Gamestate *result = minimax(this, 1, false);
 
-	REQUIRE(result->get_h() == 0);
+	REQUIRE(result->get_h() == LineValues.at(NONE));
 }
 
 TEST_CASE_METHOD(Gamestate, "Block", "[HeuristicTests]") {
@@ -237,25 +244,25 @@ TEST_CASE_METHOD(Gamestate, "Block", "[HeuristicTests]") {
 		this->set(start_idx - i * 21, 0);
 	}
 	this->set_h();
-	REQUIRE(this->h == -15000);
+	REQUIRE(this->h == -LineValues.at(OPEN_FOUR));
 	this->set(105, 1);
 	this->set_h();
-	REQUIRE(this->get_h() == -7500);
+	REQUIRE(this->get_h() == -LineValues.at(HALF_OPEN_FOUR));
 	this->clear_tile(105);
 
 	this->set(113, 1);
 	this->set_h();
-	REQUIRE(this->get_h() == -15000);
+	REQUIRE(this->get_h() == -LineValues.at(OPEN_FOUR));
 	this->clear_tile(113);
 
 	this->set(start_idx + 21, 1);
 	this->set_h();
-	REQUIRE(this->get_h() == -7500);
+	REQUIRE(this->get_h() == -LineValues.at(HALF_OPEN_FOUR));
 
 	this->set(start_idx - (21 * 4), 1);
 	this->set_h();
 	std::cerr << *this;
-	REQUIRE(this->get_h() == 0);
+	REQUIRE(this->get_h() == LineValues.at(NONE));
 }
 
 TEST_CASE_METHOD(Gamestate, "Upgrade 3-1 W-E", "[HeuristicTests]") {
@@ -269,7 +276,7 @@ TEST_CASE_METHOD(Gamestate, "Upgrade 3-1 W-E", "[HeuristicTests]") {
 	this->set_h();
 	std::cerr << *this;
 	print_heuristic(std::cerr);
-	REQUIRE(this->h == 7500);
+	REQUIRE(this->h == LineValues.at(HALF_OPEN_FOUR));
 }
 
 TEST_CASE_METHOD(Gamestate, "Upgrade 1-3 W-E", "[HeuristicTests]") {
@@ -283,7 +290,7 @@ TEST_CASE_METHOD(Gamestate, "Upgrade 1-3 W-E", "[HeuristicTests]") {
 	this->set_h();
 	std::cerr << *this;
 	print_heuristic(std::cerr);
-	REQUIRE(this->h == 7500);
+	REQUIRE(this->h == LineValues.at(HALF_OPEN_FOUR));
 }
 
 TEST_CASE_METHOD(Gamestate, "Upgrade 3-1 N-S", "[HeuristicTests]") {
@@ -297,7 +304,7 @@ TEST_CASE_METHOD(Gamestate, "Upgrade 3-1 N-S", "[HeuristicTests]") {
 	this->set_h();
 	std::cerr << *this;
 	print_heuristic(std::cerr);
-	REQUIRE(this->h == 7500);
+	REQUIRE(this->h == LineValues.at(HALF_OPEN_FOUR));
 }
 
 TEST_CASE_METHOD(Gamestate, "Upgrade 1-3 N-S", "[HeuristicTests]") {
@@ -311,7 +318,7 @@ TEST_CASE_METHOD(Gamestate, "Upgrade 1-3 N-S", "[HeuristicTests]") {
 	this->set_h();
 	std::cerr << *this;
 	print_heuristic(std::cerr);
-	REQUIRE(this->h == 7500);
+	REQUIRE(this->h == LineValues.at(HALF_OPEN_FOUR));
 }
 
 TEST_CASE_METHOD(Gamestate, "Mistake", "[HeuristicTests]") {

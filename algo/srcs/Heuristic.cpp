@@ -126,29 +126,29 @@ void Heuristic::calculate_heuristic() {
 	static const int	minus[2] = {
 			-1, 1
 	};
-	static const unsigned int	toppertjes[] = {
-			0, // LineValue::NONE
-			10, // LineValue::TWO
-			1000, // LineValue::HALF_OPEN_THREE
-			5000, // LineValue::OPEN_THREE
-			7500, // LineValue::HALF_OPEN_FOUR
-			15000, // LineValue::OPEN_FOUR
-			100000 // LineValue::FIVE
-	};
+//	static const unsigned int	toppertjes[] = {
+//			0, // LineValue::NONE
+//			10, // LineValue::TWO
+//			1000, // LineValue::HALF_OPEN_THREE
+//			5000, // LineValue::OPEN_THREE
+//			7500, // LineValue::HALF_OPEN_FOUR
+//			15000, // LineValue::OPEN_FOUR
+//			100000 // LineValue::FIVE
+//	};
 	const unsigned int opp = !player;
 	if (this->values[player][FIVE]) {
 		// if p0, -100000
 		// else, +100000
-		this->h = (minus[player] * toppertjes[FIVE]);
+		this->h = (minus[player] * LineValues.at(FIVE));
 	}
 	else if (this->values[opp][OPEN_FOUR]) {
-		this->h = (minus[opp] * toppertjes[OPEN_FOUR]);
+		this->h = (minus[opp] * LineValues.at(OPEN_FOUR));
 	}
 	else if (this->values[player][OPEN_FOUR]) {
-		this->h = (minus[player] * toppertjes[OPEN_FOUR]);
+		this->h = (minus[player] * LineValues.at(OPEN_FOUR));
 	} else {
 		for (unsigned int i = LineValue::TWO; i <= LineValue::FIVE; ++i) {
-			this->h += (this->values[1][i] - this->values[0][i]) * toppertjes[i];
+			this->h += (this->values[1][i] - this->values[0][i]) * LineValues.at(i);
 		}
 	}
 }

@@ -10,7 +10,7 @@
 
 // I guess we shouldn't give value to the three O'sL:
 // X O O O X
-
+#include <map>
 enum LineValue {
 	NONE = 0,
 	TWO = 1,
@@ -20,6 +20,16 @@ enum LineValue {
 	OPEN_FOUR = 5,
 	FIVE = 6
 };
+static const std::map<int, unsigned int> LineValues = {
+		{NONE, 0},
+		{TWO, 10},
+		{HALF_OPEN_THREE, 1000},
+		{OPEN_THREE, 5000},
+		{HALF_OPEN_FOUR, 7500},
+		{OPEN_FOUR, 15000},
+		{FIVE, 100000},
+};
+
 std::ostream&	operator<<(std::ostream& o, const LineValue& lv);
 
 class Heuristic : public Bitboard {
