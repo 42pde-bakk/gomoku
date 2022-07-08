@@ -18,6 +18,7 @@ void	Client::error(const char* str) {
 }
 
 Client::Client(Server *s) : parent(s) {
+	std::cerr << "waiting for client to connect with parent = " << s << "\n";
 	bzero(&this->addr, sizeof(struct sockaddr_in));
 	socklen_t size = sizeof(this->addr);
 	if ((this->fd = accept(this->parent->getsocketFd(), (struct sockaddr *)&this->addr, &size)) == -1)
@@ -37,9 +38,12 @@ std::vector<int> Client::receive(size_t bufsize) {
 	bzero(&buf, sizeof(buf));
 	if ((recvRet = read(fd, buf, bufsize)) == -1)
 		error("Error reading from socket");
-	if (recvRet == 0)
-		error("Read returned 0");
-
+	if (recvRet == 0) {
+		dprintf(2, "closing client\n");
+		this->closeClient();
+		dprintf(2, "closed client\n");
+		return (intArray);
+	}
 	for (int i = 0; i < recvRet; i += 4)
 		intArray.push_back(buf[i]);
 	return (intArray);
@@ -49,16 +53,33 @@ Gamestate Client::receiveGamestate() {
 	Gamestate gs;
 	int 	stones_amount;
 	int		turn;
+	std::vector<int> intArray;
 
-	turn = this->receive(4)[0];
+	printf("%d\n", 1);
+	intArray = this->receive(4);
+	if (!this->isAlive())
+		return (gs);
+	turn = intArray[0];
 	gs.player = turn % 2;
 	gs.depth = 0;
 	std::vector<int>	captures = this->receive(8);
+	if (!this->isAlive()) {
+		return (gs);
+	}
 	std::copy_n(captures.begin(), 2, gs.captures.begin());
 
-	stones_amount = this->receive(4)[0];
+	intArray = this->receive(4);
+	if (!this->isAlive()) {
+		return (gs);
+	}
+	stones_amount = intArray[0];
+
 	for (int i = 0; i < stones_amount; i++) {
 		std::vector<int> arr = this->receive(12);
+		if (!this->isAlive()) {
+			return (gs);
+		}
+
 		int y = arr[0],
 			x = arr[1],
 			colour = arr[2];
@@ -67,7 +88,6 @@ Gamestate Client::receiveGamestate() {
 	}
 	return (gs);
 }
-
 
 void Client::send_move(const Move &move) {
 	char buff[BUFSIZ];

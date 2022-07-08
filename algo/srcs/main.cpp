@@ -34,6 +34,10 @@ int fmain() {
 				while (client.isAlive()) {
 					std::cout << "Lets receive a gamestate\n";
 					Gamestate gs = client.receiveGamestate();
+					if (!client.isAlive()) {
+						std::cerr << "Client disconnected.\n";
+						break ;
+					}
 					std::cout << "got the gamestate\n";
 					Gamestate *result = iterative_deepening(&gs, gs.get_player());
 					Move move = result->get_first_move(&gs);
