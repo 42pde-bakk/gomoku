@@ -44,7 +44,7 @@ void Gamestate::generate_children() {
 		int idx = 20 * 9 + 9;
 		auto	*middle = new Gamestate(*this);
 		middle->place_stone(idx);
-		middle->calcH();
+//		middle->calcH();
 		this->children.emplace_back(middle);
 		return ;
 	}
@@ -60,7 +60,7 @@ void Gamestate::generate_children() {
 			continue;
 		child = new Gamestate(*this);
 		child->place_stone(i);
-		child->calcH();
+//		child->calcH();
 		this->children.emplace_back(child);
 	}
 
@@ -135,7 +135,9 @@ void Gamestate::place_stone(unsigned int move_idx) {
 	this->set(move_idx, this->get_player());
 	this->lastmove.move_idx = move_idx;
 	this->lastmove.player = player;
-	if (!this->perform_captures(move_idx)) {
+	const unsigned int captures_happened = this->perform_captures(move_idx);
+	//TODO: incorporate calcH() in this function and ensure changing players happens at the right time!
+	if (captures_happened) {
 		// check double threes
 		// It is important to note that it is not forbidden to introduce
 		// a double-three by capturing a pair.
@@ -147,6 +149,7 @@ void Gamestate::place_stone(unsigned int move_idx) {
 		}
 	}
 	++depth;
+	this->calcH();
 	this->change_player();
 }
 

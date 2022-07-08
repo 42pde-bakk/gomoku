@@ -126,16 +126,11 @@ void Heuristic::calculate_heuristic() {
 	static const int	minus[2] = {
 			-1, 1
 	};
-//	static const unsigned int	toppertjes[] = {
-//			0, // LineValue::NONE
-//			10, // LineValue::TWO
-//			1000, // LineValue::HALF_OPEN_THREE
-//			5000, // LineValue::OPEN_THREE
-//			7500, // LineValue::HALF_OPEN_FOUR
-//			15000, // LineValue::OPEN_FOUR
-//			100000 // LineValue::FIVE
-//	};
 	const unsigned int opp = !player;
+	/*
+	 * player is the one who just placed their stone
+	 * opp is the other one (whose turn it will be after this)
+	 */
 	if (this->values[player][FIVE]) {
 		// if p0, -100000
 		// else, +100000
