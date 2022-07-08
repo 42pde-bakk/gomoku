@@ -104,7 +104,7 @@ void Gamestate::apply_move(const Move &mv) {
 		// a double-three by capturing a pair.
 		const int created_open_threes = this->values[player][OPEN_THREE] - this->parent->values[player][OPEN_THREE];
 		if (created_open_threes >= 2) {
-			this->winner = !this->player;
+			this->set_winner(!this->player);
 		}
 	}
 	++depth;
@@ -112,21 +112,21 @@ void Gamestate::apply_move(const Move &mv) {
 	this->lastmove = std::move(mv);
 }
 
-void	Gamestate::write_to_file() const {
-	static int idx = 1;
-	std::stringstream ss;
-	ss << "/Users/pde-bakk/PycharmProjects/gomoku/algo/tests/log/gamestate_" << idx++;
-	std::fstream fs(ss.str(), std::fstream::out | std::fstream::trunc);
-
-	if (!fs.is_open()) {
-		fprintf(stderr, "Couldnt write to logfile\n");
-		exit(1);
-//		throw std::runtime_error("Couldn't write to logfile");
-	}
-//	fs << Heuristic::hash_fn(this->board) << '\n';
-	fs << "Heuristic value: " << this->h << '\n';
-	print_board(fs, false);
-}
+//void	Gamestate::write_to_file() const {
+//	static int idx = 1;
+//	std::stringstream ss;
+//	ss << "/Users/pde-bakk/PycharmProjects/gomoku/algo/tests/log/gamestate_" << idx++;
+//	std::fstream fs(ss.str(), std::fstream::out | std::fstream::trunc);
+//
+//	if (!fs.is_open()) {
+//		fprintf(stderr, "Couldnt write to logfile\n");
+//		exit(1);
+////		throw std::runtime_error("Couldn't write to logfile");
+//	}
+////	fs << Heuristic::hash_fn(this->board) << '\n';
+//	fs << "Heuristic value: " << this->h << '\n';
+//	print_board(fs, false);
+//}
 
 void Gamestate::place_stone(unsigned int move_idx) {
 	assert(move_idx < BOARDSIZE);
@@ -137,19 +137,23 @@ void Gamestate::place_stone(unsigned int move_idx) {
 	this->lastmove.player = player;
 	const unsigned int captures_happened = this->perform_captures(move_idx);
 	//TODO: incorporate calcH() in this function and ensure changing players happens at the right time!
-	if (captures_happened) {
+	if (this->has_winner()) {
+		// no need to calculate heuristic value if we already got a winner by captures!
+		return ;
+	}
+	this->calcH();
+	if (!captures_happened) {
 		// check double threes
-		// It is important to note that it is not forbidden to introduce
-		// a double-three by capturing a pair.
+		// "It is important to note that it is not forbidden to introduce
+		// a double-three by capturing a pair."
 		if (this->parent) {
 			const int created_open_threes = this->values[player][OPEN_THREE] - this->parent->values[player][OPEN_THREE];
 			if (created_open_threes >= 2) {
-				this->winner = !this->player;
+				this->set_winner(!this->player);
 			}
 		}
 	}
 	++depth;
-	this->calcH();
 	this->change_player();
 }
 
@@ -167,7 +171,6 @@ const Move & Gamestate::get_first_move(const Gamestate *root) const {
 void Gamestate::clear_children() {
 	for (auto child : this->children) {
 		delete child;
-//		child = nullptr;
 	}
 	this->children.clear();
 }

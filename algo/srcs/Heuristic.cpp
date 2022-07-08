@@ -105,7 +105,8 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::a
 
 		this->values[p][linevalue]++;
 		if (linevalue == LineValue::FIVE && this->isUnbreakable(start_idx, next - dir, dir)) {
-			this->winner = static_cast<int>(stone_p);
+			this->set_winner(p);
+//			this->winner = static_cast<int>(stone_p);
 		}
 	}
 }
@@ -149,29 +150,25 @@ void Heuristic::calculate_heuristic() {
 }
 
 int Heuristic::set_h() {
-	static const int winner_values[3] = {0, -2000000, 2000000};
-
-	if (this->has_winner()) {
-		this->h = winner_values[this->get_winner()];
-		return (this->h);
-	}
-
+//	static const int winner_values[3] = {0, -2000000, 2000000};
 //	auto hash = hash_fn(this->board);
 	this->h = 0;
 //	if (tt.find(hash) != tt.end()) {
 //		this->h = tt[hash];
 //		return (this->h);
 //	}
-	for (int i = 0; i < 2; ++i)
+	for (unsigned short int i = 0; i < 2; ++i)
 		this->values[i].fill(0);
 	this->loop_over_tiles();
 	this->h = 0;
 	this->calculate_heuristic();
 
-	if (this->has_winner())
-		this->h = winner_values[this->get_winner()];
-	else
+	if (!this->has_winner()) {
 		this->h = std::min(std::max(h, -1900000), 1900000);
+	}
+//	if (this->has_winner())
+//		this->h = winner_values[this->get_winner()];
+//	else
 
 //	tt[hash] = this->h;
 
@@ -233,6 +230,14 @@ void Heuristic::print_heuristic(std::ostream &o) const {
 
 bool Heuristic::has_winner() const {
 	return (this->winner != 0);
+}
+
+void Heuristic::set_winner(unsigned int p_winner) {
+	static const int winner_values[2] = {-2000000, 2000000};
+
+	assert(p_winner == 0 || p_winner == 1); //TODO: REMOVE
+	this->winner = p_winner + 1;
+	this->h = winner_values[p_winner];
 }
 
 int Heuristic::get_winner() const {

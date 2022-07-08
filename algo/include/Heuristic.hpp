@@ -67,6 +67,7 @@ public:
 
 	[[nodiscard]] int	get_h() const;
 	[[nodiscard]] bool	has_winner() const;
+	void set_winner(unsigned int p_winner);
 	[[nodiscard]] int	get_winner() const;
 	[[nodiscard]] int	get_player() const;
 
