@@ -172,6 +172,8 @@ TEST_CASE_METHOD(Gamestate, "five", "[HeuristicTests]") {
 	this->set(start_idx + dir, 0);
 	this->set_h();
 
+	std::cerr << *this;
+	dprintf(2, "h = %d\n", h);
 	REQUIRE(this->h == -2000000); // because it is unbreakable
 	REQUIRE(this->winner == 1);
 }

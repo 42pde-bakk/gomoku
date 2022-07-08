@@ -22,7 +22,7 @@ TEST_CASE_METHOD(Gamestate, "DoubleOpenThreeTest 1","[DoubleOpenThreeTests") {
 	std::cerr << "\n\n" << *child << "\n";
 	std::cerr << child->get_h() << "\n";
 	child->print_heuristic(std::cerr);
-	REQUIRE(child->get_h() < 0);
-
-
+	REQUIRE(child->get_h() == 2000000);
+	// Invalid move, so player 2 would have won
+	// Perhaps I should not have them saved so its children wont be generated tho
 }

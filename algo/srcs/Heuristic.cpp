@@ -106,7 +106,7 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::a
 		this->values[p][linevalue]++;
 		if (linevalue == LineValue::FIVE && this->isUnbreakable(start_idx, next - dir, dir)) {
 			this->set_winner(p);
-//			this->winner = static_cast<int>(stone_p);
+			return ;
 		}
 	}
 }
@@ -159,8 +159,10 @@ int Heuristic::set_h() {
 //	}
 	for (unsigned short int i = 0; i < 2; ++i)
 		this->values[i].fill(0);
-	this->loop_over_tiles();
 	this->h = 0;
+	this->loop_over_tiles();
+	if (this->has_winner())
+		return (this->h);
 	this->calculate_heuristic();
 
 	if (!this->has_winner()) {
@@ -284,7 +286,7 @@ bool Heuristic::isUnbreakable(unsigned int start_idx, unsigned int end_idx, int 
 			if (d == dir)
 				continue ;
 			if (canGetCaptured(start_idx, dirs[d]))
-				unbroken_length = -1;
+				return (false);
 		}
 		++unbroken_length;
 		if (unbroken_length == 5)
