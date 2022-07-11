@@ -380,6 +380,65 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't - 2", "[HeuristicTests]") 
 	REQUIRE(result->get_first_move(this).move_idx == 5 * 20 + 8);
 }
 
+TEST_CASE_METHOD(Gamestate, "Should win but doesnt", "[HeuristicTests]") {
+    this->set(7 * REALBOARDWIDTH + 7, 0);
+    this->set(8 * REALBOARDWIDTH + 7, 0);
+    this->set(9 * REALBOARDWIDTH + 7, 0);
+
+    this->set(8 * REALBOARDWIDTH + 8, 1);
+    this->set(8 * REALBOARDWIDTH + 10, 0);
+//    this->set(8 * REALBOARDWIDTH + 12, 1);
+
+    this->set(9 * REALBOARDWIDTH + 6, 1);
+    this->set(9 * REALBOARDWIDTH + 9, 1);
+    this->set(9 * REALBOARDWIDTH + 10, 1);
+    this->set(9 * REALBOARDWIDTH + 11, 1);
+    this->set(9 * REALBOARDWIDTH + 13, 0);
+
+    this->set(10 * REALBOARDWIDTH + 8, 1);
+    this->set(10 * REALBOARDWIDTH + 9, 0);
+    this->set(10 * REALBOARDWIDTH + 10, 1);
+    this->set(10 * REALBOARDWIDTH + 11, 0);
+
+    this->set(11 * REALBOARDWIDTH + 7, 1);
+    this->set(11 * REALBOARDWIDTH + 9, 1);
+    this->set(11 * REALBOARDWIDTH + 10, 1);
+    this->set(11 * REALBOARDWIDTH + 11, 1);
+
+    this->set(12 * REALBOARDWIDTH + 10, 1);
+    this->set(12 * REALBOARDWIDTH + 12, 0);
+
+    this->set(13 * REALBOARDWIDTH + 8, 1);
+    this->set(13 * REALBOARDWIDTH + 10, 0);
+
+    this->set(6 * REALBOARDWIDTH + 7, 0);
+    this->captures[1] = 4;
+    this->calcH();
+    this->change_player();
+    std::cerr << *this;
+
+    this->generate_children();
+    REQUIRE(this->children[0]->get_move().move_idx == 228);
+//    std::cerr << "\n\n\n";
+//    for (auto child : children) {
+//        std::cerr << "move_idx: " << child->get_move().move_idx << "\n";
+//        std::cerr << *child;
+//        child->print_heuristic(std::cerr);
+//    }
+    this->clear_children();
+    elapsed_time = 0;
+    start_time = std::chrono::steady_clock::now();
+//    auto result = minimax_alphabeta_start(this, 4, this->player);
+    auto result = iterative_deepening(this, this->player);
+    REQUIRE(result);
+    std::cerr << "\n\n";
+    std::cerr << *result;
+    std::cerr << result->get_h() << "\n\n\n\nHISTORY:\n";
+    REQUIRE(result->get_first_move(this).move_idx == 228);
+
+    result->print_history(std::cerr, false);
+}
+
 TEST_CASE_METHOD(Gamestate, "Mistake", "[HeuristicTests]") {
 	this->captures[0] = 4;
 	set(89, 1);
@@ -410,5 +469,4 @@ TEST_CASE_METHOD(Gamestate, "Mistake", "[HeuristicTests]") {
 		std::cerr << "Child:\n" << *child;
 		child->print_heuristic(std::cerr);
 	}
-
 }

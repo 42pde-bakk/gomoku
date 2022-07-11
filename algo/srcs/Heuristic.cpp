@@ -29,12 +29,8 @@ unsigned int Heuristic::get_length(unsigned int *i, unsigned int stone_p, unsign
 	while (idx < REALBOARDSIZE && !isSeperatingBitIndex(idx) && this->bitboard_get(idx) == stone_p) {
 		length++;
 		g_checkedTiles[idx] |= 1u << d;
-//		if (g_log)
-//			dprintf(2, "checked_tiles[%u] now is %d, Unioned this into it: (%u)\n", idx, g_checkedTiles[idx], 1u << (d + 1));
 		idx += dirs[d];
 	}
-//	if (g_log)
-//		dprintf(2, "dir=%d, length=%u\n", dirs[d], length);
 	return (length);
 }
 
@@ -55,13 +51,9 @@ LineValue	Heuristic::calc_linevalue(unsigned int length, unsigned int open_sides
 unsigned int Heuristic::count_open_sides(unsigned int prev, unsigned int next) const {
 	unsigned int open_sides = 0;
 	if (prev < REALBOARDSIZE && !isSeperatingBitIndex(prev) && tile_is_empty(prev)) {
-//		if (g_log)
-//			dprintf(2, "prev (%u) is empty!\n", prev);
 		open_sides += 1u;
 	}
 	if (next < REALBOARDSIZE && !isSeperatingBitIndex(next) && tile_is_empty(next)) {
-//		if (g_log)
-//			dprintf(2, "next (%u) is empty!\n", next);
 		open_sides += 1u;
 	}
 	return (open_sides);
@@ -71,9 +63,7 @@ void Heuristic::tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int
 	unsigned int before_prev = prev - dir;
 	unsigned int after_next = next + dir;
 	if ((tile_is_empty(prev) && bitboard_get(before_prev) == stone_p) || (tile_is_empty(next) && bitboard_get(after_next) == stone_p)) {
-//		std::cerr << "b4_prev: " << bitboard_get(before_prev) << ", af_next: " << bitboard_get(after_next) << '\n';
 		lv = static_cast<LineValue>(int(lv) + 1);
-//		std::cerr << "upgraded line to " << lv << '\n';
 	}
 }
 
@@ -81,13 +71,10 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::a
 	static const std::array<int, 4> dirs = setup_dirs();
 	const unsigned int p = stone_p - 1;
 
-//	if (g_log) dprintf(2, "start_idx: %u, stones: p=%u\n", start_idx, stone_p);
 	for (unsigned int d = 0; d < dirs.size(); d++) {
 		const int dir = dirs[d];
 
-//		if (g_log) dprintf(2, "dirs[%u] = %d\n", d, dir);
 		if (checkedTiles[start_idx] & (1u << d)) {
-//			if (g_log) dprintf(2, "already checked %u in direction %d\n", start_idx, dir);
 			continue ;
 		}
 		unsigned int next = start_idx + dir;
@@ -105,7 +92,6 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::a
 
 		this->values[p][linevalue]++;
 		if (linevalue == LineValue::FIVE /*&& this->isUnbreakable(start_idx, next - dir, dir)*/) {
-//		if (linevalue == LineValue::FIVE && this->isUnbreakable(start_idx, next - dir, dir)) {
 			this->set_winner(p);
 			return ;
 		}

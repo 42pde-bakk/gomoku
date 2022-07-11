@@ -11,8 +11,8 @@
 #include <fstream>
 #include <sstream>
 #include <chrono>
+#define MAX_CHILDREN 10
 
-bool g_log = false;
 unsigned int g_nb = 0;
 
 Gamestate::Gamestate() : Heuristic(), lastmove(), parent(nullptr), children() {
@@ -66,6 +66,12 @@ void Gamestate::generate_children() {
 		}
 	}
 	this->sort_children();
+    if (this->children.size() > MAX_CHILDREN) {
+        while (this->children.size() > MAX_CHILDREN) {
+            delete this->children.back();
+            this->children.pop_back();
+        }
+    }
 }
 
 unsigned int g_moves = 0;
@@ -84,7 +90,6 @@ std::vector<Move> Gamestate::generate_moves() const {
 	if (empty_neighbours.none()) {
 		fprintf(stderr, "Error. no more empty tiles\n");
 		exit(1);
-//		throw std::runtime_error("Error. No more empty tiles");
 	}
 
 	for (unsigned int idx = 0; idx < REALBOARDSIZE; idx++) {
@@ -113,21 +118,6 @@ void Gamestate::apply_move(const Move &mv) {
 	this->lastmove = std::move(mv);
 }
 
-//void	Gamestate::write_to_file() const {
-//	static int idx = 1;
-//	std::stringstream ss;
-//	ss << "/Users/pde-bakk/PycharmProjects/gomoku/algo/tests/log/gamestate_" << idx++;
-//	std::fstream fs(ss.str(), std::fstream::out | std::fstream::trunc);
-//
-//	if (!fs.is_open()) {
-//		fprintf(stderr, "Couldnt write to logfile\n");
-//		exit(1);
-////		throw std::runtime_error("Couldn't write to logfile");
-//	}
-////	fs << Heuristic::hash_fn(this->board) << '\n';
-//	fs << "Heuristic value: " << this->h << '\n';
-//	print_board(fs, false);
-//}
 
 bool Gamestate::place_stone(unsigned int move_idx) {
 	assert(move_idx < BOARDSIZE);
@@ -137,7 +127,7 @@ bool Gamestate::place_stone(unsigned int move_idx) {
 	this->lastmove.move_idx = move_idx;
 	this->lastmove.player = player;
 	const unsigned int captures_happened = this->perform_captures(move_idx);
-	//TODO: incorporate calcH() in this function and ensure changing players happens at the right time!
+
 	if (this->has_winner()) {
 		// no need to calculate heuristic value if we already got a winner by captures!
 		return (true);
@@ -193,7 +183,6 @@ void Gamestate::add_child(Gamestate *child) {
 Gamestate *Gamestate::calcH() {
 	this->set_h();
 	this->add_h_for_captures();
-//	this->write_to_file();
 	return (this);
 }
 

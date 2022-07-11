@@ -41,6 +41,9 @@ endif
 ifdef SPEED
  CFLAGS += -Ofast -fno-exceptions
 endif
+ifdef NDEBUG
+ CFLAGS += -D NDEBUG
+endif
 
 SHELL := /bin/bash
 export SHELL
