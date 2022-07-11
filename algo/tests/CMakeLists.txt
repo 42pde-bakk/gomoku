@@ -18,7 +18,8 @@ file(GLOB Gamerules "../srcs/Gamerules/*.cpp" "../include/Gamerules/*.hpp")
 
 add_executable(Gomokutests.out ${test_srcs} ${includes} ${srcs} ${Gamerules} ${IO} ${Async})
 add_executable(Minimaxtests.out ${MinimaxTests} ${includes} ${srcs} ${Gamerules} ${IO} ${Async})
-target_compile_options(Minimaxtests.out PRIVATE "-D THREADED=0 -D TIMEOUT_VALUE=2000")
+target_compile_options(Minimaxtests.out PRIVATE "-D THREADED=0")
+target_compile_options(Minimaxtests.out PRIVATE "-D TIMEOUT_VALUE=2000")
 target_compile_options(Gomokutests.out PRIVATE "-D TIMEOUT_VALUE=2000")
 #target_compile_definitions(Minimaxtests.out PUBLIC -DTHREAD=0)
 
