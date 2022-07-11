@@ -336,10 +336,16 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't", "[HeuristicTests]") {
 	this->change_player();
 
 	this->generate_children();
-	for (auto child : children) {
-		std::cerr << "\nChild has heuristic " << child->get_h() << "\n";
-		std::cerr << *child << '\n';
-	}
+	REQUIRE(children[0]->get_move().move_idx == 154);
+
+	this->clear_children();
+	elapsed_time = 0;
+	start_time = std::chrono::steady_clock::now();
+	auto result = minimax_alphabeta_start(this, 3, this->player);
+	REQUIRE(result);
+	std::cerr << *result;
+	std::cerr << result->get_h() << "\n\n\n\n";
+	REQUIRE(result->get_first_move(this).move_idx == 154);
 }
 
 TEST_CASE_METHOD(Gamestate, "Should block but doesn't - 2", "[HeuristicTests]") {
