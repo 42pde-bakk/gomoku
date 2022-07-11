@@ -14,7 +14,6 @@ void	Client::error(const char* str) {
 	std::cout << _RED _BOLD << str << _END "\n"; // cerr
 	perror("Client error");
 	exit(1);
-//	throw std::runtime_error(strerror(errno));
 }
 
 Client::Client(Server *s) : parent(s) {
@@ -55,7 +54,6 @@ Gamestate Client::receiveGamestate() {
 	int		turn;
 	std::vector<int> intArray;
 
-	printf("%d\n", 1);
 	intArray = this->receive(4);
 	if (!this->isAlive())
 		return (gs);
@@ -96,18 +94,13 @@ void Client::send_move(const Move &move) {
 	const int x = move.move_idx % REALBOARDWIDTH;
 	const int player = move.player + 1;
 
-//	dprintf(2, "move_idx = %d, y,x=[%d, %d], player=%d\n", move.move_idx, y, x, player);
-
 	bzero(buff, sizeof(buff));
 	memcpy(buff, (void *)&y, sizeof(int));
 	memcpy(buff + sizeof(int), (void *)&x, sizeof(int));
 	memcpy(buff + 2 * sizeof(int), (void *)&player, sizeof(int));
-//	for (int i = 0; i < 12; i++) {
-//		std::cerr << "\\x" << (int)(buff[i]) << ' ';
-//	}
-//	std::cerr << "\n";
-	int sendRet = write(fd, buff, sizeof(int) * 3);
-	if (sendRet <= 0)
+
+	const ssize_t sendRet = write(fd, buff, sizeof(int) * 3);
+	if (sendRet == -1)
 		error("Error sending move");
 }
 
@@ -119,4 +112,3 @@ void Client::closeClient() {
 	close(this->fd);
 	this->fd = -1;
 }
-
