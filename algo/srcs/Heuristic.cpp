@@ -104,7 +104,8 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::a
 			tryUpgradeLineVal(linevalue, prev, next, dir, stone_p);
 
 		this->values[p][linevalue]++;
-		if (linevalue == LineValue::FIVE && this->isUnbreakable(start_idx, next - dir, dir)) {
+		if (linevalue == LineValue::FIVE /*&& this->isUnbreakable(start_idx, next - dir, dir)*/) {
+//		if (linevalue == LineValue::FIVE && this->isUnbreakable(start_idx, next - dir, dir)) {
 			this->set_winner(p);
 			return ;
 		}
@@ -135,16 +136,19 @@ void Heuristic::calculate_heuristic() {
 	if (this->values[player][FIVE]) {
 		// if p0, -100000
 		// else, +100000
-		this->h = (minus[player] * LineValues.at(FIVE));
+		this->h = (minus[player] * LineValues[FIVE]);
 	}
 	else if (this->values[opp][OPEN_FOUR]) {
-		this->h = (minus[opp] * LineValues.at(OPEN_FOUR));
+		this->h = (minus[opp] * LineValues[OPEN_FOUR]);
+	}
+	else if (this->values[opp][HALF_OPEN_FOUR]) {
+		this->h = (minus[opp] * LineValues[HALF_OPEN_FOUR]);
 	}
 	else if (this->values[player][OPEN_FOUR]) {
-		this->h = (minus[player] * LineValues.at(OPEN_FOUR));
+		this->h = (minus[player] * LineValues[OPEN_FOUR]);
 	} else {
 		for (unsigned int i = LineValue::TWO; i <= LineValue::FIVE; ++i) {
-			this->h += (this->values[1][i] - this->values[0][i]) * LineValues.at(i);
+			this->h += (this->values[1][i] - this->values[0][i]) * LineValues[i];
 		}
 	}
 }

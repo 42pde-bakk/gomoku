@@ -10,7 +10,9 @@
 #include <chrono>
 #include <exception>
 
-#define MAX_THINK_TIME 490
+#ifndef TIMEOUT_VALUE
+# define TIMEOUT_VALUE 490
+#endif
 
 Gamestate	*minimax(Gamestate *state, int depth, bool maximizing_player);
 Gamestate	*minimax_alphabeta_start(Gamestate *state, int depth, bool maximizing_player);

@@ -20,14 +20,14 @@ enum LineValue {
 	OPEN_FOUR = 5,
 	FIVE = 6
 };
-static const std::map<int, unsigned int> LineValues = {
-		{NONE, 0},
-		{TWO, 10},
-		{HALF_OPEN_THREE, 1000},
-		{OPEN_THREE, 5000},
-		{HALF_OPEN_FOUR, 7500},
-		{OPEN_FOUR, 15000},
-		{FIVE, 100000},
+static const std::array<unsigned int, 7> LineValues {
+		0,		// NONE
+		10,		// TWO
+		1000,	// HALF_OPEN_THREE
+		5000,	// OPEN_THREE
+		7500,	// HALF_OPEN_FOUR
+		5000,	// OPEN_FOUR
+		100000	// FIVE
 };
 
 std::ostream&	operator<<(std::ostream& o, const LineValue& lv);

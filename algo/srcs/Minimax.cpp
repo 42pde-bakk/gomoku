@@ -16,13 +16,13 @@ std::chrono::time_point<std::chrono::steady_clock> current_time = std::chrono::s
 long long int elapsed_time;
 
 int check_thinking_time_left() {
-//	if (elapsed_time >= MAX_THINK_TIME) {
+//	if (elapsed_time >= TIMEOUT_VALUE) {
 //		return (OUT_OF_TIME);
 //	}
 
 	current_time = std::chrono::steady_clock::now();
 	elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
-	if (elapsed_time >= MAX_THINK_TIME) {
+	if (elapsed_time >= TIMEOUT_VALUE) {
 		return (OUT_OF_TIME);
 	}
 	return (HAS_TIME_LEFT);

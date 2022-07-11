@@ -316,6 +316,64 @@ TEST_CASE_METHOD(Gamestate, "Upgrade 1-3 N-S", "[HeuristicTests]") {
 	REQUIRE(this->h == LineValues.at(HALF_OPEN_FOUR));
 }
 
+TEST_CASE_METHOD(Gamestate, "Should block but doesn't", "[HeuristicTests]") {
+	this->set(5 * 20 + 7, 0);
+	this->set(6 * 20 + 8, 1);
+	this->set(7 * 20 + 9, 1);
+	this->set(8 * 20 + 10, 1);
+	this->set(9 * 20 + 11, 1);
+	this->set(7 * 20 + 10, 0);
+	this->set(7 * 20 + 11, 0);
+	this->set(7 * 20 + 12, 0);
+	this->set(7 * 20 + 13, 0); // my move
+	this->set(8 * 20 + 9, 0);
+	this->set(9 * 20 + 8, 1);
+	this->set(9 * 20 + 9, 1);
+	this->set(10 * 20 + 8, 1);
+	this->set(10 * 20 + 10, 0);
+	this->set(10 * 20 + 12, 0);
+	this->calcH();
+	this->change_player();
+
+	this->generate_children();
+	for (auto child : children) {
+		std::cerr << "\nChild has heuristic " << child->get_h() << "\n";
+		std::cerr << *child << '\n';
+	}
+}
+
+TEST_CASE_METHOD(Gamestate, "Should block but doesn't - 2", "[HeuristicTests]") {
+	this->set(6 * 20 + 7, 0);
+	this->set(7 * 20 + 8, 0);
+	this->set(8 * 20 + 8, 0);
+	this->set(9 * 20 + 8, 0);
+	this->set(9 * 20 + 7, 0);
+	this->set(10 * 20 + 6, 1);
+	this->set(10 * 20 + 7, 1);
+	this->set(10 * 20 + 8, 1);
+
+	this->set(6 * 20 + 8, 0);
+	this->calcH();
+	this->change_player();
+
+	std::cerr << *this;
+	print_heuristic(std::cerr);
+	this->generate_children();
+	auto lastmove = children[0]->get_move();
+	std::cerr << children[0]->get_move();
+	std::cerr << *children[0];
+	REQUIRE(lastmove.move_idx == 5 * 20 + 8);
+
+	this->clear_children();
+	elapsed_time = 0;
+	start_time = std::chrono::steady_clock::now();
+	auto result = minimax_alphabeta_start(this, 4, this->player);
+	REQUIRE(result);
+	std::cerr << *result;
+	std::cerr << result->get_h() << "\n\n\n\n";
+	REQUIRE(result->get_first_move(this).move_idx == 5 * 20 + 8);
+}
+
 TEST_CASE_METHOD(Gamestate, "Mistake", "[HeuristicTests]") {
 	this->captures[0] = 4;
 	set(89, 1);
