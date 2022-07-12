@@ -66,12 +66,12 @@ void Gamestate::generate_children() {
 		}
 	}
 	this->sort_children();
-    if (this->children.size() > MAX_CHILDREN) {
-        while (this->children.size() > MAX_CHILDREN) {
-            delete this->children.back();
-            this->children.pop_back();
-        }
-    }
+//    if (this->children.size() > MAX_CHILDREN) {
+//        while (this->children.size() > MAX_CHILDREN) {
+//            delete this->children.back();
+//            this->children.pop_back();
+//        }
+//    }
 }
 
 unsigned int g_moves = 0;
