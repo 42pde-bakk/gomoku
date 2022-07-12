@@ -17,7 +17,6 @@ void	Client::error(const char* str) {
 }
 
 Client::Client(Server *s) : parent(s) {
-	std::cerr << "waiting for client to connect with parent = " << s << "\n";
 	bzero(&this->addr, sizeof(struct sockaddr_in));
 	socklen_t size = sizeof(this->addr);
 	if ((this->fd = accept(this->parent->getsocketFd(), (struct sockaddr *)&this->addr, &size)) == -1)
