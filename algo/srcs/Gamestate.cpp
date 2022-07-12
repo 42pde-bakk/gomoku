@@ -3,16 +3,10 @@
 //
 
 #include "Gamestate.hpp"
-#include "Threadpool.hpp"
-#include "Job.hpp"
 #include <cassert>
 #include <algorithm>
-#include "Gomoku.hpp"
-#include <fstream>
 #include <sstream>
 #include <chrono>
-
-#define MAX_CHILDREN 10
 
 unsigned int g_nb = 0;
 
@@ -43,7 +37,7 @@ void Gamestate::generate_children() {
 		return;
 	}
 	if (this->board.none()) {
-		int idx = 20 * 9 + 9;
+		const uint16_t idx = 20 * 9 + 9;
 		auto *middle = new Gamestate(*this);
 		middle->place_stone(idx);
 		this->children.emplace_back(middle);
@@ -56,6 +50,7 @@ void Gamestate::generate_children() {
 	}
 
 	Gamestate *child;
+	this->children.reserve(40);
 	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
 		if (!empty_neighbours.bitboard_get(i) || Bitboard::isSeperatingBitIndex(i))
 			continue;

@@ -89,6 +89,7 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p,
 		unsigned int prev = start_idx - dir;
 		unsigned int open_sides = this->count_open_sides(prev, next);
 
+		// TODO: check that there is enough space for it to grow into a 5 (but would capturable pieces become tricky?)
 
 		LineValue linevalue = this->calc_linevalue(length, open_sides);
 		if (linevalue < HALF_OPEN_FOUR)
@@ -148,8 +149,8 @@ int Heuristic::set_h() {
 //		this->h = tt[hash];
 //		return (this->h);
 //	}
-	for (unsigned short int i = 0; i < 2; ++i)
-		this->values[i].fill(0);
+//	for (unsigned short int i = 0; i < 2; ++i)
+//		this->values[i].fill(0);
 	this->h = 0;
 	this->loop_over_tiles();
 	if (this->has_winner())

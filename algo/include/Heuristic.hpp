@@ -12,27 +12,26 @@
 
 // I guess we shouldn't give value to the three O'sL:
 // X O O O X
-#include <map>
 
 enum LineValue {
-	NONE = 0,
-	HALF_OPEN_TWO = 1,
-	TWO = 2,
-	HALF_OPEN_THREE = 3,
-	OPEN_THREE = 4,
-	HALF_OPEN_FOUR = 5,
-	OPEN_FOUR = 6,
-	FIVE = 7
+	NONE,
+	HALF_OPEN_TWO,
+	TWO,
+	HALF_OPEN_THREE,
+	OPEN_THREE,
+	HALF_OPEN_FOUR,
+	OPEN_FOUR,
+	FIVE
 };
-static const std::array<uint32_t, 8> LineValues{
-		0,        // NONE
-		5,        // HALF_OPEN_TWO
-		10,        // TWO
-		1000,    // HALF_OPEN_THREE
-		5000,    // OPEN_THREE
-		7500,    // HALF_OPEN_FOUR
-		5000,    // OPEN_FOUR
-		100000    // FIVE
+static const std::array<int32_t, 8> LineValues{
+		0,		// NONE
+		-5,		// HALF_OPEN_TWO
+		10,		// TWO
+		1000,	// HALF_OPEN_THREE
+		5000,	// OPEN_THREE
+		7500,	// HALF_OPEN_FOUR
+		5000,	// OPEN_FOUR
+		100000	// FIVE
 };
 
 std::ostream &operator<<(std::ostream &o, const LineValue &lv);
