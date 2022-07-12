@@ -30,41 +30,33 @@ int fmain() {
 
 		while (true) {
 			Client	client(&server);
-//			try {
-				while (client.isAlive()) {
-					std::cout << "Lets receive a gamestate\n";
-					Gamestate gs = client.receiveGamestate();
-					if (!client.isAlive()) {
-						std::cerr << "Client disconnected.\n";
-						break ;
-					}
-					std::cout << "got the gamestate\n";
-					Gamestate *result = iterative_deepening(&gs, gs.get_player());
-					Move move = result->get_first_move(&gs);
-					std::cout << "Move: " << move;
-					std::cout << "Result gamestate: h=" << result->get_h() << ".\n";
-					current_time = std::chrono::steady_clock::now();
-					elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
-					std::cout << _PURPLE "Calculating move took " << elapsed_time << " ms.\n" _END;
-					client.send_move(move);
-//					result->print_history(std::cout, true);
-				#if THREADED
-					std::cout << "lets wait for the workers\n";
-					threadpool.WaitForWorkers();
-					std::cout << "waited for the workers\n";
-					outputQ.clear();
-				#endif
-					std::cout << "end of while loop\n";
-				}
-//			} catch (const std::exception& e) {
-//				std::cerr << _RED _BOLD << e.what() << _END << '\n';
-//			}
+            while (client.isAlive()) {
+                std::cout << "Lets receive a gamestate\n";
+                Gamestate gs = client.receiveGamestate();
+                gs.calcH();
+                if (!client.isAlive()) {
+                    std::cerr << "Client disconnected.\n";
+                    break ;
+                }
+                std::cout << "got the gamestate\n";
+                Gamestate *result = iterative_deepening(&gs, gs.get_player());
+                Move move = result->get_first_move(&gs);
+                std::cout << "Move: " << move;
+                std::cout << "Result gamestate: h=" << result->get_h() << ".\n";
+                current_time = std::chrono::steady_clock::now();
+                elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+                std::cout << _PURPLE "Calculating move took " << elapsed_time << " ms.\n" _END;
+                client.send_move(move);
+                result->print_history(std::cout, true);
+            #if THREADED
+                std::cout << "lets wait for the workers\n";
+                threadpool.WaitForWorkers();
+                std::cout << "waited for the workers\n";
+                outputQ.clear();
+            #endif
+                std::cout << "end of while loop\n";
+            }
 		}
-//	}
-//	catch (const std::exception& e) {
-//		std::cerr << _RED _BOLD << e.what() << _END << '\n';
-//		return (1);
-//	}
 	return (0);
 }
 
