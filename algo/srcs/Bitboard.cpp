@@ -84,6 +84,7 @@ void Bitboard::print_board(std::ostream &o, bool colours) const {
 	print_legend(o, colours);
 }
 
+// TODO: write a more optimized bitboard_get(), by precalculating the real_idx for example
 unsigned int Bitboard::bitboard_get(unsigned int idx) const {
 	if (!isvalid_tile(idx))
 		return (-1);

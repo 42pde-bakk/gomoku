@@ -6,6 +6,7 @@
 #include "Directions.hpp"
 #include <iostream>
 #include <cassert>
+#include <limits>
 
 std::hash<bitboard> Heuristic::hash_fn;
 std::unordered_map<std::bitset<BOARDSIZE>, int> Heuristic::tt;
