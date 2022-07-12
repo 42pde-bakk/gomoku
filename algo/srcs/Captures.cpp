@@ -9,10 +9,10 @@
 unsigned int Gamestate::capture_check_dir(unsigned int idx, unsigned int dir) {
 	const unsigned int player_stone = this->player + 1;
 	const unsigned int opp_stone = !this->player + 1;
-	const unsigned int	pos[3] = {idx + dir, idx + 2 * dir, idx + 3 * dir };
+	const unsigned int pos[3] = {idx + dir, idx + 2 * dir, idx + 3 * dir};
 
 	assert(!Bitboard::isSeperatingBitIndex(idx));
-	for (unsigned int po : pos) {
+	for (unsigned int po: pos) {
 		if (po >= BOARDSIZE || isSeperatingBitIndex(po)) {
 			return (0);
 		}
@@ -34,7 +34,7 @@ unsigned int Gamestate::capture_check_dir(unsigned int idx, unsigned int dir) {
 
 unsigned int Gamestate::perform_captures(unsigned int pos) {
 	unsigned int ret = 0;
-	static const std::array<int, 8>	dirs = setup_all_dirs_singular();
+	static const std::array<int, 8> dirs = setup_all_dirs_singular();
 	assert(pos < REALBOARDSIZE);
 
 	for (int dir = 0; dir < 8; dir++) {

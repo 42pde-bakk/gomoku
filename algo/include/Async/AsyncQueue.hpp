@@ -11,27 +11,35 @@
 #include "Job.hpp"
 #include <unistd.h>
 
-template <typename T>
+template<typename T>
 class AsyncQueue {
 protected:
-	std::vector<T>			_q;
-	mutable std::mutex		_m;
-	std::condition_variable	_c;
+	std::vector<T> _q;
+	mutable std::mutex _m;
+	std::condition_variable _c;
 
 public:
 	AsyncQueue();
+
 	~AsyncQueue();
 
-	AsyncQueue(const AsyncQueue<T> &) = delete ;
-	AsyncQueue& operator=(const AsyncQueue<T> &) = delete ;
+	AsyncQueue(const AsyncQueue<T> &) = delete;
 
-	virtual void	push(T& t);
-	virtual T		pop();
-	bool	empty() const;
-	size_t	size() const;
-	void	clear();
-	void	waitTillFinished();
-	void	notify_all();
+	AsyncQueue &operator=(const AsyncQueue<T> &) = delete;
+
+	virtual void push(T &t);
+
+	virtual T pop();
+
+	bool empty() const;
+
+	size_t size() const;
+
+	void clear();
+
+	void waitTillFinished();
+
+	void notify_all();
 };
 
 template<typename T>
@@ -43,8 +51,8 @@ template<typename T>
 AsyncQueue<T>::~AsyncQueue() = default;
 
 template<typename T>
-void AsyncQueue<T>::push(T& t) {
-	std::lock_guard<std::mutex>	lock_guard(this->_m);
+void AsyncQueue<T>::push(T &t) {
+	std::lock_guard<std::mutex> lock_guard(this->_m);
 	this->_q.push_back(std::move(t));
 	this->_c.notify_one();
 }
@@ -56,7 +64,7 @@ T AsyncQueue<T>::pop() {
 //		// release lock as long as the wait and reaquire it afterwards.
 //		this->_c.wait(lock);
 //	}
-	this->_c.wait(lock, [&]{ return (!this->_q.empty()); } );
+	this->_c.wait(lock, [&] { return (!this->_q.empty()); });
 
 	T t = std::move(this->_q.back());
 	this->_q.pop_back();
@@ -67,7 +75,7 @@ template<typename T>
 bool AsyncQueue<T>::empty() const {
 	bool ret;
 	{
-		std::unique_lock<std::mutex>	lock(_m);
+		std::unique_lock<std::mutex> lock(_m);
 		ret = this->_q.empty();
 	}
 	return (ret);
@@ -75,14 +83,14 @@ bool AsyncQueue<T>::empty() const {
 
 template<typename T>
 void AsyncQueue<T>::clear() {
-	std::unique_lock<std::mutex>	lock(_m);
+	std::unique_lock<std::mutex> lock(_m);
 	while (!this->_q.empty())
 		this->_q.pop_back();
 }
 
 template<typename T>
 size_t AsyncQueue<T>::size() const {
-	std::unique_lock<std::mutex>	lock(_m);
+	std::unique_lock<std::mutex> lock(_m);
 	return (this->_q.size());
 }
 
@@ -97,7 +105,8 @@ void AsyncQueue<T>::waitTillFinished() {
 //	this->_c.wait(lock, [&]{ return (this->_q.empty()); } );
 }
 
-AsyncQueue<Gamestate*>&	getOutputQueue();
-AsyncQueue<Job>&	getJobQueue();
+AsyncQueue<Gamestate *> &getOutputQueue();
+
+AsyncQueue<Job> &getJobQueue();
 
 #endif //GOMOKUBOT_ASYNCQUEUE_HPP

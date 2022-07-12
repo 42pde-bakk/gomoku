@@ -14,9 +14,11 @@
 # define TIMEOUT_VALUE 490
 #endif
 
-Gamestate	*minimax(Gamestate *state, int depth, bool maximizing_player);
-Gamestate	*minimax_alphabeta_start(Gamestate *state, int depth, bool maximizing_player);
-Gamestate	*iterative_deepening(Gamestate *gs, int player);
+Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player);
+
+Gamestate *minimax_alphabeta_start(Gamestate *state, int depth, bool maximizing_player);
+
+Gamestate *iterative_deepening(Gamestate *gs, int player);
 
 
 extern std::chrono::time_point<std::chrono::steady_clock> start_time;

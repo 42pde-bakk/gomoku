@@ -19,10 +19,11 @@ uint8_t Heuristic::get_player() const {
 	return (this->player);
 }
 
-unsigned int Heuristic::get_length(unsigned int *i, unsigned int stone_p, unsigned int d,  std::array<unsigned int, REALBOARDSIZE>& g_checkedTiles) const {
+unsigned int Heuristic::get_length(unsigned int *i, unsigned int stone_p, unsigned int d,
+								   std::array<unsigned int, REALBOARDSIZE> &g_checkedTiles) const {
 	static const std::array<int, 4> dirs = setup_dirs();
 	unsigned int length = 1;
-	unsigned int& idx = *i;
+	unsigned int &idx = *i;
 
 	assert(i == &idx);
 
@@ -34,14 +35,14 @@ unsigned int Heuristic::get_length(unsigned int *i, unsigned int stone_p, unsign
 	return (length);
 }
 
-LineValue	Heuristic::calc_linevalue(unsigned int length, unsigned int open_sides) {
+LineValue Heuristic::calc_linevalue(unsigned int length, unsigned int open_sides) {
 	static const LineValue values[6][3] = {
-			{LineValue::NONE, LineValue::NONE, LineValue::NONE}, // zero-length
-			{LineValue::NONE, LineValue::NONE, LineValue::NONE}, // 1-length
-			{LineValue::NONE, LineValue::HALF_OPEN_TWO, LineValue::TWO},
+			{LineValue::NONE, LineValue::NONE,            LineValue::NONE}, // zero-length
+			{LineValue::NONE, LineValue::NONE,            LineValue::NONE}, // 1-length
+			{LineValue::NONE, LineValue::HALF_OPEN_TWO,   LineValue::TWO},
 			{LineValue::NONE, LineValue::HALF_OPEN_THREE, LineValue::OPEN_THREE},
-			{LineValue::NONE, LineValue::HALF_OPEN_FOUR, LineValue::OPEN_FOUR},
-			{LineValue::FIVE, LineValue::FIVE, LineValue::FIVE}
+			{LineValue::NONE, LineValue::HALF_OPEN_FOUR,  LineValue::OPEN_FOUR},
+			{LineValue::FIVE, LineValue::FIVE,            LineValue::FIVE}
 	};
 
 	length = std::min(length, 5u);
@@ -59,15 +60,18 @@ unsigned int Heuristic::count_open_sides(unsigned int prev, unsigned int next) c
 	return (open_sides);
 }
 
-void Heuristic::tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int next, const int dir, unsigned int stone_p) const {
+void Heuristic::tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int next, const int dir,
+								  unsigned int stone_p) const {
 	unsigned int before_prev = prev - dir;
 	unsigned int after_next = next + dir;
-	if ((tile_is_empty(prev) && bitboard_get(before_prev) == stone_p) || (tile_is_empty(next) && bitboard_get(after_next) == stone_p)) {
+	if ((tile_is_empty(prev) && bitboard_get(before_prev) == stone_p) ||
+		(tile_is_empty(next) && bitboard_get(after_next) == stone_p)) {
 		lv = static_cast<LineValue>(int(lv) + 1);
 	}
 }
 
-void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::array<unsigned int, REALBOARDSIZE>& checkedTiles) {
+void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p,
+							std::array<unsigned int, REALBOARDSIZE> &checkedTiles) {
 	static const std::array<int, 4> dirs = setup_dirs();
 	const unsigned int p = stone_p - 1;
 
@@ -75,7 +79,7 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::a
 		const int dir = dirs[d];
 
 		if (checkedTiles[start_idx] & (1u << d)) {
-			continue ;
+			continue;
 		}
 		unsigned int next = start_idx + dir;
 		unsigned int length = this->get_length(&next, stone_p, d, checkedTiles);
@@ -93,7 +97,7 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p, std::a
 		this->values[p][linevalue]++;
 		if (linevalue == LineValue::FIVE /*&& this->isUnbreakable(start_idx, next - dir, dir)*/) {
 			this->set_winner(p);
-			return ;
+			return;
 		}
 	}
 }
@@ -111,7 +115,7 @@ void Heuristic::loop_over_tiles() {
 }
 
 void Heuristic::calculate_heuristic() {
-	static const int	minus[2] = {
+	static const int minus[2] = {
 			-1, 1
 	};
 	const unsigned int opp = !player;
@@ -123,14 +127,11 @@ void Heuristic::calculate_heuristic() {
 		// if p0, -100000
 		// else, +100000
 		this->h = (minus[player] * LineValues[FIVE]);
-	}
-	else if (this->values[opp][OPEN_FOUR]) {
+	} else if (this->values[opp][OPEN_FOUR]) {
 		this->h = (minus[opp] * LineValues[OPEN_FOUR]);
-	}
-	else if (this->values[opp][HALF_OPEN_FOUR]) {
+	} else if (this->values[opp][HALF_OPEN_FOUR]) {
 		this->h = (minus[opp] * LineValues[HALF_OPEN_FOUR]);
-	}
-	else if (this->values[player][OPEN_FOUR]) {
+	} else if (this->values[player][OPEN_FOUR]) {
 		this->h = (minus[player] * LineValues[OPEN_FOUR]);
 	} else {
 		for (unsigned int i = LineValue::HALF_OPEN_TWO; i <= LineValue::FIVE; ++i) {
@@ -178,17 +179,16 @@ int Heuristic::add_h_for_captures() {
 		auto p = (captures[0] >= 10) ? 0 : 1;
 		this->winner = p;
 		this->h = winner_values[p];
-	}
-	else {
+	} else {
 		this->h += (captures[1] - captures[0] * 1000);
 	}
 	return (this->h);
 }
 
-std::string	LineValueToStr(const LineValue& x) {
+std::string LineValueToStr(const LineValue &x) {
 	switch (x) {
-        case LineValue::HALF_OPEN_TWO:
-            return "HALF_OPEN_TWO";
+		case LineValue::HALF_OPEN_TWO:
+			return "HALF_OPEN_TWO";
 		case LineValue::TWO:
 			return "TWO";
 		case LineValue::HALF_OPEN_THREE:
@@ -202,7 +202,7 @@ std::string	LineValueToStr(const LineValue& x) {
 		case LineValue::FIVE:
 			return "FIVE";
 		default:
-			break ;
+			break;
 	}
 	return ("NONE");
 }
@@ -215,10 +215,10 @@ void Heuristic::print_heuristic(std::ostream &o) const {
 	o << "Heuristic value: " << this->get_h() << "\n";
 	for (unsigned int p = 0; p < 2; p++) {
 		o << "Player " << p + 1 << ":\n";
-		for (auto & i : linevalues) {
-			o << '\t' << LineValueToStr(i) << ": " << (int)this->values[p][i] << "\n";
+		for (auto &i: linevalues) {
+			o << '\t' << LineValueToStr(i) << ": " << (int) this->values[p][i] << "\n";
 		}
-		o << "\tCaptures: " << this->captures[p] << '\n';
+		o << "\tCaptures: " << (int) this->captures[p] << '\n';
 	}
 }
 
@@ -238,10 +238,10 @@ uint8_t Heuristic::get_winner() const {
 	return (this->winner);
 }
 
-Heuristic::Heuristic() { }
+Heuristic::Heuristic() {}
 
 Heuristic::Heuristic(const Heuristic &x)
-	: Bitboard(x), values(), h(x.h), winner(x.winner), player(x.player), captures(x.captures) {
+		: Bitboard(x), values(), h(x.h), winner(x.winner), player(x.player), captures(x.captures) {
 	values[0].fill(0);
 	values[1].fill(0);
 }
@@ -263,7 +263,8 @@ bool Heuristic::canGetCaptured(unsigned int start_idx, int dir) const {
 		++length;
 		back_idx += dir_opp;
 	}
-	if (length != 2 || idx >= REALBOARDSIZE || isSeperatingBitIndex(idx) || back_idx >= REALBOARDSIZE || isSeperatingBitIndex(back_idx))
+	if (length != 2 || idx >= REALBOARDSIZE || isSeperatingBitIndex(idx) || back_idx >= REALBOARDSIZE ||
+		isSeperatingBitIndex(back_idx))
 		return (false);
 	return (tile_is_empty(idx) ^ tile_is_empty(back_idx));
 //	return ((int)tile_is_empty(idx) + (int)tile_is_empty(back_idx) == 1);
@@ -276,13 +277,13 @@ bool Heuristic::isUnbreakable(unsigned int start_idx, unsigned int end_idx, int 
 	for (; start_idx <= end_idx; start_idx += dir) {
 		for (int d = 0; d < 4; d++) {
 			if (d == dir)
-				continue ;
+				continue;
 			if (canGetCaptured(start_idx, dirs[d]))
 				return (false);
 		}
 		++unbroken_length;
 		if (unbroken_length == 5)
-			break ;
+			break;
 	}
 	return (unbroken_length == 5);
 }

@@ -4,14 +4,14 @@
 
 #include "AsyncQueue.hpp"
 
-AsyncQueue<Gamestate*>&	getOutputQueue() {
-	static AsyncQueue<Gamestate*>	outputQueue;
+AsyncQueue<Gamestate *> &getOutputQueue() {
+	static AsyncQueue<Gamestate *> outputQueue;
 
 	return (outputQueue);
 }
 
-AsyncQueue<Job>&	getJobQueue() {
-	static AsyncQueue<Job>	jobQueue;
+AsyncQueue<Job> &getJobQueue() {
+	static AsyncQueue<Job> jobQueue;
 
 	return (jobQueue);
 }

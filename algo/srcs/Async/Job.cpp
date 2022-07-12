@@ -5,9 +5,9 @@
 #include "Async/Job.hpp"
 #include "Gamestate.hpp"
 
-Job::Job() : _parent(), _moveIdx((unsigned int)-1) { }
+Job::Job() : _parent(), _moveIdx((unsigned int) -1) {}
 
-Job::Job(Gamestate* const parent, const unsigned int moveIdx) : _parent(parent), _moveIdx(moveIdx) { }
+Job::Job(Gamestate *const parent, const unsigned int moveIdx) : _parent(parent), _moveIdx(moveIdx) {}
 
 //Job::Job(const Job &x) : _parent(x._parent), _moveIdx(x._moveIdx) { }
 //
@@ -21,7 +21,7 @@ Job::Job(Gamestate* const parent, const unsigned int moveIdx) : _parent(parent),
 
 Job::~Job() = default;
 
-Gamestate* Job::get_parent() const {
+Gamestate *Job::get_parent() const {
 	return (this->_parent);
 }
 
@@ -30,12 +30,12 @@ unsigned int Job::get_moveIdx() const {
 }
 
 Gamestate *Job::execute() const {
-	auto	*child = new Gamestate(*this->_parent);
+	auto *child = new Gamestate(*this->_parent);
 	child->place_stone(this->_moveIdx);
 	return (child);
 }
 
-Job::Job(Job&& x) : _parent(std::move(x._parent)), _moveIdx(std::move(x._moveIdx)) { }
+Job::Job(Job &&x) : _parent(std::move(x._parent)), _moveIdx(std::move(x._moveIdx)) {}
 
 std::ostream &operator<<(std::ostream &o, const Job &j) {
 	o << "Job " << j.get_parent() << ", " << j.get_moveIdx() << '\n';

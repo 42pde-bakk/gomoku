@@ -4,7 +4,7 @@
 
 #include <array>
 
-std::array<int, 8>	all_dirs() {
+std::array<int, 8> all_dirs() {
 	static const std::array<int, 8> dirs = {
 			1, // E
 			19, // SW

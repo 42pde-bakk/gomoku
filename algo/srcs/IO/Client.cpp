@@ -9,7 +9,7 @@
 #include <cstring>
 #include <cassert>
 
-void	Client::error(const char* str) {
+void Client::error(const char *str) {
 	this->closeClient();
 	std::cout << _RED _BOLD << str << _END "\n"; // cerr
 	perror("Client error");
@@ -19,7 +19,7 @@ void	Client::error(const char* str) {
 Client::Client(Server *s) : parent(s) {
 	bzero(&this->addr, sizeof(struct sockaddr_in));
 	socklen_t size = sizeof(this->addr);
-	if ((this->fd = accept(this->parent->getsocketFd(), (struct sockaddr *)&this->addr, &size)) == -1)
+	if ((this->fd = accept(this->parent->getsocketFd(), (struct sockaddr *) &this->addr, &size)) == -1)
 		error("Error accepting client");
 	std::cout << "Accepted a client at fd " << this->fd << "\n"; // cerr
 }
@@ -29,8 +29,8 @@ Client::~Client() {
 }
 
 std::vector<int> Client::receive(size_t bufsize) {
-	int		recvRet;
-	char	buf[bufsize + 1];
+	int recvRet;
+	char buf[bufsize + 1];
 	std::vector<int> intArray;
 
 	bzero(&buf, sizeof(buf));
@@ -49,8 +49,8 @@ std::vector<int> Client::receive(size_t bufsize) {
 
 Gamestate Client::receiveGamestate() {
 	Gamestate gs;
-	int 	stones_amount;
-	int		turn;
+	int stones_amount;
+	int turn;
 	std::vector<int> intArray;
 
 	intArray = this->receive(4);
@@ -58,7 +58,7 @@ Gamestate Client::receiveGamestate() {
 		return (gs);
 	turn = intArray[0];
 	gs.player = turn % 2;
-	std::vector<int>	captures = this->receive(8);
+	std::vector<int> captures = this->receive(8);
 	if (!this->isAlive()) {
 		return (gs);
 	}
@@ -77,8 +77,8 @@ Gamestate Client::receiveGamestate() {
 		}
 
 		int y = arr[0],
-			x = arr[1],
-			colour = arr[2];
+				x = arr[1],
+				colour = arr[2];
 		assert(colour == 1 || colour == 2);
 		gs.set(y * 20 + x, colour - 1);
 	}
@@ -93,9 +93,9 @@ void Client::send_move(const Move &move) {
 	const int player = move.player + 1;
 
 	bzero(buff, sizeof(buff));
-	memcpy(buff, (void *)&y, sizeof(int));
-	memcpy(buff + sizeof(int), (void *)&x, sizeof(int));
-	memcpy(buff + 2 * sizeof(int), (void *)&player, sizeof(int));
+	memcpy(buff, (void *) &y, sizeof(int));
+	memcpy(buff + sizeof(int), (void *) &x, sizeof(int));
+	memcpy(buff + 2 * sizeof(int), (void *) &player, sizeof(int));
 
 	const ssize_t sendRet = write(fd, buff, sizeof(int) * 3);
 	if (sendRet == -1)

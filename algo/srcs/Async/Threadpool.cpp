@@ -6,6 +6,7 @@
 #include "JobQueue.hpp"
 #include "Gomoku.hpp"
 #include <unistd.h>
+
 #if THREADED
 
 Threadpool::Threadpool(unsigned int numThreads)
