@@ -439,6 +439,31 @@ TEST_CASE_METHOD(Gamestate, "Should win but doesnt", "[HeuristicTests]") {
     result->print_history(std::cerr, false);
 }
 
+TEST_CASE_METHOD(Gamestate, "Should block open 3", "[HeuristicTests]") {
+    this->set(8 * REALBOARDWIDTH + 9, 0);
+    this->set(7 * REALBOARDWIDTH + 9, 0);
+    this->set(9 * REALBOARDWIDTH + 8, 0);
+    this->set(9 * REALBOARDWIDTH + 7, 0);
+    this->set(9 * REALBOARDWIDTH + 6, 0);
+
+    this->set(9 * REALBOARDWIDTH + 9, 1);
+    this->set(7 * REALBOARDWIDTH + 8, 1);
+    this->set(7 * REALBOARDWIDTH + 7, 1);
+    this->set(7 * REALBOARDWIDTH + 6, 1);
+    this->set(6 * REALBOARDWIDTH + 6, 1);
+
+    calcH();
+    this->place_stone(8 * REALBOARDWIDTH + 8);
+    std::cerr << *this << "\n\n\n";
+
+    this->generate_children();
+    for (auto child : children) {
+        std::cerr << *child << "\n";
+        child->print_heuristic(std::cerr);
+        std::cerr << "\n\n";
+    }
+}
+
 TEST_CASE_METHOD(Gamestate, "Mistake", "[HeuristicTests]") {
 	this->captures[0] = 4;
 	set(89, 1);
