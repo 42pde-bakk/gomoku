@@ -38,11 +38,8 @@ endif
 ifdef SINGLETHREADED
  CFLAGS += -D THREADED=0
 endif
-ifdef SPEED
- CFLAGS += -Ofast -fno-exceptions
-endif
-ifdef NDEBUG
- CFLAGS += -D NDEBUG
+ifndef NO_OPTIMIZATION
+ CFLAGS += -Ofast -fno-exceptions -D NDEBUG
 endif
 
 SHELL := /bin/bash
@@ -69,6 +66,3 @@ fclean: clean
 	/bin/rm -f $(NAME)
 
 re: fclean all
-
-dirs:
-	@mkdir $(patsubst %, $(PATH_OBJ)/%, $(DIRS)) $(patsubst %, bin/%, $(DIRS))
