@@ -65,4 +65,6 @@ clean:
 fclean: clean
 	/bin/rm -f $(NAME)
 
-re: fclean all
+re:
+	$(MAKE) fclean
+	$(MAKE) all
