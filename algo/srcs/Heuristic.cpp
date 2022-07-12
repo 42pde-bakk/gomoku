@@ -15,7 +15,7 @@ int Heuristic::get_h() const {
 	return (this->h);
 }
 
-int Heuristic::get_player() const {
+uint8_t Heuristic::get_player() const {
 	return (this->player);
 }
 
@@ -36,9 +36,9 @@ unsigned int Heuristic::get_length(unsigned int *i, unsigned int stone_p, unsign
 
 LineValue	Heuristic::calc_linevalue(unsigned int length, unsigned int open_sides) {
 	static const LineValue values[6][3] = {
-			{LineValue::NONE, LineValue::NONE, LineValue::NONE},
-			{LineValue::NONE, LineValue::NONE, LineValue::NONE},
-			{LineValue::NONE, LineValue::TWO, LineValue::TWO},
+			{LineValue::NONE, LineValue::NONE, LineValue::NONE}, // zero-length
+			{LineValue::NONE, LineValue::NONE, LineValue::NONE}, // 1-length
+			{LineValue::NONE, LineValue::HALF_OPEN_TWO, LineValue::TWO},
 			{LineValue::NONE, LineValue::HALF_OPEN_THREE, LineValue::OPEN_THREE},
 			{LineValue::NONE, LineValue::HALF_OPEN_FOUR, LineValue::OPEN_FOUR},
 			{LineValue::FIVE, LineValue::FIVE, LineValue::FIVE}
@@ -133,7 +133,7 @@ void Heuristic::calculate_heuristic() {
 	else if (this->values[player][OPEN_FOUR]) {
 		this->h = (minus[player] * LineValues[OPEN_FOUR]);
 	} else {
-		for (unsigned int i = LineValue::TWO; i <= LineValue::FIVE; ++i) {
+		for (unsigned int i = LineValue::HALF_OPEN_TWO; i <= LineValue::FIVE; ++i) {
 			this->h += (this->values[1][i] - this->values[0][i]) * LineValues[i];
 		}
 	}
@@ -187,6 +187,8 @@ int Heuristic::add_h_for_captures() {
 
 std::string	LineValueToStr(const LineValue& x) {
 	switch (x) {
+        case LineValue::HALF_OPEN_TWO:
+            return "HALF_OPEN_TWO";
 		case LineValue::TWO:
 			return "TWO";
 		case LineValue::HALF_OPEN_THREE:
@@ -207,14 +209,14 @@ std::string	LineValueToStr(const LineValue& x) {
 
 void Heuristic::print_heuristic(std::ostream &o) const {
 	static const LineValue linevalues[] = {
-			LineValue::TWO, LineValue::HALF_OPEN_THREE, LineValue::OPEN_THREE,
+			LineValue::HALF_OPEN_TWO, LineValue::TWO, LineValue::HALF_OPEN_THREE, LineValue::OPEN_THREE,
 			LineValue::HALF_OPEN_FOUR, LineValue::OPEN_FOUR, LineValue::FIVE
 	};
 	o << "Heuristic value: " << this->get_h() << "\n";
 	for (unsigned int p = 0; p < 2; p++) {
 		o << "Player " << p + 1 << ":\n";
 		for (auto & i : linevalues) {
-			o << '\t' << LineValueToStr(i) << ": " << this->values[p].at(i) << "\n";
+			o << '\t' << LineValueToStr(i) << ": " << (int)this->values[p][i] << "\n";
 		}
 		o << "\tCaptures: " << this->captures[p] << '\n';
 	}
@@ -227,19 +229,19 @@ bool Heuristic::has_winner() const {
 void Heuristic::set_winner(unsigned int p_winner) {
 	static const int winner_values[2] = {-2000000, 2000000};
 
-	assert(p_winner == 0 || p_winner == 1); //TODO: REMOVE
+	assert(p_winner == 0 || p_winner == 1);
 	this->winner = p_winner + 1;
 	this->h = winner_values[p_winner];
 }
 
-int Heuristic::get_winner() const {
+uint8_t Heuristic::get_winner() const {
 	return (this->winner);
 }
 
 Heuristic::Heuristic() { }
 
 Heuristic::Heuristic(const Heuristic &x)
-	: Bitboard(x), values(), h(x.h), winner(x.winner), depth(x.depth), player(x.player), captures(x.captures) {
+	: Bitboard(x), values(), h(x.h), winner(x.winner), player(x.player), captures(x.captures) {
 	values[0].fill(0);
 	values[1].fill(0);
 }
@@ -289,7 +291,7 @@ unsigned int Heuristic::get_opponent_stone(const unsigned int stone) {
 	return (stone ^ 3u);
 }
 
-std::array<int, 2> Heuristic::get_captures() const {
+std::array<uint8_t, 2> Heuristic::get_captures() const {
 	return (this->captures);
 }
 

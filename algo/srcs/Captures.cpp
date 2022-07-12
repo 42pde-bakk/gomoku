@@ -23,7 +23,6 @@ unsigned int Gamestate::capture_check_dir(unsigned int idx, unsigned int dir) {
 		this->clear_tile(pos[0]);
 		this->clear_tile(pos[1]);
 		this->captures[this->player] += 2;
-		this->tactical = 1;
 		if (this->captures[this->player] >= 10) {
 			// Perhaps I should make winning by captures worth more but let's see
 			this->set_winner(this->player);

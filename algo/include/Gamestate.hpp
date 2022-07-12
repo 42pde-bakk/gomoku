@@ -28,8 +28,6 @@ public:
 	Gamestate(const Gamestate& x);
 	~Gamestate();
 
-//	void	update_heuristic(unsigned int move_idx);
-
 	void generate_children();
 	std::vector<Move>	generate_moves() const;
 	void	apply_move(const Move& move);
@@ -55,12 +53,10 @@ public:
 	void	sort_children();
 	Gamestate*	calcH();
 	const Gamestate*	get_parent();
-	[[nodiscard]] int	isTactical() const;
 
 	void	print_history(std::ostream& o, bool colours) const;
 protected:
 	int		change_player();
-	void	write_to_file() const;
 	// Captures.cpp
 	unsigned int perform_captures(unsigned int pos);
 	unsigned int capture_check_dir(unsigned int idx, unsigned int dir);

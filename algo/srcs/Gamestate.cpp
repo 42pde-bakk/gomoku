@@ -113,7 +113,6 @@ void Gamestate::apply_move(const Move &mv) {
 			this->set_winner(!this->player);
 		}
 	}
-	++depth;
 	this->change_player();
 	this->lastmove = std::move(mv);
 }
@@ -145,7 +144,6 @@ bool Gamestate::place_stone(unsigned int move_idx) {
 			}
 		}
 	}
-	++depth;
 	this->change_player();
 	return (true);
 }
@@ -188,10 +186,6 @@ Gamestate *Gamestate::calcH() {
 
 const Gamestate *Gamestate::get_parent() {
 	return (this->parent);
-}
-
-int Gamestate::isTactical() const {
-	return (this->tactical);
 }
 
 bool Gamestate::has_children() const {

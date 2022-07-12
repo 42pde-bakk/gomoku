@@ -7,21 +7,24 @@
 #include "Bitboard.hpp"
 #include <unordered_map>
 #include <array>
+#include <cstdint>
 
 // I guess we shouldn't give value to the three O'sL:
 // X O O O X
 #include <map>
 enum LineValue {
 	NONE = 0,
-	TWO = 1,
-	HALF_OPEN_THREE = 2,
-	OPEN_THREE = 3,
-	HALF_OPEN_FOUR = 4,
-	OPEN_FOUR = 5,
-	FIVE = 6
+    HALF_OPEN_TWO = 1,
+	TWO = 2,
+	HALF_OPEN_THREE = 3,
+	OPEN_THREE = 4,
+	HALF_OPEN_FOUR = 5,
+	OPEN_FOUR = 6,
+	FIVE = 7
 };
-static const std::array<unsigned int, 7> LineValues {
+static const std::array<uint32_t, 8> LineValues {
 		0,		// NONE
+		5,		// HALF_OPEN_TWO
 		10,		// TWO
 		1000,	// HALF_OPEN_THREE
 		5000,	// OPEN_THREE
@@ -37,13 +40,11 @@ protected:
 	static std::hash<bitboard> hash_fn;
 	static std::unordered_map<std::bitset<BOARDSIZE>, int> tt;
 
-	std::array<std::array<short int, 7>, 2> values{};
-	int h{};
-	int winner{};
-	int depth{},
-		player{};
-	int tactical{false};
-	std::array<int, 2>	captures{};
+	std::array<std::array<uint8_t, 8>, 2> values{};
+	int32_t h{};
+	uint8_t winner{},
+            player{};
+	std::array<uint8_t, 2>	captures{};
 
 	int set_h();
 	int add_h_for_captures();
@@ -68,13 +69,13 @@ public:
 	[[nodiscard]] int	get_h() const;
 	[[nodiscard]] bool	has_winner() const;
 	void set_winner(unsigned int p_winner);
-	[[nodiscard]] int	get_winner() const;
-	[[nodiscard]] int	get_player() const;
+	[[nodiscard]] uint8_t get_winner() const;
+	[[nodiscard]] uint8_t get_player() const;
 
 	void	print_heuristic(std::ostream& o) const;
 	static unsigned int get_opponent_stone(unsigned int stone);
 
-	std::array<int, 2>	get_captures() const;
+	std::array<uint8_t, 2> get_captures() const;
 };
 
 #endif //GOMOKUBOT_HEURISTIC_HPP

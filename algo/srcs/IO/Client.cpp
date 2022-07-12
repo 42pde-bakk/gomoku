@@ -58,7 +58,6 @@ Gamestate Client::receiveGamestate() {
 		return (gs);
 	turn = intArray[0];
 	gs.player = turn % 2;
-	gs.depth = 0;
 	std::vector<int>	captures = this->receive(8);
 	if (!this->isAlive()) {
 		return (gs);
