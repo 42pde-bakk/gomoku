@@ -100,7 +100,7 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p,
 //			continue ;
 //		}
 		unsigned int next = start_idx + dir;
-		unsigned int length = this->get_length(&next, stone_p, dir, checkedTiles);
+		unsigned int length = this->get_length(&next, stone_p, d, checkedTiles);
 
 		if (length < 2) // Might change this to (length <= 2)
 			continue;

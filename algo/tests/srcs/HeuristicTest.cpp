@@ -76,6 +76,21 @@ TEST_CASE_METHOD(Gamestate, "2 fours", "[HeuristicTests]") {
 	REQUIRE(this->h == -LineValues.at(OPEN_FOUR)); // 2 open fours is not more valuable than 1
 }
 
+TEST_CASE_METHOD(Gamestate, "Edge case", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+
+	this->set(start_idx, 0);
+	this->set(start_idx + 2, 0);
+	this->set(start_idx + 3, 0);
+	this->set(start_idx + 5, 0);
+	this->set(start_idx + 6, 0);
+	this->calcH();
+	std::cerr << *this;
+	print_heuristic(std::cerr);
+	REQUIRE(this->h == -LineValues.at(OPEN_FOUR)); // 2 open fours is not more valuable than 1
+}
+
+
 TEST_CASE_METHOD(Gamestate, "BLOCKED BY JAMES", "[HeuristicTests]") {
 	const int start_idx = middle_idx;
 
