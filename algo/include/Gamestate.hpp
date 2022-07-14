@@ -58,6 +58,7 @@ public:
 	bool place_stone(unsigned int move_idx);
 
 	void clear_children();
+	void	reset();
 
 	void add_child(Gamestate *child);
 

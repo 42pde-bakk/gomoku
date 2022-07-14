@@ -118,7 +118,7 @@ void Gamestate::apply_move(const Move &mv) {
 
 bool Gamestate::place_stone(unsigned int move_idx) {
 	assert(move_idx < BOARDSIZE);
-	assert (this->tile_is_empty(move_idx));
+	assert(this->tile_is_empty(move_idx));
 
 	this->set(move_idx, this->get_player());
 	this->lastmove.move_idx = move_idx;
@@ -165,9 +165,12 @@ void Gamestate::clear_children() {
 }
 
 void Gamestate::print_history(std::ostream &o, bool colours) const {
+	o << "this->parent: " << parent << '\n';
 	if (this->parent)
 		this->parent->print_history(o, colours);
+	o << "let's print the board!\n";
 	this->print_board(o, colours);
+	o << "let's print the heuristic!\n";
 	this->print_heuristic(o);
 	o << '\n';
 }
@@ -200,4 +203,15 @@ void Gamestate::sort_children() {
 
 Move Gamestate::get_move() const {
 	return (this->lastmove);
+}
+
+void Gamestate::reset() {
+	this->board.reset();
+	this->values[0].fill(0);
+	this->values[1].fill(0);
+	this->h = 0;
+	this->captures.fill(0);
+	this->winner = 0;
+	this->player = 0;
+	this->clear_children();
 }

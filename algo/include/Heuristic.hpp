@@ -16,7 +16,7 @@
 enum LineValue {
 	NONE,
 	HALF_OPEN_TWO,
-	TWO,
+	OPEN_TWO,
 	HALF_OPEN_THREE,
 	OPEN_THREE,
 	HALF_OPEN_FOUR,
@@ -26,7 +26,7 @@ enum LineValue {
 static const std::array<int32_t, 8> LineValues{
 		0,		// NONE
 		-5,		// HALF_OPEN_TWO
-		10,		// TWO
+		10,		// OPEN_TWO
 		1000,	// HALF_OPEN_THREE
 		5000,	// OPEN_THREE
 		7500,	// HALF_OPEN_FOUR
@@ -56,7 +56,7 @@ protected:
 	[[nodiscard]] bool canGetCaptured(unsigned int start_idx, int dir) const;
 
 private:
-	unsigned int get_length(unsigned int *idx, unsigned int stone_p, unsigned int d,
+	unsigned int get_length(unsigned int *i, unsigned int stone_p, unsigned int d,
 							std::array<unsigned int, REALBOARDSIZE> &g_checkedTiles) const;
 
 	[[nodiscard]] unsigned int count_open_sides(unsigned int prev, unsigned int next) const;
@@ -69,6 +69,8 @@ private:
 
 	void
 	count_lines(unsigned int start_idx, unsigned int stone_p, std::array<unsigned int, REALBOARDSIZE> &checkedTiles);
+
+	bool enoughSpaceForFiveInARow(unsigned int idx, int dir, int opp_dir, unsigned int opp_stone) const;
 
 	void loop_over_tiles();
 

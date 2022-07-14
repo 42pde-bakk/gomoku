@@ -23,24 +23,37 @@ uint8_t Heuristic::get_player() const {
 unsigned int Heuristic::get_length(unsigned int *i, unsigned int stone_p, unsigned int d,
 								   std::array<unsigned int, REALBOARDSIZE> &g_checkedTiles) const {
 	static const std::array<int, 4> dirs = setup_dirs();
-	unsigned int length = 1;
+	unsigned int lengths[2] = {1,0};
 	unsigned int &idx = *i;
+	const unsigned int opp_stone = get_opponent_stone(stone_p);
+	unsigned int stone_value;
+	unsigned int empty_tile_count = 0;
 
-	assert(i == &idx);
-
-	while (idx < REALBOARDSIZE && !isSeperatingBitIndex(idx) && this->bitboard_get(idx) == stone_p) {
-		length++;
-		g_checkedTiles[idx] |= 1u << d;
+	while (isvalid_tile(idx)) {
+		stone_value = this->bitboard_get(idx);
+		if (stone_value == opp_stone) {
+			break ;
+		} else if (stone_value == stone_p) {
+			lengths[empty_tile_count]++;
+			g_checkedTiles[idx] |= 1u << d;
+		} else {
+			if (empty_tile_count)
+				break ;
+			empty_tile_count++;
+		}
 		idx += dirs[d];
 	}
-	return (length);
+	const unsigned int total_length = lengths[0] + lengths[1];
+	if (total_length < 5)
+		return (total_length);
+	return (std::max(lengths[0], lengths[1]));
 }
 
 LineValue Heuristic::calc_linevalue(unsigned int length, unsigned int open_sides) {
 	static const LineValue values[6][3] = {
 			{LineValue::NONE, LineValue::NONE,            LineValue::NONE}, // zero-length
 			{LineValue::NONE, LineValue::NONE,            LineValue::NONE}, // 1-length
-			{LineValue::NONE, LineValue::HALF_OPEN_TWO,   LineValue::TWO},
+			{LineValue::NONE, LineValue::HALF_OPEN_TWO,   LineValue::OPEN_TWO},
 			{LineValue::NONE, LineValue::HALF_OPEN_THREE, LineValue::OPEN_THREE},
 			{LineValue::NONE, LineValue::HALF_OPEN_FOUR,  LineValue::OPEN_FOUR},
 			{LineValue::FIVE, LineValue::FIVE,            LineValue::FIVE}
@@ -74,6 +87,7 @@ void Heuristic::tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int
 void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p,
 							std::array<unsigned int, REALBOARDSIZE> &checkedTiles) {
 	static const std::array<int, 4> dirs = setup_dirs();
+	static const std::array<int, 4> opp_dirs = setup_dirs_opposite();
 	const unsigned int p = stone_p - 1;
 
 	for (unsigned int d = 0; d < dirs.size(); d++) {
@@ -82,8 +96,11 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p,
 		if (checkedTiles[start_idx] & (1u << d)) {
 			continue;
 		}
+//		if (!this->enoughSpaceForFiveInARow(start_idx, dir, opp_dirs[d], get_opponent_stone(stone_p))) {
+//			continue ;
+//		}
 		unsigned int next = start_idx + dir;
-		unsigned int length = this->get_length(&next, stone_p, d, checkedTiles);
+		unsigned int length = this->get_length(&next, stone_p, dir, checkedTiles);
 
 		if (length < 2) // Might change this to (length <= 2)
 			continue;
@@ -93,8 +110,8 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p,
 		// TODO: check that there is enough space for it to grow into a 5 (but would capturable pieces become tricky?)
 
 		LineValue linevalue = this->calc_linevalue(length, open_sides);
-		if (linevalue < HALF_OPEN_FOUR)
-			tryUpgradeLineVal(linevalue, prev, next, dir, stone_p);
+//		if (linevalue < HALF_OPEN_FOUR)
+//			tryUpgradeLineVal(linevalue, prev, next, dir, stone_p);
 
 		this->values[p][linevalue]++;
 		if (linevalue == LineValue::FIVE /*&& this->isUnbreakable(start_idx, next - dir, dir)*/) {
@@ -150,8 +167,8 @@ int Heuristic::set_h() {
 //		this->h = tt[hash];
 //		return (this->h);
 //	}
-//	for (unsigned short int i = 0; i < 2; ++i)
-//		this->values[i].fill(0);
+	for (unsigned short int i = 0; i < 2; ++i)
+		this->values[i].fill(0);
 	this->h = 0;
 	this->loop_over_tiles();
 	if (this->has_winner())
@@ -191,8 +208,8 @@ std::string LineValueToStr(const LineValue &x) {
 	switch (x) {
 		case LineValue::HALF_OPEN_TWO:
 			return "HALF_OPEN_TWO";
-		case LineValue::TWO:
-			return "TWO";
+		case LineValue::OPEN_TWO:
+			return "OPEN_TWO";
 		case LineValue::HALF_OPEN_THREE:
 			return "HALF_OPEN_THREE";
 		case LineValue::OPEN_THREE:
@@ -211,7 +228,7 @@ std::string LineValueToStr(const LineValue &x) {
 
 void Heuristic::print_heuristic(std::ostream &o) const {
 	static const LineValue linevalues[] = {
-			LineValue::HALF_OPEN_TWO, LineValue::TWO, LineValue::HALF_OPEN_THREE, LineValue::OPEN_THREE,
+			LineValue::HALF_OPEN_TWO, LineValue::OPEN_TWO, LineValue::HALF_OPEN_THREE, LineValue::OPEN_THREE,
 			LineValue::HALF_OPEN_FOUR, LineValue::OPEN_FOUR, LineValue::FIVE
 	};
 	o << "Heuristic value: " << this->get_h() << "\n";
@@ -296,6 +313,26 @@ unsigned int Heuristic::get_opponent_stone(const unsigned int stone) {
 
 std::array<uint8_t, 2> Heuristic::get_captures() const {
 	return (this->captures);
+}
+
+bool Heuristic::enoughSpaceForFiveInARow(unsigned int idx, int dir, int opp_dir, unsigned int opp_stone) const {
+	unsigned int tmp = idx + dir;
+	unsigned int count = 1;
+
+	// TODO: should I add checkedTiles here as well?
+
+	while (isvalid_tile(tmp) && bitboard_get(tmp) != opp_stone) {
+		count++;
+		tmp += dir;
+	}
+	if (count >= 5)
+		return (true);
+	tmp = idx + opp_dir;
+	while (isvalid_tile(tmp) && bitboard_get(tmp) != opp_stone) {
+		count++;
+		tmp += opp_dir;
+	}
+	return (count >= 5);
 }
 
 std::ostream &operator<<(std::ostream &o, const LineValue &lv) {

@@ -13,6 +13,16 @@
 # define REALBOARDWIDTH 20
 # define REALBOARDSIZE REALBOARDWIDTH * BOARDHEIGHT
 
+# define EAST 1
+# define WEST -1
+# define NORTH -REALBOARDWIDTH
+# define SOUTH REALBOARDWIDTH
+# define NORTHEAST (NORTH + EAST)
+# define NORTHWEST (NORTH + WEST)
+# define SOUTHEAST (SOUTH + EAST)
+# define SOUTHWEST (SOUTH + WEST)
+
+
 typedef std::bitset<BOARDSIZE> bitboard;
 
 class Bitboard {

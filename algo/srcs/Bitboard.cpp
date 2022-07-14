@@ -120,6 +120,7 @@ void Bitboard::set(unsigned int idx, unsigned int player) {
 	assert(idx <= BOARDSIZE / 2);
 	assert(player < 2);
 	assert(!isSeperatingBitIndex(idx));
+	assert(this->bitboard_get(idx) == 0);
 	const unsigned int real_idx = idx * 2;
 	this->board[real_idx] = player;
 	this->board[real_idx + 1] = !player;

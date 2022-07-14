@@ -9,133 +9,7 @@
 
 const int middle_idx = 9 * 20 + 9;
 
-TEST_CASE_METHOD(Gamestate, "Two", "[HeuristicTests]") {
-	const int start_idx = middle_idx;
 
-	place_stone(start_idx); // p0
-	this->set_h();
-	REQUIRE(get_h() == 0);
-	place_stone(start_idx + 20); // p1
-	this->set_h();
-	REQUIRE(get_h() == 0);
-	place_stone(start_idx + 1); // p0
-	this->set_h();
-	REQUIRE(get_h() == -10);
-	place_stone(start_idx + 22); // p1
-	this->set_h();
-//	std::cerr << *this << "\n";
-//	print_heuristic(std::cerr);
-	REQUIRE(h == -LineValues.at(TWO));
-}
-
-TEST_CASE_METHOD(Gamestate, "Three", "[HeuristicTests]") {
-	const int start_idx = middle_idx;
-
-	set(start_idx, 0);
-	set(start_idx + 19, 0);
-	set(start_idx + 19 * 2, 0);
-
-	set_h();
-	REQUIRE(get_h() == -LineValues.at(OPEN_THREE));
-	set(start_idx - 19, 1);
-	REQUIRE(set_h() == -LineValues.at(HALF_OPEN_THREE));
-}
-
-TEST_CASE_METHOD(Gamestate, "Blocked Three", "[HeuristicTests]") {
-	const int start_idx = middle_idx;
-
-	place_stone(start_idx);
-	place_stone(start_idx + 1);
-	place_stone(start_idx + 2);
-	place_stone(start_idx + 2 + 20);
-	place_stone(start_idx + 3);
-
-	std::cerr << *this;
-
-	REQUIRE(h == 0);
-}
-
-
-TEST_CASE_METHOD(Gamestate, "Three at the top wall", "[HeuristicTests]") {
-	const int start_idx = 5;
-	const int dir = 20;
-	set(start_idx, 0);
-	set(start_idx + dir, 0);
-	set(start_idx + 2 * dir, 0);
-
-	set_h();
-	REQUIRE(get_h() == -LineValues.at(HALF_OPEN_THREE));
-	set(start_idx + 3 * dir, 1);
-	set_h();
-	REQUIRE(get_h() == 0);
-	std::cerr << *this;
-	print_heuristic(std::cerr);
-}
-
-TEST_CASE_METHOD(Gamestate, "Three at the bottom wall", "[HeuristicTests]") {
-	const int start_idx = 360;
-	const int dir = -20;
-	set(start_idx, 0);
-	set(start_idx + dir, 0);
-	set(start_idx + 2 * dir, 0);
-
-	set_h();
-	REQUIRE(get_h() == -LineValues.at(HALF_OPEN_THREE));
-	set(start_idx + 3 * dir, 1);
-	set_h();
-	REQUIRE(get_h() == 0);
-	std::cerr << *this;
-	print_heuristic(std::cerr);
-}
-
-TEST_CASE_METHOD(Gamestate, "Three at the left wall", "[HeuristicTests]") {
-	const int start_idx = 180;
-	const int dir = 1;
-	set(start_idx, 0);
-	set(start_idx + dir, 0);
-	set(start_idx + 2 * dir, 0);
-
-	set_h();
-	REQUIRE(get_h() == -LineValues.at(HALF_OPEN_THREE));
-	set(start_idx + 3 * dir, 1);
-	set_h();
-	REQUIRE(get_h() == 0);
-	std::cerr << *this;
-	print_heuristic(std::cerr);
-}
-
-TEST_CASE_METHOD(Gamestate, "Three at the right wall", "[HeuristicTests]") {
-	const int start_idx = 178;
-	const int dir = -1;
-	set(start_idx, 0);
-	set(start_idx + dir, 0);
-	set(start_idx + 2 * dir, 0);
-
-	set_h();
-	std::cerr << *this;
-	print_heuristic(std::cerr);
-	REQUIRE(get_h() == -LineValues.at(HALF_OPEN_THREE));
-	set(start_idx + 3 * dir, 1);
-	set_h();
-	REQUIRE(get_h() == 0);
-}
-
-TEST_CASE_METHOD(Gamestate, "Three plus one", "[HeuristicTests]") {
-	const int start_idx = middle_idx;
-	const int dir = 1;
-	set(start_idx, 0);
-	set(start_idx + dir, 0);
-	set(start_idx + 2 * dir, 0);
-	set(start_idx - dir, 1);
-
-	set_h();
-	REQUIRE(get_h() == -LineValues.at(HALF_OPEN_THREE));
-	set(start_idx + 3 * dir, 1);
-	set_h();
-	std::cerr << *this;
-	print_heuristic(std::cerr);
-	REQUIRE(get_h() == 0);
-}
 
 TEST_CASE_METHOD(Gamestate, "four", "[HeuristicTests]") {
 	const int start_idx = middle_idx;
@@ -171,6 +45,23 @@ TEST_CASE_METHOD(Gamestate, "five", "[HeuristicTests]") {
 	REQUIRE(this->winner == 1);
 }
 
+TEST_CASE_METHOD(Gamestate, "4-1", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+	const int dir = 20;
+
+	this->set(start_idx, 0);
+	this->set(start_idx - dir, 0);
+	this->set(start_idx - 2 * dir, 0);
+	this->set(start_idx - 3 * dir, 0);
+	this->set(start_idx + 2 * dir, 0);
+	this->set_h();
+
+	std::cerr << *this;
+	print_heuristic(std::cerr);
+	REQUIRE(this->h == -LineValues[OPEN_FOUR]); // because it is unbreakable
+	REQUIRE(this->winner == 0);
+}
+
 TEST_CASE_METHOD(Gamestate, "2 fours", "[HeuristicTests]") {
 	const int start_idx = middle_idx;
 
@@ -179,7 +70,9 @@ TEST_CASE_METHOD(Gamestate, "2 fours", "[HeuristicTests]") {
 		this->set(start_idx - i * 21, 0);
 		this->set(start_idx - i * 19, 0);
 	}
-	this->set_h();
+	this->calcH();
+	std::cerr << *this;
+	print_heuristic(std::cerr);
 	REQUIRE(this->h == -LineValues.at(OPEN_FOUR)); // 2 open fours is not more valuable than 1
 }
 
@@ -271,7 +164,7 @@ TEST_CASE_METHOD(Gamestate, "Upgrade 3-1 W-E", "[HeuristicTests]") {
 	this->set_h();
 	std::cerr << *this;
 	print_heuristic(std::cerr);
-	REQUIRE(this->h == LineValues.at(HALF_OPEN_FOUR));
+	REQUIRE(this->h == LineValues.at(OPEN_FOUR));
 }
 
 TEST_CASE_METHOD(Gamestate, "Upgrade 1-3 W-E", "[HeuristicTests]") {
@@ -285,7 +178,7 @@ TEST_CASE_METHOD(Gamestate, "Upgrade 1-3 W-E", "[HeuristicTests]") {
 	this->set_h();
 	std::cerr << *this;
 	print_heuristic(std::cerr);
-	REQUIRE(this->h == LineValues.at(HALF_OPEN_FOUR));
+	REQUIRE(this->h == LineValues.at(OPEN_FOUR));
 }
 
 TEST_CASE_METHOD(Gamestate, "Upgrade 3-1 N-S", "[HeuristicTests]") {
@@ -299,7 +192,7 @@ TEST_CASE_METHOD(Gamestate, "Upgrade 3-1 N-S", "[HeuristicTests]") {
 	this->set_h();
 	std::cerr << *this;
 	print_heuristic(std::cerr);
-	REQUIRE(this->h == LineValues.at(HALF_OPEN_FOUR));
+	REQUIRE(this->h == LineValues.at(OPEN_FOUR));
 }
 
 TEST_CASE_METHOD(Gamestate, "Upgrade 1-3 N-S", "[HeuristicTests]") {
@@ -313,7 +206,7 @@ TEST_CASE_METHOD(Gamestate, "Upgrade 1-3 N-S", "[HeuristicTests]") {
 	this->set_h();
 	std::cerr << *this;
 	print_heuristic(std::cerr);
-	REQUIRE(this->h == LineValues.at(HALF_OPEN_FOUR));
+	REQUIRE(this->h == LineValues.at(OPEN_FOUR));
 }
 
 TEST_CASE_METHOD(Gamestate, "Should block but doesn't", "[HeuristicTests]") {
@@ -418,13 +311,14 @@ TEST_CASE_METHOD(Gamestate, "Should win but doesnt", "[HeuristicTests]") {
     std::cerr << *this;
 
     this->generate_children();
-    REQUIRE(this->children[0]->get_move().move_idx == 228);
-//    std::cerr << "\n\n\n";
-//    for (auto child : children) {
-//        std::cerr << "move_idx: " << child->get_move().move_idx << "\n";
-//        std::cerr << *child;
-//        child->print_heuristic(std::cerr);
-//    }
+    std::cerr << "\n\n\n";
+    for (auto child : children) {
+        std::cerr << "move_idx: " << child->get_move().move_idx << "\n";
+        std::cerr << *child;
+        child->print_heuristic(std::cerr);
+    }
+
+	REQUIRE(this->children[0]->get_move().move_idx == 228);
     this->clear_children();
     elapsed_time = 0;
     start_time = std::chrono::steady_clock::now();
