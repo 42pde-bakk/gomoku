@@ -30,7 +30,7 @@ static const std::array<int32_t, 8> LineValues{
 		1000,	// HALF_OPEN_THREE
 		5000,	// OPEN_THREE
 		7500,	// HALF_OPEN_FOUR
-		5000,	// OPEN_FOUR
+		15000,	// OPEN_FOUR
 		100000	// FIVE
 };
 
