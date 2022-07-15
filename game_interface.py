@@ -19,6 +19,13 @@ class GameMode(enum.IntEnum):
 		return f"{self.name.capitalize().replace('_', ' ')}"
 
 
+class MoveSnapshot(Move):
+	def __init__(self, row: int, col: int, player: int):
+		super().__init__(row, col, player)
+		self.capturing = False
+		self.capture_indices = []
+
+
 def get_portnb(fname: str) -> int:
 	with open(fname, 'r') as f:
 		return int(f.read())
@@ -33,6 +40,7 @@ class Game(tk.Frame):
 		self.gamestate = Gamestate()
 		self.buttons = []
 		self.frm_position = []
+		self.ordered_moves = []
 		self.size = size
 		self.player = 1
 		self.previous_player = 0
@@ -58,6 +66,7 @@ class Game(tk.Frame):
 	def create_options_window(self):
 		frm_options = ttk.Frame(self, relief=tk.RIDGE, borderwidth=10).pack(padx=25, pady=25)
 		self.display_captures(frm_options)
+		self.undo_move_bt(frm_options)
 		self.new_game_bt(frm_options)
 		self.choose_different_game_om(frm_options)
 
@@ -102,7 +111,7 @@ class Game(tk.Frame):
 	def pick_color(self, row: int, col: int):
 		if self.gamestate.board.get(row, col) == 0:
 			button_img = self.gray
-		elif self.gamestate.board.get(row, col) == 1:
+		elif self.gamestate.board.get(row, col) == 2:
 			button_img = self.white
 		else:
 			button_img = self.black
@@ -127,6 +136,7 @@ class Game(tk.Frame):
 				print("Illegal move")
 				self.previous_player = Gamestate.get_other_player(self.player)
 				return
+			self.ordered_moves.append(MoveSnapshot(row, col, self.player))
 			self.gamestate.place_stone(y=row, x=col, stone=self.player)
 			self.update_button(row, col)
 		else:
@@ -179,6 +189,7 @@ class Game(tk.Frame):
 		print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}')
 		if self.gamestate.board.get(y=row, x=col) == 0:
 			# Handle rules here -> not Game.rules.is_legal_move
+			self.ordered_moves.append(MoveSnapshot(row, col, self.player))
 			self.gamestate.place_stone(y=row, x=col, stone=self.player)
 			self.update_button(row, col)
 			if self.after_move_check(row, col):
@@ -242,12 +253,15 @@ class Game(tk.Frame):
 	def handle_captures(self, row, col) -> None:
 		capture_check = Game.rules.is_capturing(row, col, self.player, self.gamestate.board)
 		if capture_check is not None:
+			self.ordered_moves[-1].capturing = True
 			for i in range(int(len(capture_check) // 2)):
 				i = i * 2
 				self.gamestate.capture(capture_check[i], capture_check[i + 1], self.player)
 				self.remove_captured(capture_check[i], capture_check[i + 1])
 				self.update_captures()
 				self.update()
+				self.ordered_moves[-1].capture_indices.append(capture_check[i])
+				self.ordered_moves[-1].capture_indices.append(capture_check[i + 1])
 
 	def remove_captured(self, pos1: tuple, pos2: tuple):
 		pos1_row, pos1_col = pos1
@@ -274,3 +288,38 @@ class Game(tk.Frame):
 
 	def update_board(self, row, col):
 		print(f'updating board, row={row}, h={col}')
+
+	def recreate_captured(self, captured, opponent):
+		for stone in captured:
+			row, col = stone
+			self.gamestate.board.set(row, col, opponent)
+			stone_color = self.pick_color(row, col)
+			self.buttons[row * self.size + col].config(image=stone_color)
+			self.update()
+
+	def undo_move(self):
+		print(self.game_mode)
+		if self.game_mode == GameMode.BOT_POT:
+			return
+		if self.ordered_moves:
+			last_move = self.ordered_moves.pop()
+			row, col = last_move.y, last_move.x
+			self.gamestate.board.set(row, col, Stone.EMPTY.value)
+			self.buttons[row * self.size + col].config(image=self.gray)
+			if last_move.capturing:
+				self.recreate_captured(last_move.capture_indices, self.gamestate.get_other_player(last_move.player))
+				num_captured = len(last_move.capture_indices)
+				self.gamestate.captures[last_move.player - 1] -= num_captured
+				self.update_captures()
+			if self.game_mode == GameMode.HOTSEAT:
+				self.previous_player = self.player
+			self.change_player()
+
+	def undo_move_bt(self, frm_options):
+		bt_undo_move = ttk.Button(
+			master=frm_options,
+			text="UNDO MOVE",
+			command=self.undo_move,
+			width=15,
+		)
+		bt_undo_move.pack()
