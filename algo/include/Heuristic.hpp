@@ -56,8 +56,7 @@ protected:
 	[[nodiscard]] bool canGetCaptured(unsigned int start_idx, int dir) const;
 
 private:
-	unsigned int get_length(unsigned int *i, unsigned int stone_p, unsigned int d,
-							std::array<unsigned int, REALBOARDSIZE> &g_checkedTiles) const;
+	unsigned int get_length(unsigned int *i, unsigned int stone_p, unsigned int d) const;
 
 	[[nodiscard]] unsigned int count_open_sides(unsigned int prev, unsigned int next) const;
 
@@ -68,7 +67,7 @@ private:
 	void calculate_heuristic();
 
 	void
-	count_lines(unsigned int start_idx, unsigned int stone_p, std::array<unsigned int, REALBOARDSIZE> &checkedTiles);
+	count_lines(unsigned int start_idx, unsigned int stone_p);
 
 	bool enoughSpaceForFiveInARow(unsigned int idx, int dir, int opp_dir, unsigned int opp_stone) const;
 

@@ -103,6 +103,7 @@ TEST_CASE_METHOD(Gamestate, "Half Open Two NE-SW", "[HeuristicTests - Half Open 
 	this->set(middle_idx, 0);
 	this->place_stone(middle_idx + SOUTHWEST);
 	REQUIRE(this->get_h() == -LineValues[HALF_OPEN_TWO]);
+	std::cerr << *this;
 	this->reset();
 	this->change_player();
 
