@@ -90,6 +90,21 @@ TEST_CASE_METHOD(Gamestate, "Edge case", "[HeuristicTests]") {
 	REQUIRE(this->h == -LineValues.at(OPEN_FOUR)); // 2 open fours is not more valuable than 1
 }
 
+TEST_CASE_METHOD(Gamestate, "Four to grow to 5", "[HeuristicTests]") {
+	const int start_idx = middle_idx;
+
+	this->set(start_idx + WEST, 1);
+	this->set(start_idx, 0);
+	this->set(start_idx + EAST, 0);
+	this->set(start_idx + 2 * EAST, 0);
+	this->set(start_idx + 5 * EAST, 1);
+	this->place_stone(start_idx + 3 * EAST);
+
+	std::cerr << *this;
+	this->print_heuristic(std::cerr);
+	REQUIRE(get_h() == -LineValues.at(HALF_OPEN_FOUR));
+}
+
 
 TEST_CASE_METHOD(Gamestate, "BLOCKED BY JAMES", "[HeuristicTests]") {
 	const int start_idx = middle_idx;

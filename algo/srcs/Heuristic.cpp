@@ -50,6 +50,10 @@ unsigned int Heuristic::get_length(unsigned int *i, unsigned int stone_p, unsign
 	if (g_checkedTiles2[start_idx] & (1u << d) && lengths[1] == 0) {
 		return (0);
 	}
+	while (this->bitboard_get(idx - dirs[d]) != stone_p) {
+		// so I can afterwards easily find the next tile
+		idx -= dirs[d];
+	}
 	const unsigned int total_length = lengths[0] + lengths[1];
 	if (total_length < 5)
 		return (total_length);
@@ -72,11 +76,11 @@ LineValue Heuristic::calc_linevalue(unsigned int length, unsigned int open_sides
 
 unsigned int Heuristic::count_open_sides(unsigned int prev, unsigned int next) const {
 	unsigned int open_sides = 0;
-	if (prev < REALBOARDSIZE && !isSeperatingBitIndex(prev) && tile_is_empty(prev)) {
-		open_sides += 1u;
+	if (isvalid_tile(prev) && tile_is_empty(prev)) {
+		++open_sides;
 	}
-	if (next < REALBOARDSIZE && !isSeperatingBitIndex(next) && tile_is_empty(next)) {
-		open_sides += 1u;
+	if (isvalid_tile(next) && tile_is_empty(next)) {
+		++open_sides;
 	}
 	return (open_sides);
 }
