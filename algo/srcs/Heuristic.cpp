@@ -12,6 +12,9 @@ std::hash<bitboard> Heuristic::hash_fn;
 std::unordered_map<std::bitset<BOARDSIZE>, int> Heuristic::tt;
 std::array<unsigned int, REALBOARDSIZE> g_checkedTiles;
 std::array<unsigned int, REALBOARDSIZE> g_checkedTiles2; // for across the water
+std::array<unsigned int, REALBOARDSIZE>	g_checkedTilesArray[2] = { // to index with empty_tile_count
+		g_checkedTiles, g_checkedTiles2
+};
 
 int Heuristic::get_h() const {
 	return (this->h);
@@ -36,10 +39,7 @@ unsigned int Heuristic::get_length(unsigned int *i, unsigned int stone_p, unsign
 			break ;
 		} else if (stone_value == stone_p) {
 			lengths[empty_tile_count]++;
-			if (!empty_tile_count)
-				g_checkedTiles[idx] |= 1u << d;
-			else
-				g_checkedTiles2[idx] |= 1u << d;
+			g_checkedTilesArray[empty_tile_count][idx] |= 1u << d;
 		} else {
 			if (empty_tile_count)
 				break ;
