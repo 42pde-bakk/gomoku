@@ -19,11 +19,11 @@ TEST_CASE_METHOD(Gamestate, "four", "[HeuristicTests]") {
 	this->set(start_idx - 1 * dir, 1);
 	this->set(start_idx - 2 * dir, 1);
 	this->set(start_idx - 3 * dir, 1);
-	this->set_h();
+	this->set_h(0);
 	REQUIRE(this->h == LineValues.at(OPEN_FOUR));
 
 	this->set(start_idx + dir, 0);
-	this->set_h();
+	this->set_h(0);
 
 	REQUIRE(this->h == LineValues.at(HALF_OPEN_FOUR));
 }
@@ -37,7 +37,7 @@ TEST_CASE_METHOD(Gamestate, "five", "[HeuristicTests]") {
 	this->set(start_idx - 2 * dir, 0);
 	this->set(start_idx - 3 * dir, 0);
 	this->set(start_idx + dir, 0);
-	this->set_h();
+	this->set_h(0);
 
 	std::cerr << *this;
 	dprintf(2, "h = %d\n", h);
@@ -54,7 +54,7 @@ TEST_CASE_METHOD(Gamestate, "4-1", "[HeuristicTests]") {
 	this->set(start_idx - 2 * dir, 0);
 	this->set(start_idx - 3 * dir, 0);
 	this->set(start_idx + 2 * dir, 0);
-	this->set_h();
+	this->set_h(0);
 
 	std::cerr << *this;
 	print_heuristic(std::cerr);
@@ -70,7 +70,7 @@ TEST_CASE_METHOD(Gamestate, "2 fours", "[HeuristicTests]") {
 		this->set(start_idx - i * 21, 0);
 		this->set(start_idx - i * 19, 0);
 	}
-	this->calcH();
+	this->calcH(0);
 	std::cerr << *this;
 	print_heuristic(std::cerr);
 	REQUIRE(this->h == -LineValues.at(OPEN_FOUR)); // 2 open fours is not more valuable than 1
@@ -84,7 +84,7 @@ TEST_CASE_METHOD(Gamestate, "Edge case", "[HeuristicTests]") {
 	this->set(start_idx + 3, 0);
 	this->set(start_idx + 5, 0);
 	this->set(start_idx + 6, 0);
-	this->calcH();
+	this->calcH(0);
 	std::cerr << *this;
 	print_heuristic(std::cerr);
 	REQUIRE(this->h == -LineValues.at(OPEN_FOUR)); // 2 open fours is not more valuable than 1
@@ -113,7 +113,7 @@ TEST_CASE_METHOD(Gamestate, "BLOCKED BY JAMES", "[HeuristicTests]") {
 	}
 	this->set(start_idx - 4 * 21, 1);
 	this->set(start_idx + 21, 1);
-	this->set_h();
+	this->set_h(0);
 
 	REQUIRE(this->h == LineValues.at(NONE));
 }
@@ -127,7 +127,7 @@ TEST_CASE_METHOD(Gamestate, "BLOCK4", "[HeuristicTests]") {
 	}
 	this->set(start_idx - 4 * 21, 0);
 	this->set(start_idx + 21, 0);
-	this->set_h();
+	this->set_h(0);
 	print_board(std::cerr, false);
 	print_heuristic(std::cerr);
 
@@ -142,7 +142,7 @@ TEST_CASE_METHOD(Gamestate, "MinimaxHeuristicReturn", "[HeuristicTests]") {
 		this->set(start_idx - i * 21, 1);
 	}
 	this->set(start_idx - 4 * 21, 0);
-	this->set_h();
+	this->set_h(0);
 	print_board(std::cerr, false);
 	print_heuristic(std::cerr);
 	std::cerr << '\n';
@@ -159,24 +159,24 @@ TEST_CASE_METHOD(Gamestate, "Block", "[HeuristicTests]") {
 	for (int i = 0; i < 4; i++) {
 		this->set(start_idx - i * 21, 0);
 	}
-	this->set_h();
+	this->set_h(0);
 	REQUIRE(this->h == -LineValues.at(OPEN_FOUR));
 	this->set(105, 1);
-	this->set_h();
+	this->set_h(0);
 	REQUIRE(this->get_h() == -LineValues.at(HALF_OPEN_FOUR));
 	this->clear_tile(105);
 
 	this->set(113, 1);
-	this->set_h();
+	this->set_h(0);
 	REQUIRE(this->get_h() == -LineValues.at(OPEN_FOUR));
 	this->clear_tile(113);
 
 	this->set(start_idx + 21, 1);
-	this->set_h();
+	this->set_h(0);
 	REQUIRE(this->get_h() == -LineValues.at(HALF_OPEN_FOUR));
 
 	this->set(start_idx - (21 * 4), 1);
-	this->set_h();
+	this->set_h(0);
 	std::cerr << *this;
 	REQUIRE(this->get_h() == LineValues.at(NONE));
 }
@@ -189,7 +189,7 @@ TEST_CASE_METHOD(Gamestate, "Upgrade 3-1 W-E", "[HeuristicTests]") {
 	this->set(start_idx + 1 * dir, 1);
 	this->set(start_idx + 2 * dir, 1);
 	this->set(start_idx + 4 * dir, 1);
-	this->set_h();
+	this->set_h(0);
 	std::cerr << *this;
 	print_heuristic(std::cerr);
 	REQUIRE(this->h == LineValues.at(OPEN_FOUR));
@@ -203,7 +203,7 @@ TEST_CASE_METHOD(Gamestate, "Upgrade 1-3 W-E", "[HeuristicTests]") {
 	this->set(start_idx + 1 * dir, 1);
 	this->set(start_idx + 2 * dir, 1);
 	this->set(start_idx + 4 * dir, 1);
-	this->set_h();
+	this->set_h(0);
 	std::cerr << *this;
 	print_heuristic(std::cerr);
 	REQUIRE(this->h == LineValues.at(OPEN_FOUR));
@@ -217,7 +217,7 @@ TEST_CASE_METHOD(Gamestate, "Upgrade 3-1 N-S", "[HeuristicTests]") {
 	this->set(start_idx + 1 * dir, 1);
 	this->set(start_idx + 2 * dir, 1);
 	this->set(start_idx + 4 * dir, 1);
-	this->set_h();
+	this->set_h(0);
 	std::cerr << *this;
 	print_heuristic(std::cerr);
 	REQUIRE(this->h == LineValues.at(OPEN_FOUR));
@@ -231,7 +231,7 @@ TEST_CASE_METHOD(Gamestate, "Upgrade 1-3 N-S", "[HeuristicTests]") {
 	this->set(start_idx + 1 * dir, 1);
 	this->set(start_idx + 2 * dir, 1);
 	this->set(start_idx + 4 * dir, 1);
-	this->set_h();
+	this->set_h(0);
 	std::cerr << *this;
 	print_heuristic(std::cerr);
 	REQUIRE(this->h == LineValues.at(OPEN_FOUR));
@@ -253,7 +253,7 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't", "[HeuristicTests]") {
 	this->set(10 * 20 + 8, 1);
 	this->set(10 * 20 + 10, 0);
 	this->set(10 * 20 + 12, 0);
-	this->calcH();
+	this->calcH(0);
 	this->change_player();
 
 	this->generate_children();
@@ -280,7 +280,7 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't - 2", "[HeuristicTests]") 
 	this->set(10 * 20 + 8, 1);
 
 	this->set(6 * 20 + 8, 0);
-	this->calcH();
+	this->calcH(0);
 	this->change_player();
 
 	std::cerr << *this;
@@ -301,66 +301,6 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't - 2", "[HeuristicTests]") 
 	REQUIRE(result->get_first_move(this).move_idx == 5 * 20 + 8);
 }
 
-TEST_CASE_METHOD(Gamestate, "Should win but doesnt", "[HeuristicTests]") {
-    this->set(7 * REALBOARDWIDTH + 7, 0);
-    this->set(8 * REALBOARDWIDTH + 7, 0);
-    this->set(9 * REALBOARDWIDTH + 7, 0);
-
-    this->set(8 * REALBOARDWIDTH + 8, 1);
-    this->set(8 * REALBOARDWIDTH + 10, 0);
-//    this->set(8 * REALBOARDWIDTH + 12, 1);
-
-    this->set(9 * REALBOARDWIDTH + 6, 1);
-    this->set(9 * REALBOARDWIDTH + 9, 1);
-    this->set(9 * REALBOARDWIDTH + 10, 1);
-    this->set(9 * REALBOARDWIDTH + 11, 1);
-    this->set(9 * REALBOARDWIDTH + 13, 0);
-
-    this->set(10 * REALBOARDWIDTH + 8, 1);
-    this->set(10 * REALBOARDWIDTH + 9, 0);
-    this->set(10 * REALBOARDWIDTH + 10, 1);
-    this->set(10 * REALBOARDWIDTH + 11, 0);
-
-    this->set(11 * REALBOARDWIDTH + 7, 1);
-    this->set(11 * REALBOARDWIDTH + 9, 1);
-    this->set(11 * REALBOARDWIDTH + 10, 1);
-    this->set(11 * REALBOARDWIDTH + 11, 1);
-
-    this->set(12 * REALBOARDWIDTH + 10, 1);
-    this->set(12 * REALBOARDWIDTH + 12, 0);
-
-    this->set(13 * REALBOARDWIDTH + 8, 1);
-    this->set(13 * REALBOARDWIDTH + 10, 0);
-
-    this->set(6 * REALBOARDWIDTH + 7, 0);
-    this->captures[1] = 4;
-    this->calcH();
-    this->change_player();
-    std::cerr << *this;
-
-    this->generate_children();
-    std::cerr << "\n\n\n";
-    for (auto child : children) {
-        std::cerr << "move_idx: " << child->get_move().move_idx << "\n";
-        std::cerr << *child;
-        child->print_heuristic(std::cerr);
-    }
-
-	REQUIRE(this->children[0]->get_move().move_idx == 228);
-    this->clear_children();
-    elapsed_time = 0;
-    start_time = std::chrono::steady_clock::now();
-//    auto result = minimax_alphabeta_start(this, 4, this->player);
-    auto result = iterative_deepening(this, this->player);
-    REQUIRE(result);
-    std::cerr << "\n\n";
-    std::cerr << *result;
-    std::cerr << result->get_h() << "\n\n\n\nHISTORY:\n";
-    REQUIRE(result->get_first_move(this).move_idx == 228);
-
-    result->print_history(std::cerr, false);
-}
-
 TEST_CASE_METHOD(Gamestate, "Should block open 3", "[HeuristicTests]") {
     this->set(8 * REALBOARDWIDTH + 9, 0);
     this->set(7 * REALBOARDWIDTH + 9, 0);
@@ -374,7 +314,7 @@ TEST_CASE_METHOD(Gamestate, "Should block open 3", "[HeuristicTests]") {
     this->set(7 * REALBOARDWIDTH + 6, 1);
     this->set(6 * REALBOARDWIDTH + 6, 1);
 
-    calcH();
+	calcH(0);
     this->place_stone(8 * REALBOARDWIDTH + 8);
     std::cerr << *this << "\n\n\n";
 
@@ -408,7 +348,7 @@ TEST_CASE_METHOD(Gamestate, "Mistake", "[HeuristicTests]") {
 	set(230, 0);
 	set(250, 1);
 	this->player = 1;
-	set_h();
+	set_h(0);
 	std::cerr << *this << '\n';
 
 	generate_children();

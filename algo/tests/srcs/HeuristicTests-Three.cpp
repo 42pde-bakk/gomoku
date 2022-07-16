@@ -92,7 +92,7 @@ TEST_CASE_METHOD(Gamestate, "Three", "[HeuristicTests]") {
 	this->place_stone(start_idx + NORTHEAST);
 	std::cerr << *this;
 	this->print_heuristic(std::cerr);
-	REQUIRE(set_h() == -LineValues.at(HALF_OPEN_THREE));
+	REQUIRE(set_h(0) == -LineValues.at(HALF_OPEN_THREE));
 }
 
 TEST_CASE_METHOD(Gamestate, "Three but no room to grow to five", "[HeuristicTests]") {
@@ -130,10 +130,10 @@ TEST_CASE_METHOD(Gamestate, "Three at the top wall", "[HeuristicTests]") {
 	this->set(start_idx + dir, 0);
 	this->set(start_idx + 2 * dir, 0);
 
-	this->set_h();
+	this->set_h(0);
 	REQUIRE(this->get_h() == -LineValues.at(HALF_OPEN_THREE));
 	this->set(start_idx + 3 * dir, 1);
-	this->set_h();
+	this->set_h(0);
 	REQUIRE(this->get_h() == 0);
 	std::cerr << *this;
 	this->print_heuristic(std::cerr);
@@ -146,10 +146,10 @@ TEST_CASE_METHOD(Gamestate, "Three at the bottom wall", "[HeuristicTests]") {
 	set(start_idx + dir, 0);
 	set(start_idx + 2 * dir, 0);
 
-	set_h();
+	set_h(0);
 	REQUIRE(get_h() == -LineValues.at(HALF_OPEN_THREE));
 	set(start_idx + 3 * dir, 1);
-	set_h();
+	set_h(0);
 	REQUIRE(get_h() == 0);
 	std::cerr << *this;
 	print_heuristic(std::cerr);
@@ -162,10 +162,10 @@ TEST_CASE_METHOD(Gamestate, "Three at the left wall", "[HeuristicTests]") {
 	set(start_idx + dir, 0);
 	set(start_idx + 2 * dir, 0);
 
-	set_h();
+	set_h(0);
 	REQUIRE(get_h() == -LineValues.at(HALF_OPEN_THREE));
 	set(start_idx + 3 * dir, 1);
-	set_h();
+	set_h(0);
 	REQUIRE(get_h() == 0);
 	std::cerr << *this;
 	print_heuristic(std::cerr);
@@ -178,12 +178,12 @@ TEST_CASE_METHOD(Gamestate, "Three at the right wall", "[HeuristicTests]") {
 	set(start_idx + dir, 0);
 	set(start_idx + 2 * dir, 0);
 
-	set_h();
+	set_h(0);
 	std::cerr << *this;
 	print_heuristic(std::cerr);
 	REQUIRE(get_h() == -LineValues.at(HALF_OPEN_THREE));
 	set(start_idx + 3 * dir, 1);
-	set_h();
+	set_h(0);
 	REQUIRE(get_h() == 0);
 }
 
@@ -195,10 +195,10 @@ set(start_idx + dir, 0);
 set(start_idx + 2 * dir, 0);
 set(start_idx - dir, 1);
 
-set_h();
+	set_h(0);
 REQUIRE(get_h() == -LineValues.at(HALF_OPEN_THREE));
 set(start_idx + 3 * dir, 1);
-set_h();
+	set_h(0);
 std::cerr << *this;
 print_heuristic(std::cerr);
 REQUIRE(get_h() == 0);

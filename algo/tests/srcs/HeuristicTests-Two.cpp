@@ -118,16 +118,16 @@ TEST_CASE_METHOD(Gamestate, "OPEN OPEN_TWO's", "[HeuristicTests]") {
 	const int start_idx = middle_idx;
 
 	place_stone(start_idx); // p0
-	this->set_h();
+	this->set_h(0);
 	REQUIRE(get_h() == 0);
 	place_stone(start_idx + 20); // p1
-	this->set_h();
+	this->set_h(0);
 	REQUIRE(get_h() == 0);
 	place_stone(start_idx + 1); // p0
-	this->set_h();
+	this->set_h(0);
 	REQUIRE(get_h() == -10);
 	place_stone(start_idx + 22); // p1
-	this->set_h();
+	this->set_h(0);
 
 	std::cerr << *this;
 	print_heuristic(std::cerr);

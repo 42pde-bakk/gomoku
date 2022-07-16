@@ -9,6 +9,8 @@
 #include <chrono>
 
 unsigned int g_nb = 0;
+unsigned int g_moves = 0;
+unsigned int g_applied_moves = 0;
 
 Gamestate::Gamestate() : Heuristic(), lastmove(), parent(nullptr), children() {
 }
@@ -71,9 +73,6 @@ void Gamestate::generate_children() {
 //    }
 }
 
-unsigned int g_moves = 0;
-unsigned int g_applied_moves = 0;
-
 std::vector<Move> Gamestate::generate_moves() const {
 	std::vector<Move> next_moves;
 
@@ -106,15 +105,13 @@ void Gamestate::apply_move(const Move &mv) {
 		// check double threes
 		// It is important to note that it is not forbidden to introduce
 		// a double-three by capturing a pair.
-		const int created_open_threes = this->values[player][OPEN_THREE] - this->parent->values[player][OPEN_THREE];
-		if (created_open_threes >= 2) {
+		if (this->created_open_threes >= 2) {
 			this->set_winner(!this->player);
 		}
 	}
 	this->change_player();
 	this->lastmove = std::move(mv);
 }
-
 
 bool Gamestate::place_stone(unsigned int move_idx) {
 	assert(move_idx < BOARDSIZE);
@@ -129,7 +126,7 @@ bool Gamestate::place_stone(unsigned int move_idx) {
 		// no need to calculate heuristic value if we already got a winner by captures!
 		return (true);
 	}
-	this->calcH();
+	this->calcH(move_idx);
 	if (!captures_happened) {
 		// check double threes
 		// "It is important to note that it is not forbidden to introduce
@@ -179,8 +176,8 @@ void Gamestate::add_child(Gamestate *child) {
 	this->children.push_back(child);
 }
 
-Gamestate *Gamestate::calcH() {
-	this->set_h();
+Gamestate *Gamestate::calcH(const unsigned int new_stone_idx) {
+	this->set_h(new_stone_idx);
 	this->add_h_for_captures();
 	return (this);
 }

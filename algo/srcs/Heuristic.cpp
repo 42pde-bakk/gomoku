@@ -12,6 +12,8 @@ std::hash<bitboard> Heuristic::hash_fn;
 std::unordered_map<std::bitset<BOARDSIZE>, int> Heuristic::tt;
 std::array<unsigned int, REALBOARDSIZE> g_checkedTiles;
 std::array<unsigned int, REALBOARDSIZE> g_checkedTiles2; // for across the water
+static unsigned int	g_newly_placed_stone_idx;
+static bool			g_contains_newly_placed_stone;
 
 int Heuristic::get_h() const {
 	return (this->h);
@@ -21,10 +23,10 @@ uint8_t Heuristic::get_player() const {
 	return (this->player);
 }
 
-unsigned int Heuristic::get_length(unsigned int *i, unsigned int stone_p, unsigned int d) const {
+unsigned int
+Heuristic::get_length(unsigned int &idx, unsigned int stone_p, unsigned int d) const {
 	static const std::array<int, 4> dirs = setup_dirs();
 	unsigned int lengths[2] = {1,0};
-	unsigned int &idx = *i;
 	const unsigned int opp_stone = get_opponent_stone(stone_p);
 	unsigned int stone_value;
 	unsigned int empty_tile_count = 0;
@@ -40,6 +42,9 @@ unsigned int Heuristic::get_length(unsigned int *i, unsigned int stone_p, unsign
 				g_checkedTiles[idx] |= 1u << d;
 			} else {
 				g_checkedTiles2[idx] |= 1u << d;
+			}
+			if (idx == g_newly_placed_stone_idx) {
+				g_contains_newly_placed_stone = true;
 			}
 		} else {
 			if (empty_tile_count)
@@ -110,7 +115,8 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 //			continue ;
 //		}
 		unsigned int	next = start_idx + dir;
-		unsigned int	length = this->get_length(&next, stone_p, d);
+		g_contains_newly_placed_stone = false;
+		unsigned int	length = this->get_length(next, stone_p, d);
 
 		if (length < 2) // Might change this to (length <= 2)
 			continue;
@@ -122,6 +128,10 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 //		if (linevalue < HALF_OPEN_FOUR)
 //			tryUpgradeLineVal(linevalue, prev, next, dir, stone_p);
 
+		if (linevalue == OPEN_THREE && g_contains_newly_placed_stone) {
+			++this->created_open_threes;
+		}
+
 		this->values[p][linevalue]++;
 		if (linevalue == LineValue::FIVE /*&& this->isUnbreakable(start_idx, next - dir, dir)*/) {
 			this->set_winner(p);
@@ -131,7 +141,6 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 }
 
 void Heuristic::loop_over_tiles() {
-//	std::array<unsigned int, REALBOARDSIZE> checkedTiles{};
 	g_checkedTiles.fill(0);
 	g_checkedTiles2.fill(0);
 	for (unsigned int i = 0; i < REALBOARDSIZE; i++) {
@@ -169,9 +178,10 @@ void Heuristic::calculate_heuristic() {
 	}
 }
 
-int Heuristic::set_h() {
+int Heuristic::set_h(const unsigned int new_stone_idx) {
 //	static const int winner_values[3] = {0, -2000000, 2000000};
 //	auto hash = hash_fn(this->board);
+	g_newly_placed_stone_idx = new_stone_idx;
 	this->h = 0;
 //	if (tt.find(hash) != tt.end()) {
 //		this->h = tt[hash];
@@ -343,6 +353,10 @@ bool Heuristic::enoughSpaceForFiveInARow(unsigned int idx, int dir, int opp_dir,
 		tmp += opp_dir;
 	}
 	return (count >= 5);
+}
+
+uint8_t Heuristic::get_created_open_threes() const {
+	return (this->created_open_threes);
 }
 
 std::ostream &operator<<(std::ostream &o, const LineValue &lv) {

@@ -66,7 +66,7 @@ public:
 
 	void sort_children();
 
-	Gamestate *calcH();
+	Gamestate *calcH(const unsigned int new_stone_idx);
 
 	const Gamestate *get_parent();
 

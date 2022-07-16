@@ -44,10 +44,11 @@ protected:
 	std::array<std::array<uint8_t, 8>, 2> values{};
 	int32_t h{};
 	uint8_t winner{},
-			player{};
+			player{},
+			created_open_threes{};
 	std::array<uint8_t, 2> captures{};
 
-	int set_h();
+	int set_h(const unsigned int new_stone_idx);
 
 	int add_h_for_captures();
 
@@ -56,7 +57,8 @@ protected:
 	[[nodiscard]] bool canGetCaptured(unsigned int start_idx, int dir) const;
 
 private:
-	unsigned int get_length(unsigned int *i, unsigned int stone_p, unsigned int d) const;
+	unsigned int
+	get_length(unsigned int &idx, unsigned int stone_p, unsigned int d) const;
 
 	[[nodiscard]] unsigned int count_open_sides(unsigned int prev, unsigned int next) const;
 
@@ -91,6 +93,8 @@ public:
 	[[nodiscard]] uint8_t get_winner() const;
 
 	[[nodiscard]] uint8_t get_player() const;
+
+	[[nodiscard]] uint8_t get_created_open_threes() const;
 
 	void print_heuristic(std::ostream &o) const;
 
