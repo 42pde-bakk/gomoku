@@ -162,12 +162,9 @@ void Gamestate::clear_children() {
 }
 
 void Gamestate::print_history(std::ostream &o, bool colours) const {
-	o << "this->parent: " << parent << '\n';
 	if (this->parent)
 		this->parent->print_history(o, colours);
-	o << "let's print the board!\n";
 	this->print_board(o, colours);
-	o << "let's print the heuristic!\n";
 	this->print_heuristic(o);
 	o << '\n';
 }
