@@ -133,10 +133,10 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 		}
 
 		this->values[p][linevalue]++;
-		if (linevalue == LineValue::FIVE /*&& this->isUnbreakable(start_idx, next - dir, dir)*/) {
-			this->set_winner(p);
-			return;
-		}
+//		if (linevalue == LineValue::FIVE /*&& this->isUnbreakable(start_idx, next - dir, dir)*/) {
+//			this->set_winner(p);
+//			return;
+//		}
 	}
 }
 

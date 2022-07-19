@@ -28,23 +28,6 @@ TEST_CASE_METHOD(Gamestate, "four", "[HeuristicTests]") {
 	REQUIRE(this->h == LineValues.at(HALF_OPEN_FOUR));
 }
 
-TEST_CASE_METHOD(Gamestate, "five", "[HeuristicTests]") {
-	const int start_idx = middle_idx;
-	const int dir = 20;
-
-	this->set(start_idx, 0);
-	this->set(start_idx - dir, 0);
-	this->set(start_idx - 2 * dir, 0);
-	this->set(start_idx - 3 * dir, 0);
-	this->set(start_idx + dir, 0);
-	this->set_h(0);
-
-	std::cerr << *this;
-	dprintf(2, "h = %d\n", h);
-	REQUIRE(this->h == -2000000); // because it is unbreakable
-	REQUIRE(this->winner == 1);
-}
-
 TEST_CASE_METHOD(Gamestate, "4-1", "[HeuristicTests]") {
 	const int start_idx = middle_idx;
 	const int dir = 20;

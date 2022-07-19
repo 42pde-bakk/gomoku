@@ -32,7 +32,7 @@ int main() {
 		while (client.isAlive()) {
 			std::cout << "Lets receive a gamestate\n";
 			Gamestate gs = client.receiveGamestate();
-			gs.calcH(0);
+			gs.calcH((unsigned int)-1);
 			if (!client.isAlive()) {
 				std::cerr << "Client disconnected.\n";
 				break;

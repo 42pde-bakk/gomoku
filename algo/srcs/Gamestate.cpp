@@ -184,7 +184,7 @@ const Gamestate *Gamestate::get_parent() {
 }
 
 bool Gamestate::has_children() const {
-	return (this->children.empty() == false);
+	return (!this->children.empty());
 }
 
 void Gamestate::sort_children() {
