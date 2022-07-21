@@ -111,5 +111,7 @@ TEST_CASE_METHOD(Gamestate, "Gamestate::isUnbreakable", "[GamestateTests]") {
 	this->place_stone(start + 39); // p0
 	this->place_stone(start - 2); // p1
 	std::cerr << *this << "\n";
-	REQUIRE_FALSE(isUnbreakable(start, start + 4 * dir, dir));
+	dprintf(2, "start = %d, end = %d, dir = %d\n", start, start + 4 * dir, dir);
+	REQUIRE(isUnbreakable(start, start + 4 * dir, dir));
+//	REQUIRE_FALSE(isUnbreakable(start, start + 4 * dir, dir));
 }

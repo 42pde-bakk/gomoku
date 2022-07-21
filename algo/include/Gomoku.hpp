@@ -12,7 +12,9 @@
 #ifndef THREADED
 # define THREADED 0
 #endif
+
 #include <mutex>
+
 extern std::mutex cerrMutex;
 extern std::mutex fsMutex;
 extern bool g_log; // Used to turn logging off and on on short intervals to discover bugs

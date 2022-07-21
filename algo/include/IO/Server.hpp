@@ -9,22 +9,26 @@
 #include <arpa/inet.h>
 #include <string>
 #include <sys/socket.h>
+
 #define BACKLOG_LENGTH 1
 
 
 class Server {
-	int					sockfd;
-	unsigned int		port{};
-	struct sockaddr_in	serv_addr{};
+	int sockfd;
+	unsigned int port{};
+	struct sockaddr_in serv_addr{};
 
 public:
 	Server();
+
 	~Server();
-	[[nodiscard]] int	getsocketFd() const;
+
+	[[nodiscard]] int getsocketFd() const;
+
 	[[nodiscard]] unsigned int getport() const;
 
 private:
-	void	writePortNbToFile(const std::string& s) const;
+	void writePortNbToFile(const std::string &s) const;
 };
 
 

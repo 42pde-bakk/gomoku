@@ -38,15 +38,15 @@ endif
 ifdef SINGLETHREADED
  CFLAGS += -D THREADED=0
 endif
-ifdef SPEED
- CFLAGS += -Ofast -fno-exceptions
+ifndef NO_OPTIMIZATION
+ CFLAGS += -Ofast -fno-exceptions -D NDEBUG
 endif
 
 SHELL := /bin/bash
 export SHELL
 export DEBUG
 
-all: directories $(NAME)
+all: $(NAME)
 
 directories:
 	@mkdir -p $(BUILD_DIR)
@@ -65,7 +65,6 @@ clean:
 fclean: clean
 	/bin/rm -f $(NAME)
 
-re: fclean all
-
-dirs:
-	@mkdir $(patsubst %, $(PATH_OBJ)/%, $(DIRS)) $(patsubst %, bin/%, $(DIRS))
+re:
+	$(MAKE) fclean
+	$(MAKE) all

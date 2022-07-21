@@ -23,13 +23,11 @@ TEST_CASE("Bitboard relational operators", "[BitboardTests]") {
 	REQUIRE(bb == bb2);
 
 	bb.set(3, 0);
-	bb.set(3, 1);
-	unsigned int a = bb.bitboard_get(3);
-	std::cerr << "a = " << a << "\n";
-	REQUIRE(a == 2);
-	REQUIRE_FALSE(bb == bb2);
-
+	bb2.set(3, 1);
 	bb.print_board(std::cerr, false);
+	REQUIRE(bb.bitboard_get(3) == 1);
+	REQUIRE(bb2.bitboard_get(3) == 2);
+	REQUIRE_FALSE(bb == bb2);
 }
 
 TEST_CASE("Bitboard empty neighbours", "[BitboardTests]") {

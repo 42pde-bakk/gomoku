@@ -7,18 +7,19 @@
 
 #include "Gomoku.hpp"
 #include <iostream>
+//#include <cstdint>
 
 class Move {
 public:
-	int	move_idx,
-		player;
-	bool tacticalMove;
+	uint16_t move_idx;
+	uint8_t player;
 
 	Move() = default;
-	Move(int idx, int player, bool isTactical = false);
+
+	Move(uint16_t idx, uint8_t player);
 
 	// Allows the operator<< to access the private vars
-	friend std::ostream&	operator<<(std::ostream& o, const Move& m);
+	friend std::ostream &operator<<(std::ostream &o, const Move &m);
 };
 
 
