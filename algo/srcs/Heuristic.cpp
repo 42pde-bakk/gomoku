@@ -24,12 +24,12 @@ uint8_t Heuristic::get_player() const {
 }
 
 unsigned int
-Heuristic::get_length(unsigned int &idx, unsigned int stone_p, unsigned int d) const {
+Heuristic::get_length(unsigned int &idx, unsigned int stone_p, unsigned int d, bool &empty_space_inbetween) const {
 	static const std::array<int, 4> dirs = setup_dirs();
 	unsigned int lengths[2] = {1,0};
 	const unsigned int opp_stone = get_opponent_stone(stone_p);
 	unsigned int stone_value;
-	unsigned int empty_tile_count = 0;
+//	unsigned int empty_tile_count = 0;
 	const unsigned int start_idx = idx;
 
 	while (isvalid_tile(idx)) {
@@ -37,8 +37,8 @@ Heuristic::get_length(unsigned int &idx, unsigned int stone_p, unsigned int d) c
 		if (stone_value == opp_stone) {
 			break ;
 		} else if (stone_value == stone_p) {
-			lengths[empty_tile_count]++;
-			if (!empty_tile_count) {
+			lengths[empty_space_inbetween]++;
+			if (!empty_space_inbetween) {
 				g_checkedTiles[idx] |= 1u << d;
 			} else {
 				g_checkedTiles2[idx] |= 1u << d;
@@ -47,9 +47,9 @@ Heuristic::get_length(unsigned int &idx, unsigned int stone_p, unsigned int d) c
 				g_contains_newly_placed_stone = true;
 			}
 		} else {
-			if (empty_tile_count)
+			if (empty_space_inbetween)
 				break ;
-			empty_tile_count++;
+			empty_space_inbetween = true;
 		}
 		idx += dirs[d];
 	}
@@ -115,14 +115,19 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 //			continue ;
 //		}
 		unsigned int	next = start_idx + dir;
+		bool	empty_space_inbetween = false;
 		g_contains_newly_placed_stone = false;
-		unsigned int	length = this->get_length(next, stone_p, d);
+		unsigned int	length = this->get_length(next, stone_p, d, empty_space_inbetween);
 
 		if (length < 2) // Might change this to (length <= 2)
 			continue;
 		unsigned int prev = start_idx - dir;
 		unsigned int open_sides = this->count_open_sides(prev, next);
 		// TODO: check that there is enough space for it to grow into a 5 (but would capturable pieces become tricky?)
+
+		if (length == 4 && open_sides == 0 && empty_space_inbetween) {
+			++open_sides;
+		}
 
 		LineValue linevalue = this->calc_linevalue(length, open_sides);
 //		if (linevalue < HALF_OPEN_FOUR)
