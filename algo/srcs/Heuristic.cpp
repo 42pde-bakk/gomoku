@@ -170,6 +170,7 @@ void Heuristic::calculate_heuristic() {
 		// if p0, -100000
 		// else, +100000
 		this->h = (minus[player] * LineValues[FIVE]);
+		this->set_winner(player);
 	} else if (this->values[opp][OPEN_FOUR]) {
 		this->h = (minus[opp] * LineValues[OPEN_FOUR]);
 	} else if (this->values[opp][HALF_OPEN_FOUR]) {
