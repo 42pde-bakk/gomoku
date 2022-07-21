@@ -27,11 +27,11 @@ static const std::array<int32_t, 8> LineValues{
 		0,		// NONE
 		-5,		// HALF_OPEN_TWO
 		10,		// OPEN_TWO
-		1000,	// HALF_OPEN_THREE
-		5000,	// OPEN_THREE
-		7500,	// HALF_OPEN_FOUR
-		15000,	// OPEN_FOUR
-		100000	// FIVE
+		100,	// HALF_OPEN_THREE
+		1000,	// OPEN_THREE
+		10000,	// HALF_OPEN_FOUR
+		100000,	// OPEN_FOUR
+		1000000	// FIVE
 };
 
 std::ostream &operator<<(std::ostream &o, const LineValue &lv);
@@ -58,7 +58,7 @@ protected:
 
 private:
 	unsigned int
-	get_length(unsigned int &idx, unsigned int stone_p, unsigned int d) const;
+	get_length(unsigned int &idx, unsigned int stone_p, unsigned int d, bool &empty_space_inbetween) const;
 
 	[[nodiscard]] unsigned int count_open_sides(unsigned int prev, unsigned int next) const;
 
