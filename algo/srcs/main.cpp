@@ -19,6 +19,7 @@ struct sigaction sigact;
 
 void sighandler(int sig, siginfo_t *siginfo, void *context) {
 	(void)sig;
+	(void)siginfo;
 	(void)context;
 	isAlive = false;
 }
