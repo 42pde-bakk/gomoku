@@ -30,11 +30,11 @@ bool Bitboard::operator==(const Bitboard &rhs) const {
 	return (this->board == rhs.board);
 }
 
-bool Bitboard::operator!=(const Bitboard &rhs) const{
+bool Bitboard::operator!=(const Bitboard &rhs) const {
 	return !(*this == rhs);
 }
 
-void	print_legend(std::ostream& o, bool print_colours) {
+void print_legend(std::ostream &o, bool print_colours) {
 	const static char legend[] = "0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 S\n";
 	if (print_colours)
 		o << _YELLOW;
@@ -43,7 +43,7 @@ void	print_legend(std::ostream& o, bool print_colours) {
 		o << _END;
 }
 
-static void	print_item(std::ostream& o, bool print_colours, unsigned int item) {
+static void print_item(std::ostream &o, bool print_colours, unsigned int item) {
 	const static char *colours[] = {
 			_WHITE _BOLD,
 			_BLUE _BOLD,
@@ -72,7 +72,7 @@ std::ostream &operator<<(std::ostream &o, const Bitboard &b) {
 	return (o);
 }
 
-void	Bitboard::print_board(std::ostream& o, bool colours) const {
+void Bitboard::print_board(std::ostream &o, bool colours) const {
 	print_legend(o, colours);
 	for (int i = 0; i < REALBOARDSIZE; i++) {
 		print_item(o, colours, bitboard_get(i));
@@ -84,6 +84,7 @@ void	Bitboard::print_board(std::ostream& o, bool colours) const {
 	print_legend(o, colours);
 }
 
+// TODO: write a more optimized bitboard_get(), by precalculating the real_idx for example
 unsigned int Bitboard::bitboard_get(unsigned int idx) const {
 	if (!isvalid_tile(idx))
 		return (-1);
@@ -119,6 +120,7 @@ void Bitboard::set(unsigned int idx, unsigned int player) {
 	assert(idx <= BOARDSIZE / 2);
 	assert(player < 2);
 	assert(!isSeperatingBitIndex(idx));
+	assert(this->bitboard_get(idx) == 0);
 	const unsigned int real_idx = idx * 2;
 	this->board[real_idx] = player;
 	this->board[real_idx + 1] = !player;
@@ -131,14 +133,14 @@ void Bitboard::clear_tile(unsigned int idx) {
 }
 
 
-bitboard	Bitboard::get_empty_neighbours() const {
-	Bitboard	empty_cells(~this->board);
+bitboard Bitboard::get_empty_neighbours() const {
+	Bitboard empty_cells(~this->board);
 	for (unsigned int n = 0; n < REALBOARDSIZE; n++) {
 		if (!this->tile_is_empty(n))
 			empty_cells.clear_tile(n);
 	}
-	bitboard	neighbours = SHIFT_N(board) | SHIFT_W(board) | SHIFT_S(board) | SHIFT_E(board) \
-							| SHIFT_NE(board) | SHIFT_NW(board) | SHIFT_SE(board) | SHIFT_SW(board);
+	bitboard neighbours = SHIFT_N(board) | SHIFT_W(board) | SHIFT_S(board) | SHIFT_E(board) \
+ | SHIFT_NE(board) | SHIFT_NW(board) | SHIFT_SE(board) | SHIFT_SW(board);
 	return (neighbours & empty_cells.board);
 }
 

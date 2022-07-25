@@ -4,6 +4,7 @@
 
 #ifndef GOMOKUBOT_THREADPOOL_HPP
 #define GOMOKUBOT_THREADPOOL_HPP
+
 #include <thread>
 #include <utility>
 #include "AsyncQueue.hpp"
@@ -12,26 +13,31 @@
 
 // Singleton FTW
 class Threadpool {
-	const unsigned int			_numThreads;
-	unsigned int				_busyWorkers;
-	mutable std::mutex			_m;
-	mutable std::mutex			_parent_mutex;
-	std::vector<std::thread>	_threads;
-	AsyncQueue<Job>&			_jobQueue;
+	const unsigned int _numThreads;
+	unsigned int _busyWorkers;
+	mutable std::mutex _m;
+	mutable std::mutex _parent_mutex;
+	std::vector<std::thread> _threads;
+	AsyncQueue<Job> &_jobQueue;
 
-	void	launch_worker();
-	bool	hasTasks() const;
+	void launch_worker();
+
+	bool hasTasks() const;
+
 	explicit Threadpool(unsigned int numThreads = std::thread::hardware_concurrency());
 
 public:
-	Threadpool(const Threadpool& x) = delete;
-	Threadpool& operator=(const Threadpool& x) = delete;
+	Threadpool(const Threadpool &x) = delete;
+
+	Threadpool &operator=(const Threadpool &x) = delete;
+
 	~Threadpool();
 
-	static Threadpool& GetInstance();
+	static Threadpool &GetInstance();
 
 	void WaitForWorkers() const;
-	void	stop_threads();
+
+	void stop_threads();
 };
 
 

@@ -10,20 +10,26 @@
 #include "Gamestate.hpp"
 
 class Client {
-	Server* parent;
-	int	fd{};
-	struct sockaddr_in	addr{};
+	Server *parent;
+	int fd{};
+	struct sockaddr_in addr{};
 
 	[[nodiscard]] std::vector<int> receive(size_t bufsize);
-	void	closeClient();
-	void	error(const char* str);
+
+	void closeClient();
+
+	void error(const char *str);
 
 public:
 	explicit Client(Server *s);
+
 	~Client();
+
 	[[nodiscard]] Gamestate receiveGamestate();
+
 	void send_move(const Move &move);
-	[[nodiscard]] bool	isAlive() const;
+
+	[[nodiscard]] bool isAlive() const;
 };
 
 

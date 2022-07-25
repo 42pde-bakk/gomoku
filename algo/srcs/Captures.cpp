@@ -7,13 +7,12 @@
 #include <cassert>
 
 unsigned int Gamestate::capture_check_dir(unsigned int idx, unsigned int dir) {
-	static const int winner_values[2] = {-2100000, 2100000};
 	const unsigned int player_stone = this->player + 1;
 	const unsigned int opp_stone = !this->player + 1;
-	const unsigned int	pos[3] = {idx + dir, idx + 2 * dir, idx + 3 * dir };
+	const unsigned int pos[3] = {idx + dir, idx + 2 * dir, idx + 3 * dir};
 
 	assert(!Bitboard::isSeperatingBitIndex(idx));
-	for (unsigned int po : pos) {
+	for (unsigned int po: pos) {
 		if (po >= BOARDSIZE || isSeperatingBitIndex(po)) {
 			return (0);
 		}
@@ -24,10 +23,9 @@ unsigned int Gamestate::capture_check_dir(unsigned int idx, unsigned int dir) {
 		this->clear_tile(pos[0]);
 		this->clear_tile(pos[1]);
 		this->captures[this->player] += 2;
-		this->tactical = 1;
 		if (this->captures[this->player] >= 10) {
-			this->winner = this->player + 1;
-			this->h = winner_values[this->player];
+			// Perhaps I should make winning by captures worth more but let's see
+			this->set_winner(this->player);
 		}
 		return (1);
 	}
@@ -36,7 +34,7 @@ unsigned int Gamestate::capture_check_dir(unsigned int idx, unsigned int dir) {
 
 unsigned int Gamestate::perform_captures(unsigned int pos) {
 	unsigned int ret = 0;
-	static const std::array<int, 8>	dirs = setup_all_dirs_singular();
+	static const std::array<int, 8> dirs = setup_all_dirs_singular();
 	assert(pos < REALBOARDSIZE);
 
 	for (int dir = 0; dir < 8; dir++) {
