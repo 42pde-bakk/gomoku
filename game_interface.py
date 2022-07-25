@@ -50,8 +50,10 @@ class Game(tk.Frame):
 		self.hotseat_move = [0, 0]
 		self.white = tk.PhotoImage(file='assets/white.png')
 		self.black = tk.PhotoImage(file='assets/black.png')
-		self.gray = tk.PhotoImage(file='assets/gray.png')
-		self.red = tk.PhotoImage(file="assets/red.png")
+		self.last_white = tk.PhotoImage(file='assets/last_white.png')
+		self.last_black = tk.PhotoImage(file='assets/last_black.png')
+		self.gray = tk.PhotoImage(file='assets/blank.png')
+		self.red = tk.PhotoImage(file="assets/hotseat.png")
 		self.bot_socket = BotSocket(get_portnb('algo/portnb.txt'))
 
 	def print_board(self):
@@ -60,7 +62,9 @@ class Game(tk.Frame):
 	def create_game_window(self):
 		lbl_name = ttk.Label(self, text=f"Go Go Gomoku\nGame Mode: {self.game_mode}")
 		lbl_name.pack()
-		self.frm_board = ttk.Frame(self, relief=tk.RAISED, borderwidth=10, height=500, width=500)
+		s = ttk.Style()
+		s.configure('Board.TFrame', background='#A15A00',)
+		self.frm_board = ttk.Frame(self, relief=tk.RAISED, style='Board.TFrame', borderwidth=10, height=500, width=500)
 		self.frm_board.pack(padx=25, pady=25)
 
 	def create_options_window(self):
@@ -79,21 +83,18 @@ class Game(tk.Frame):
 	def display_board(self) -> None:
 		for row in range(self.size):
 			for col in range(self.size):
-				self.frm_position.append(ttk.Frame(
-					master=self.frm_board
-					, relief=tk.RIDGE
-					, borderwidth=1
-				))
 				button_img = self.pick_color(row, col)
-				self.frm_position[row * self.size + col].grid(row=row, column=col, padx=1, pady=1)
 				self.buttons.append(tk.Button(
-					master=self.frm_position[row * self.size + col],
+					master=self.frm_board,
+					relief=tk.SUNKEN,
+					borderwidth=0,
+					activebackground="black",
 					image=button_img,
 					command=lambda row=row, column=col: self.handle_click((row, column)),
-					height=26,
-					width=26
+					height=24,
+					width=24
 				))
-				self.buttons[row * self.size + col].pack()
+				self.buttons[row * self.size + col].grid(row=row, column=col)
 
 	def handle_click(self, args) -> None:
 		row, col = args
@@ -117,8 +118,26 @@ class Game(tk.Frame):
 			button_img = self.black
 		return button_img
 
+	def pick_last_move_color(self, row: int, col: int):
+		button_img = self.gray
+		if self.gamestate.board.get(row, col) == 1:
+			button_img = self.last_black
+		elif self.gamestate.board.get(row, col) == 2:
+			button_img = self.last_white
+		return button_img
+
 	def update_button(self, row: int, col: int) -> None:
 		print(f"placing a new button at row: {row}, col: {col}")
+		button_img = self.pick_last_move_color(row, col)
+		self.buttons[row * self.size + col].config(image=button_img)
+		self.update()
+
+	def replace_brighter(self) -> None:
+		if len(self.ordered_moves) > 1:
+			move = self.ordered_moves[-2]
+		else:
+			move = self.ordered_moves[0]
+		row, col = move.y, move.x
 		button_img = self.pick_color(row, col)
 		self.buttons[row * self.size + col].config(image=button_img)
 		self.update()
@@ -149,6 +168,7 @@ class Game(tk.Frame):
 
 	def after_move_check(self, row: int, col: int) -> bool:
 		""" Check for captures and wins"""
+		self.replace_brighter()
 		if self.game_mode == GameMode.HOTSEAT:
 			self.update_button(self.hotseat_move[0], self.hotseat_move[1])
 		self.handle_captures(row, col)
@@ -156,6 +176,8 @@ class Game(tk.Frame):
 			if congratulate_winner(self.player):
 				self.reset_board()
 				return True
+			else:
+				self.undo_move()
 		return False
 
 	def get_ai_move(self) -> Move:
@@ -187,8 +209,7 @@ class Game(tk.Frame):
 		move = self.get_ai_move()
 		col, row = move.x, move.y
 		print(f'In {time.time() - time_start:.2f}s the AI decided to move to y,x={row, col}')
-		if self.gamestate.board.get(y=row, x=col) == 0:
-			# Handle rules here -> not Game.rules.is_legal_move
+		if self.gamestate.board.get(y=row, x=col) == 0 and Game.rules.is_legal_move(row, col, self.player, self.gamestate.board):
 			self.ordered_moves.append(MoveSnapshot(row, col, self.player))
 			self.gamestate.place_stone(y=row, x=col, stone=self.player)
 			self.update_button(row, col)
@@ -209,7 +230,7 @@ class Game(tk.Frame):
 		button_img = self.gray
 		for row in range(self.size):
 			for col in range(self.size):
-				self.buttons[row * self.size + col].config(image=button_img)
+				self.buttons[row * self.size + col].config(image=button_img, relief='flat', borderwidth=0)
 
 	def reset_board(self):
 		self.player = 1
