@@ -34,7 +34,7 @@ def get_portnb(fname: str) -> int:
 class Game(tk.Frame):
 	rules = Rules()
 
-	def __init__(self, size, game_mode: GameMode, master=None): #change game_mode to int
+	def __init__(self, size, game_mode: GameMode, second_bot_path=None, master=None): #change game_mode to int
 		super().__init__(master)
 		self.pack()
 		self.gamestate = Gamestate()
@@ -53,6 +53,7 @@ class Game(tk.Frame):
 		self.gray = tk.PhotoImage(file='assets/gray.png')
 		self.red = tk.PhotoImage(file="assets/red.png")
 		self.bot_socket = BotSocket(get_portnb('algo/portnb.txt'))
+		self.bot_socket_2 = BotSocket(get_portnb(f'{second_bot_path}/algo/portnb.txt')) if second_bot_path else None
 
 	def print_board(self):
 		print(self.gamestate.board.get_board())
@@ -159,6 +160,14 @@ class Game(tk.Frame):
 		return False
 
 	def get_ai_move(self) -> Move:
+		if self.game_mode == GameMode.BOT_POT and self.bot_socket_2 is not None:
+			if self.player == 2:
+				self.bot_socket_2.send_gamestate(self.gamestate)
+				return self.bot_socket_2.receive_move()
+			else:
+				self.bot_socket.send_gamestate(self.gamestate)
+				return self.bot_socket.receive_move()
+
 		self.bot_socket.send_gamestate(self.gamestate)
 		return self.bot_socket.receive_move()
 
@@ -199,9 +208,9 @@ class Game(tk.Frame):
 		self.change_player()
 
 	def play_bot_pot(self):
-		self.gamestate.place_stone(y=10, x=10, stone=self.player)
-		self.update_button(0, 0)
-		self.change_player()
+		# self.gamestate.place_stone(y=10, x=10, stone=self.player)
+		# self.update_button(0, 0)
+		# self.change_player()
 		while self.game_mode == GameMode.BOT_POT:
 			self.play_vs_ai()
 
