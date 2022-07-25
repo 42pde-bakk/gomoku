@@ -130,18 +130,11 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 		}
 
 		LineValue linevalue = this->calc_linevalue(length, open_sides);
-//		if (linevalue < HALF_OPEN_FOUR)
-//			tryUpgradeLineVal(linevalue, prev, next, dir, stone_p);
-
-		if (linevalue == OPEN_THREE && g_contains_newly_placed_stone) {
+		if (g_contains_newly_placed_stone && linevalue == OPEN_THREE) {
 			++this->created_open_threes;
 		}
 
 		this->values[p][linevalue]++;
-//		if (linevalue == LineValue::FIVE /*&& this->isUnbreakable(start_idx, next - dir, dir)*/) {
-//			this->set_winner(p);
-//			return;
-//		}
 	}
 }
 
@@ -225,7 +218,7 @@ int Heuristic::add_h_for_captures() {
 		this->winner = p;
 		this->h = winner_values[p];
 	} else {
-		this->h += (captures[1] - captures[0] * 1000);
+		this->h += (captures[1] - captures[0]) * CAPTURE_VALUE;
 	}
 	return (this->h);
 }
