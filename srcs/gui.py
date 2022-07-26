@@ -1,7 +1,9 @@
 from tkinter import messagebox
 
 def congratulate_winner(player: int):
-    messagebox.showinfo('Congratulations', f"🎉🎉🎉 PLAYER {player} WON 🎉🎉🎉")
+    undo = messagebox.askquestion('Congratulations', f"🎉🎉🎉 PLAYER {player} WON 🎉🎉🎉\nUndo winning move?")
+    if undo == 'yes':
+        return False
     res = messagebox.askquestion("Try again", "New game?")
     if res == 'no':
         exit(1)
