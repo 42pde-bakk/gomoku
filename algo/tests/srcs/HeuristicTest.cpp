@@ -272,16 +272,20 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't - 2", "[HeuristicTests]") 
 	auto lastmove = children[0]->get_move();
 	std::cerr << children[0]->get_move();
 	std::cerr << *children[0];
+	REQUIRE(lastmove.move_idx == 149);
+
+	children[0]->generate_children();
+	lastmove = children[0]->get_children()[0]->get_move();
 	REQUIRE(lastmove.move_idx == 5 * 20 + 8);
 
-	this->clear_children();
-	elapsed_time = 0;
-	start_time = std::chrono::steady_clock::now();
-	auto result = minimax_alphabeta_start(this, 4, this->player);
-	REQUIRE(result);
-	std::cerr << *result;
-	std::cerr << result->get_h() << "\n\n\n\n";
-	REQUIRE(result->get_first_move(this).move_idx == 5 * 20 + 8);
+//	this->clear_children();
+//	elapsed_time = 0;
+//	start_time = std::chrono::steady_clock::now();
+//	auto result = minimax_alphabeta_start(this, 4, this->player);
+//	REQUIRE(result);
+//	std::cerr << *result;
+//	std::cerr << result->get_h() << "\n\n\n\n";
+//	REQUIRE(result->get_first_move(this).move_idx == 5 * 20 + 8);
 }
 
 TEST_CASE_METHOD(Gamestate, "Should block open 3", "[HeuristicTests]") {
