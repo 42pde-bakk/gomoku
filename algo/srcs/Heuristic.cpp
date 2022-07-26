@@ -103,10 +103,13 @@ void Heuristic::tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int
 
 void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 	static const std::array<int, 4> dirs = setup_dirs();
+	static const std::array<int, 4>	opp_dirs = setup_dirs_opposite();
 	const unsigned int p = stone_p - 1;
+	const unsigned int opp_stone = this->get_opponent_stone(stone_p);
 
 	for (unsigned int d = 0; d < dirs.size(); d++) {
 		const int dir = dirs[d];
+		const int opp_dir = opp_dirs[d];
 
 		if (g_checkedTiles[start_idx] & (1u << d)) {
 			continue;
@@ -124,6 +127,10 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 		unsigned int prev = start_idx - dir;
 		unsigned int open_sides = this->count_open_sides(prev, next);
 		// TODO: check that there is enough space for it to grow into a 5 (but would capturable pieces become tricky?)
+
+		if (!this->enoughSpaceForFiveInARow(start_idx, dir, opp_dir, opp_stone)) {
+			continue ;
+		}
 
 		if (length == 4 && open_sides == 0 && empty_space_inbetween) {
 			++open_sides;
