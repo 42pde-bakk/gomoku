@@ -23,16 +23,18 @@ enum LineValue {
 	OPEN_FOUR,
 	FIVE
 };
-static const std::array<int32_t, 8> LineValues{
+static const uint8_t LINEVALUE_COUNT = 8;
+static const std::array<int32_t, LINEVALUE_COUNT> LineValues{
 		0,		// NONE
-		-5,		// HALF_OPEN_TWO
+		-9000,	// HALF_OPEN_TWO
 		10,		// OPEN_TWO
 		100,	// HALF_OPEN_THREE
-		1000,	// OPEN_THREE
-		10000,	// HALF_OPEN_FOUR
-		100000,	// OPEN_FOUR
-		1000000	// FIVE
+		4500,	// OPEN_THREE
+		8000,	// HALF_OPEN_FOUR
+		20000,	// OPEN_FOUR
+		100000	// FIVE
 };
+static const uint32_t CAPTURE_VALUE = 100;
 
 std::ostream &operator<<(std::ostream &o, const LineValue &lv);
 
@@ -41,7 +43,7 @@ protected:
 	static std::hash<bitboard> hash_fn;
 	static std::unordered_map<std::bitset<BOARDSIZE>, int> tt;
 
-	std::array<std::array<uint8_t, 8>, 2> values{};
+	std::array<std::array<uint8_t, LINEVALUE_COUNT>, 2> values{};
 	int32_t h{};
 	uint8_t winner{},
 			player{},

@@ -272,6 +272,10 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't - 2", "[HeuristicTests]") 
 	auto lastmove = children[0]->get_move();
 	std::cerr << children[0]->get_move();
 	std::cerr << *children[0];
+//	REQUIRE(lastmove.move_idx == 149);
+
+//	children[0]->generate_children();
+//	lastmove = children[0]->get_children()[0]->get_move();
 	REQUIRE(lastmove.move_idx == 5 * 20 + 8);
 
 	this->clear_children();
@@ -339,4 +343,38 @@ TEST_CASE_METHOD(Gamestate, "Mistake", "[HeuristicTests]") {
 		std::cerr << "Child:\n" << *child;
 		child->print_heuristic(std::cerr);
 	}
+}
+
+TEST_CASE_METHOD(Gamestate, "Mistake 2", "[HeuristicTests]") {
+	this->set(middle_idx, 0);
+	this->set(middle_idx + WEST, 0);
+	this->set(middle_idx + EAST, 0);
+	this->set(middle_idx + NORTHEAST, 0);
+	this->set(middle_idx + 2 * NORTHEAST, 0);
+	this->set(middle_idx + NORTHEAST + 2 * NORTH, 0);
+	this->set(middle_idx + 4 * WEST + 2 * SOUTH, 0);
+
+	this->set(middle_idx + 2 * NORTH, 1);
+	this->set(middle_idx + 2 * NORTH + EAST, 1);
+	this->set(middle_idx + NORTHWEST, 1);
+	this->set(middle_idx + 2 * WEST, 1);
+	this->set(middle_idx + 3 * WEST + SOUTH, 1);
+	this->set(middle_idx + 2 * WEST + SOUTH, 1);
+	this->set(middle_idx + WEST + SOUTH, 1);
+
+	this->calcH(middle_idx + WEST + SOUTH);
+	// who is player?
+
+	std::cerr << *this << "\n\n\n";
+
+//	this->generate_children();
+//	for (auto child : children) {
+//		std::cerr << child->get_move() << *child;
+//		child->print_heuristic(std::cerr);
+//		std::cerr << '\n';
+//	}
+	auto result = iterative_deepening(this, this->player);
+
+//	result->print_history(std::cout, false);
+	std::cout << result->get_move();
 }
