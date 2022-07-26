@@ -10,7 +10,29 @@
 #include "Colours.hpp"
 
 #include <chrono>
+#include <csignal>
 #include <exception>
+
+static bool isAlive = true;
+static Client *c;
+struct sigaction sigact;
+
+void sighandler(int sig, siginfo_t *siginfo, void *context) {
+	(void)sig;
+	(void)siginfo;
+	(void)context;
+	isAlive = false;
+}
+
+void	set_signal_handler() {
+	sigact.sa_sigaction = &sighandler;
+	sigact.sa_flags = SA_SIGINFO;
+
+	if (sigaction(SIGINT, &sigact, NULL)) {
+		perror("sigaction");
+		exit(EXIT_FAILURE);
+	}
+}
 
 int main() {
 #if THREADED
@@ -27,11 +49,15 @@ int main() {
 	std::cout << "Sizeof gamestate = " << sizeof(Bitboard) << ", " << sizeof(Heuristic) << ", " << sizeof(Gamestate)
 			  << "\n";
 
-	while (true) {
+	set_signal_handler();
+
+	while (isAlive) {
+		c = NULL;
 		Client client(&server);
 		while (client.isAlive()) {
+			bool error = false;
 			std::cout << "Lets receive a gamestate\n";
-			Gamestate gs = client.receiveGamestate();
+			Gamestate gs = client.receiveGamestate(error);
 			gs.calcH((unsigned int)-1);
 			if (!client.isAlive()) {
 				std::cerr << "Client disconnected.\n";

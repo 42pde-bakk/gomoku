@@ -28,7 +28,7 @@ public:
 	[[nodiscard]] unsigned int getport() const;
 
 private:
-	void writePortNbToFile(const std::string &s) const;
+	void writePortNbToFile() const;
 };
 
 

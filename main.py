@@ -4,7 +4,7 @@ import pstats
 from game_interface import Game, GameMode
 
 
-def select_mode(args: argparse.Namespace) -> None:
+def select_mode(args: argparse.Namespace):
 	if args.hotseat:
 		return GameMode.HOTSEAT
 	elif args.bot_pot:
@@ -12,11 +12,12 @@ def select_mode(args: argparse.Namespace) -> None:
 	else:
 		return GameMode.VERSUS_AI
 
+
 def main(args: argparse.Namespace) -> None:
 	if args.cprofile:
 		pr = cProfile.Profile()
 		pr.enable()
-	board = Game(size = 19, game_mode = select_mode(args))
+	board = Game(size=19, game_mode=select_mode(args), second_bot_path=args.second_bot)
 	board.print_board()
 	board.create_game()
 	if args.cprofile:
@@ -27,9 +28,10 @@ def main(args: argparse.Namespace) -> None:
 
 def parse_args() -> argparse.Namespace:
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--hotseat', action = 'store_true', default = False)
-	parser.add_argument('--bot_pot', action = 'store_true', default = False)
-	parser.add_argument('--cprofile', action = 'store_true', default = False)
+	parser.add_argument('--hotseat', action='store_true', default=False)
+	parser.add_argument('--bot_pot', action='store_true', default=False)
+	parser.add_argument('--cprofile', action='store_true', default=False)
+	parser.add_argument('--second_bot', nargs='?', default=None)
 
 	args = parser.parse_args()
 	return args

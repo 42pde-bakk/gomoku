@@ -14,7 +14,6 @@ static void error(const char *str) {
 	std::cout << _RED _BOLD << str << "\n" _END; // cerr
 	perror("Server::error");
 	exit(1);
-//	throw std::runtime_error(strerror(errno));
 }
 
 Server::Server() : port(4242u) {
@@ -31,7 +30,7 @@ Server::Server() : port(4242u) {
 		port++;
 		this->serv_addr.sin_port = htons(this->port);
 	}
-	this->writePortNbToFile("portnb.txt");
+	this->writePortNbToFile();
 
 	if (listen(this->sockfd, BACKLOG_LENGTH) == -1)
 		error("Error starting listening");
@@ -46,15 +45,17 @@ int Server::getsocketFd() const {
 Server::~Server() {
 	close(this->sockfd);
 	this->sockfd = -1;
+	this->port = 0;
+	this->writePortNbToFile();
 }
 
 unsigned int Server::getport() const {
 	return (this->port);
 }
 
-void Server::writePortNbToFile(const std::string &s) const {
+void Server::writePortNbToFile() const {
 	std::ofstream ofile;
-	ofile.open(s);
+	ofile.open("portnb.txt");
 
 	ofile << this->getport() << std::endl;
 	ofile.close();
