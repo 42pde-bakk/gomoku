@@ -26,13 +26,13 @@ enum LineValue {
 static const uint8_t LINEVALUE_COUNT = 8;
 static const std::array<int32_t, LINEVALUE_COUNT> LineValues{
 		0,		// NONE
-		-5,		// HALF_OPEN_TWO
+		-9000,	// HALF_OPEN_TWO
 		10,		// OPEN_TWO
 		100,	// HALF_OPEN_THREE
-		1000,	// OPEN_THREE
-		10000,	// HALF_OPEN_FOUR
-		100000,	// OPEN_FOUR
-		1000000	// FIVE
+		4500,	// OPEN_THREE
+		8000,	// HALF_OPEN_FOUR
+		20000,	// OPEN_FOUR
+		100000	// FIVE
 };
 static const uint32_t CAPTURE_VALUE = 100;
 
