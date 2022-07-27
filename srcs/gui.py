@@ -9,6 +9,3 @@ def congratulate_winner(player: int):
         exit(1)
     else:
         return True
-
-def select_game_mode():
-    pass
