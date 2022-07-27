@@ -121,3 +121,21 @@ class Rules:
 		if len(first_capture):
 			return first_capture
 		return None
+
+	def get_winning_five_indices(self):
+		# pass which one of 4 directions the line goes.
+		# map
+		pass
+
+	def get_breaking_moves(self):
+		# return potential_moves
+		pass
+
+	def five_can_be_broken(self, potential_moves) -> bool:
+		# potential_moves = self.get_breaking_moves()
+		# for move in potential_moves:
+		# 	pass
+			# if place is empty
+				# if place can capture and win_by_five returns false after
+					# return true
+		return false
