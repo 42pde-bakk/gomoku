@@ -14,35 +14,23 @@ class Rules:
 							, (-2, 6), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (-1, 3), (-1, 4), (-1, 5)\
 							, (1, -1), (1, 0), (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (2, -2), (2, -1)\
 							, (2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6)]
-							# [(0, 0),(0, 1),(0, 2),(0, 3),(0, 4),(0, 5),(0, 6),(0, 7),(0, 8),(1, 1)
-							# ,(1, 2),(1, 3),(1, 4),(1, 5),(1, 6),(1, 7),(3, 1),(3, 2),(3, 3),(3, 4)
-							# ,(3, 5),(3, 6),(3, 7),(4, 0),(4, 1),(4, 2),(4, 3),(4, 4),(4, 5),(4, 6)
-							# ,(4, 7),(4, 8)] #, - (2, 2)] # (-1, 0)
+
 		self.vertical = [(-2, -2), (-1, -2), (0, -2), (1, -2), (2, -2), (3, -2), (4, -2), (5, -2)\
 							, (6, -2), (-1, -1), (0, -1), (1, -1), (2, -1), (3, -1), (4, -1), (5, -1)\
 							, (-1, 1), (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (-2, 2), (-1, 2)\
 							, (0, 2), (1, 2), (2, 2), (3, 2), (4, 2), (5, 2), (6, 2)]
-			# 				[(0, 0),(1, 0),(2, 0),(3, 0),(4, 0),(5, 0),(6, 0),(7, 0),(8, 0),(1, 1)
-			# 				,(2, 1),(3, 1),(4, 1),(5, 1),(6, 1),(7, 1),(1, 3),(2, 3),(3, 3),(4, 3)
-			# 				,(5, 3),(6, 3),(7, 3),(0, 4),(1, 4),(2, 4),(3, 4),(4, 4),(5, 4),(6, 4)
-			# 				,(7, 4),(8, 4)] #,- (2, 2)] # (0, -1)
+
 		self.negative_slope = [(0, -1), (1, 0), (2, 1), (3, 2), (4, 3), (5, 4), (0, -2), (1, -1)\
 							, (2, 0), (3, 1), (4, 2), (5, 3), (6, 4), (2, -2), (3, -1), (4, 0)\
 							, (5, 1), (6, 2), (-1, 0), (0, 1), (1, 2), (2, 3), (3, 4), (4, 5)\
 							, (-2, 0), (-1, 1), (0, 2), (1, 3), (2, 4), (3, 5), (4, 6), (-2, 2)\
 							, (-1, 3), (0, 4), (1, 5), (2, 6)]
-			# 				[(2, 1),(3, 2),(4, 3),(5, 4),(6, 5),(7, 6),(2, 0),(3, 1),(4, 2),(5, 3)
-			# 				,(6, 4),(7, 5),(8, 6),(4, 0),(5, 1),(6, 2),(7, 3),(8, 4),(1, 2),(2, 3)
-			# 				,(3, 4),(4, 5),(5, 6),(6, 7),(0, 2),(1, 3),(2, 4),(3, 5),(4, 6),(5, 7)
-			# 				,(6, 8),(0, 4),(1, 5),(2, 6),(3, 7),(4, 8)] #,- (2, 2) ] # (-1, -1)
+
 		self.positive_slope = [(0, -1), (-1, 0), (-2, 1), (-3, 2), (-4, 3), (-5, 4), (0, -2), (-1, -1)\
 							, (-2, 0), (-3, 1), (-4, 2), (-5, 3), (-6, 4), (-2, -2), (-3, -1), (-4, 0), (-5, 1)\
 							, (-6, 2), (1, 0), (0, 1), (-1, 2), (-2, 3), (-3, 4), (-4, 5), (2, 0), (1, 1), (0, 2)\
 							, (-1, 3), (-2, 4), (-3, 5), (-4, 6), (2, 2), (1, 3), (0, 4), (-1, 5), (-2, 6)]
-			# 				[(6, 1),(5, 2),(4, 3),(3, 4),(2, 5),(1, 6),(6, 0),(5, 1),(4, 2),(3, 3)
-			# 				,(2, 4),(1, 5),(0, 6),(4, 0),(3, 1),(2, 2),(1, 3),(0, 4),(7, 2),(6, 3)
-			# 				,(5, 4),(4, 5),(3, 6),(2, 7),(8, 2),(7, 3),(6, 4),(5, 5),(4, 6),(3, 7)
-			# 				,(2, 8),(8, 4),(7, 5),(6, 6),(5, 7),(4, 8)] #, -(6, 2)] # (1, -1)
+
 
 	def is_legal_move(self, row: int, col: int, player: int, board: Board) -> bool:
 		if self.is_two_open_threes(row, col, player, board):
@@ -111,11 +99,12 @@ class Rules:
 		return 2
 
 	def is_winning_condition(self, row: int, col: int, player: int, board: Board, captures: list) -> bool:
+		opponent = self.opponent_value(player)
 		if self.win_by_five(row, col, player, board):
-			# check if can be captured next move.
-			print('WIN \nby five in a row for player: ' + str(player))
-			return True
-		elif self.win_by_captures(player, captures):
+			if not self.five_can_be_broken(opponent, board):
+				print('WIN \nby five in a row for player: ' + str(player))
+				return True
+		if self.win_by_captures(player, captures):
 			print('WIN \nby 10 captured stones for player: ' + str(player))
 			return True
 		return False
@@ -140,6 +129,7 @@ class Rules:
 			while not self.is_not_player_check(row + (n_opp * d_row), col + (n_opp * d_col), player, board):
 				n_opp -= 1
 			if n + abs(n_opp) - 1 >= 5:
+				self.save_five_beginning_indices((d_col, d_row), row, col, n, n_opp)
 				return True
 		return False
 
@@ -155,19 +145,18 @@ class Rules:
 			return first_capture
 		return None
 
-	def check_direction(self, direction):
-		pass
-
 	def save_five_beginning_indices(self, direction, row, col, n, n_opp):
 		"""
 		For Horizontal and slopes the beginning is the left most position. For Vertical it's uppermost position.
 		:param direction: (-1, 0) hor(_); (-1, -1) neg(\); (0, -1) ver(|); (1, -1) pos(/)
 		:param n: multiplier for direction
-		:param n_opp: multiplier for direction
+		:param n_opp: multiplier for direction for positive slope
 		"""
-		if direction in [(-1, 0), (-1, -1), (1, -1)]:
-			pass
-			#look for n_opp
+		d_col, d_row = direction
+		if direction in [(-1, 0), (-1, -1), (0, -1)]:
+			first_row, first_col = row + (n * d_row), col + (n * d_col)
+		else:
+			first_row, first_col = row + (n_opp * d_row), col + (n_opp * d_col)
 		self.winning_five_indices = (first_row, first_col, direction)
 
 	def get_possible_moves(self, direction: tuple):
@@ -181,13 +170,13 @@ class Rules:
 			possible_moves = self.positive_slope
 		return possible_moves
 
-	def has_breaking_move(self, row: int, col: int, possible_moves, player: int, board: Board):
+	def has_breaking_move(self, row: int, col: int, possible_moves, player: int, board: Board) -> bool:
 		opponent = self.opponent_value(player)
 		for place in possible_moves:
 			rel_row, rel_col = place
 			if board.get(row + rel_row, col + rel_col) == 0:
 				captures = self.is_capturing(row + rel_row, col + rel_col, player, board)
-				if captures:
+				if captures is not None:
 					pos1_y, pos1_x = captures[0]
 					pos2_y, pos2_x = captures[1]
 					board.set(pos1_y, pos1_x, Stone.EMPTY.value)
@@ -202,5 +191,5 @@ class Rules:
 	def five_can_be_broken(self, player: int, board: Board) -> bool:
 		row, col, direction = self.winning_five_indices
 		possible_moves = self.get_possible_moves(direction)
-		breaking_move = self.has_breaking_move(self, row, col, possible_moves, player, board)
+		breaking_move = self.has_breaking_move(row, col, possible_moves, player, board)
 		return breaking_move

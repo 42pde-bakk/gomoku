@@ -175,7 +175,7 @@ class Game(tk.Frame):
 
 	def after_move_check(self, row: int, col: int) -> bool:
 		""" Check for captures and wins"""
-		self.print_all_moves()
+		# self.print_all_moves()
 		self.replace_brighter()
 		if self.game_mode == GameMode.HOTSEAT:
 			self.update_button(self.hotseat_move[0], self.hotseat_move[1])
@@ -296,6 +296,7 @@ class Game(tk.Frame):
 				self.update()
 				self.ordered_moves[-1].capture_indices.append(capture_check[i])
 				self.ordered_moves[-1].capture_indices.append(capture_check[i + 1])
+		print("WE HAVE CAPTURES!!!!!!!!!!!!!!!!!!")
 
 	def remove_captured(self, pos1: tuple, pos2: tuple):
 		pos1_row, pos1_col = pos1
