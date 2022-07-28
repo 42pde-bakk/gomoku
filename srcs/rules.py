@@ -9,6 +9,40 @@ class Rules:
 		self.dir = [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]
 		self.opp = [Board.get_relative_position(direction, -1) for direction in self.dir]
 		self.opp_val = [Board.get_relative_position(direction, -2) for direction in self.dir]
+		self.winning_five_indices = None
+		self.horizontal = [(-2, -2), (-2, -1), (-2, 0), (-2, 1), (-2, 2), (-2, 3), (-2, 4), (-2, 5)\
+							, (-2, 6), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (-1, 3), (-1, 4), (-1, 5)\
+							, (1, -1), (1, 0), (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (2, -2), (2, -1)\
+							, (2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6)]
+							# [(0, 0),(0, 1),(0, 2),(0, 3),(0, 4),(0, 5),(0, 6),(0, 7),(0, 8),(1, 1)
+							# ,(1, 2),(1, 3),(1, 4),(1, 5),(1, 6),(1, 7),(3, 1),(3, 2),(3, 3),(3, 4)
+							# ,(3, 5),(3, 6),(3, 7),(4, 0),(4, 1),(4, 2),(4, 3),(4, 4),(4, 5),(4, 6)
+							# ,(4, 7),(4, 8)] #, - (2, 2)] # (-1, 0)
+		self.vertical = [(-2, -2), (-1, -2), (0, -2), (1, -2), (2, -2), (3, -2), (4, -2), (5, -2)\
+							, (6, -2), (-1, -1), (0, -1), (1, -1), (2, -1), (3, -1), (4, -1), (5, -1)\
+							, (-1, 1), (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (-2, 2), (-1, 2)\
+							, (0, 2), (1, 2), (2, 2), (3, 2), (4, 2), (5, 2), (6, 2)]
+			# 				[(0, 0),(1, 0),(2, 0),(3, 0),(4, 0),(5, 0),(6, 0),(7, 0),(8, 0),(1, 1)
+			# 				,(2, 1),(3, 1),(4, 1),(5, 1),(6, 1),(7, 1),(1, 3),(2, 3),(3, 3),(4, 3)
+			# 				,(5, 3),(6, 3),(7, 3),(0, 4),(1, 4),(2, 4),(3, 4),(4, 4),(5, 4),(6, 4)
+			# 				,(7, 4),(8, 4)] #,- (2, 2)] # (0, -1)
+		self.negative_slope = [(0, -1), (1, 0), (2, 1), (3, 2), (4, 3), (5, 4), (0, -2), (1, -1)\
+							, (2, 0), (3, 1), (4, 2), (5, 3), (6, 4), (2, -2), (3, -1), (4, 0)\
+							, (5, 1), (6, 2), (-1, 0), (0, 1), (1, 2), (2, 3), (3, 4), (4, 5)\
+							, (-2, 0), (-1, 1), (0, 2), (1, 3), (2, 4), (3, 5), (4, 6), (-2, 2)\
+							, (-1, 3), (0, 4), (1, 5), (2, 6)]
+			# 				[(2, 1),(3, 2),(4, 3),(5, 4),(6, 5),(7, 6),(2, 0),(3, 1),(4, 2),(5, 3)
+			# 				,(6, 4),(7, 5),(8, 6),(4, 0),(5, 1),(6, 2),(7, 3),(8, 4),(1, 2),(2, 3)
+			# 				,(3, 4),(4, 5),(5, 6),(6, 7),(0, 2),(1, 3),(2, 4),(3, 5),(4, 6),(5, 7)
+			# 				,(6, 8),(0, 4),(1, 5),(2, 6),(3, 7),(4, 8)] #,- (2, 2) ] # (-1, -1)
+		self.positive_slope = [(0, -1), (-1, 0), (-2, 1), (-3, 2), (-4, 3), (-5, 4), (0, -2), (-1, -1)\
+							, (-2, 0), (-3, 1), (-4, 2), (-5, 3), (-6, 4), (-2, -2), (-3, -1), (-4, 0), (-5, 1)\
+							, (-6, 2), (1, 0), (0, 1), (-1, 2), (-2, 3), (-3, 4), (-4, 5), (2, 0), (1, 1), (0, 2)\
+							, (-1, 3), (-2, 4), (-3, 5), (-4, 6), (2, 2), (1, 3), (0, 4), (-1, 5), (-2, 6)]
+			# 				[(6, 1),(5, 2),(4, 3),(3, 4),(2, 5),(1, 6),(6, 0),(5, 1),(4, 2),(3, 3)
+			# 				,(2, 4),(1, 5),(0, 6),(4, 0),(3, 1),(2, 2),(1, 3),(0, 4),(7, 2),(6, 3)
+			# 				,(5, 4),(4, 5),(3, 6),(2, 7),(8, 2),(7, 3),(6, 4),(5, 5),(4, 6),(3, 7)
+			# 				,(2, 8),(8, 4),(7, 5),(6, 6),(5, 7),(4, 8)] #, -(6, 2)] # (1, -1)
 
 	def is_legal_move(self, row: int, col: int, player: int, board: Board) -> bool:
 		if self.is_two_open_threes(row, col, player, board):
@@ -97,7 +131,7 @@ class Rules:
 		return row < 0 or row >= 19 or col < 0 or col >= 19 or board.get(row, col) != player_to_check
 
 	def win_by_five(self, row: int, col: int, player: int, board: np.ndarray) -> bool:
-		d = [(-1, 0), (-1, -1), (0, -1), (1, -1)]
+		d = [(-1, 0), (-1, -1), (0, -1), (1, -1)] # hor(_), neg(\), ver(|), pos(/)
 		for d_col, d_row in d:
 			n = 1
 			n_opp = -1
@@ -109,7 +143,6 @@ class Rules:
 				return True
 		return False
 
-	# Add board to Rules class
 	def is_capturing(self, row: int, col: int, player: int, board: Board) -> Union[list, None]:
 		opponent = self.opponent_value(player)
 		first_capture = []
@@ -122,20 +155,52 @@ class Rules:
 			return first_capture
 		return None
 
-	def get_winning_five_indices(self):
-		# pass which one of 4 directions the line goes.
-		# map
+	def check_direction(self, direction):
 		pass
 
-	def get_breaking_moves(self):
-		# return potential_moves
-		pass
+	def save_five_beginning_indices(self, direction, row, col, n, n_opp):
+		"""
+		For Horizontal and slopes the beginning is the left most position. For Vertical it's uppermost position.
+		:param direction: (-1, 0) hor(_); (-1, -1) neg(\); (0, -1) ver(|); (1, -1) pos(/)
+		:param n: multiplier for direction
+		:param n_opp: multiplier for direction
+		"""
+		if direction in [(-1, 0), (-1, -1), (1, -1)]:
+			pass
+			#look for n_opp
+		self.winning_five_indices = (first_row, first_col, direction)
 
-	def five_can_be_broken(self, potential_moves) -> bool:
-		# potential_moves = self.get_breaking_moves()
-		# for move in potential_moves:
-		# 	pass
-			# if place is empty
-				# if place can capture and win_by_five returns false after
-					# return true
-		return false
+	def get_possible_moves(self, direction: tuple):
+		if direction == (-1, 0):
+			possible_moves = self.horizontal
+		elif direction == (-1, -1):
+			possible_moves = self.negative_slope
+		elif direction == (0, -1):
+			possible_moves = self.vertical
+		else:
+			possible_moves = self.positive_slope
+		return possible_moves
+
+	def has_breaking_move(self, row: int, col: int, possible_moves, player: int, board: Board):
+		opponent = self.opponent_value(player)
+		for place in possible_moves:
+			rel_row, rel_col = place
+			if board.get(row + rel_row, col + rel_col) == 0:
+				captures = self.is_capturing(row + rel_row, col + rel_col, player, board)
+				if captures:
+					pos1_y, pos1_x = captures[0]
+					pos2_y, pos2_x = captures[1]
+					board.set(pos1_y, pos1_x, Stone.EMPTY.value)
+					board.set(pos2_y, pos2_x, Stone.EMPTY.value)
+					if self.win_by_five(row, col, player, board):
+						board.set(pos1_y, pos1_x, opponent)
+						board.set(pos2_y, pos2_x, opponent)
+					else:
+						return True
+		return False
+
+	def five_can_be_broken(self, player: int, board: Board) -> bool:
+		row, col, direction = self.winning_five_indices
+		possible_moves = self.get_possible_moves(direction)
+		breaking_move = self.has_breaking_move(self, row, col, possible_moves, player, board)
+		return breaking_move

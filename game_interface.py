@@ -60,6 +60,10 @@ class Game(tk.Frame):
 	def print_board(self):
 		print(self.gamestate.board.get_board())
 
+	def print_all_moves(self):
+		for move in self.ordered_moves:
+			print(f"{move.y, move.x},", end='')
+
 	def create_game_window(self):
 		lbl_name = ttk.Label(self, text=f"Go Go Gomoku\nGame Mode: {self.game_mode}")
 		lbl_name.pack()
@@ -171,6 +175,7 @@ class Game(tk.Frame):
 
 	def after_move_check(self, row: int, col: int) -> bool:
 		""" Check for captures and wins"""
+		self.print_all_moves()
 		self.replace_brighter()
 		if self.game_mode == GameMode.HOTSEAT:
 			self.update_button(self.hotseat_move[0], self.hotseat_move[1])
@@ -242,6 +247,7 @@ class Game(tk.Frame):
 
 	def reset_board(self):
 		self.player = 1
+		self.ordered_moves = []
 		self.gamestate = Gamestate()
 		self.reset_pieces()
 		self.update_captures()
