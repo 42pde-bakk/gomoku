@@ -2,6 +2,7 @@ from srcs.gamestate import Stone
 import numpy as np
 from srcs.board import Board
 from typing import Union
+from copy import deepcopy
 
 class Rules:
 	def __init__(self):
@@ -49,7 +50,7 @@ class Rules:
 				if board.get(row + rel[0], col + rel[1]):
 					return False
 				break
-			if not board.get(row + rel[0], col + rel[1]):
+			if board.get(row + rel[0], col + rel[1]) == 0:
 				if inside_zero:
 					break
 				if first_zero:
@@ -69,7 +70,7 @@ class Rules:
 				if board.get(row + rel[0], col + rel[1]):
 					return False
 				return True
-			if not board.get(row + rel[0], col + rel[1]):
+			if board.get(row + rel[0], col + rel[1]) == 0:
 				if inside_zero:
 					return False
 				if first_zero:
@@ -172,18 +173,19 @@ class Rules:
 
 	def has_breaking_move(self, row: int, col: int, possible_moves, player: int, board: Board) -> bool:
 		opponent = self.opponent_value(player)
+		test_board = deepcopy(board)
 		for place in possible_moves:
 			rel_row, rel_col = place
-			if board.get(row + rel_row, col + rel_col) == 0:
-				captures = self.is_capturing(row + rel_row, col + rel_col, player, board)
+			if test_board.get(row + rel_row, col + rel_col) == 0:
+				captures = self.is_capturing(row + rel_row, col + rel_col, player, test_board)
 				if captures is not None:
 					pos1_y, pos1_x = captures[0]
 					pos2_y, pos2_x = captures[1]
-					board.set(pos1_y, pos1_x, Stone.EMPTY.value)
-					board.set(pos2_y, pos2_x, Stone.EMPTY.value)
-					if self.win_by_five(row, col, player, board):
-						board.set(pos1_y, pos1_x, opponent)
-						board.set(pos2_y, pos2_x, opponent)
+					test_board.set(pos1_y, pos1_x, Stone.EMPTY.value)
+					test_board.set(pos2_y, pos2_x, Stone.EMPTY.value)
+					if self.win_by_five(row, col, player, test_board):
+						test_board.set(pos1_y, pos1_x, opponent)
+						test_board.set(pos2_y, pos2_x, opponent)
 					else:
 						return True
 		return False
