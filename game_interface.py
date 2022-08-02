@@ -98,6 +98,8 @@ class Game(tk.Frame):
 				self.buttons[row * self.size + col].grid(row=row, column=col)
 
 	def handle_click(self, args) -> None:
+		if self.game_mode == GameMode.BOT_POT:
+			return
 		row, col = args
 		print(f"Clicked on row: {row}, col: {col}")
 		if self.game_mode == GameMode.VERSUS_AI:
@@ -229,9 +231,6 @@ class Game(tk.Frame):
 		self.change_player()
 
 	def play_bot_pot(self):
-		# self.gamestate.place_stone(y=10, x=10, stone=self.player)
-		# self.update_button(0, 0)
-		# self.change_player()
 		while self.game_mode == GameMode.BOT_POT:
 			self.play_vs_ai()
 
@@ -271,7 +270,6 @@ class Game(tk.Frame):
 		lbl_choose_game_mode = ttk.Label(frm_options, text=f"Change Game Mode").pack()
 		options = ['Versus ai', 'Hotseat', 'Bot pot', 'Versus ai']
 		clicked = tk.StringVar()
-		# clicked.set(options[0])
 		om_choose_game = ttk.OptionMenu(
 			frm_options,
 			clicked,
@@ -330,6 +328,8 @@ class Game(tk.Frame):
 	def undo_move(self):
 		print(self.game_mode)
 		if self.game_mode == GameMode.BOT_POT:
+			print("Bot pot and ended")
+			self.game_mode = GameMode.HOTSEAT
 			return
 		if self.ordered_moves:
 			last_move = self.ordered_moves.pop()
