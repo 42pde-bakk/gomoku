@@ -6,33 +6,33 @@
 #define GOMOKUBOT_HEURISTIC_HPP
 
 #include "Bitboard.hpp"
-#include <unordered_map>
 #include <array>
 #include <cstdint>
+#include <unordered_map>
 
 // I guess we shouldn't give value to the three O'sL:
 // X O O O X
 
 enum LineValue {
-	NONE,
-	HALF_OPEN_TWO,
-	OPEN_TWO,
-	HALF_OPEN_THREE,
-	OPEN_THREE,
-	HALF_OPEN_FOUR,
-	OPEN_FOUR,
-	FIVE
+  NONE,
+  HALF_OPEN_TWO,
+  OPEN_TWO,
+  HALF_OPEN_THREE,
+  OPEN_THREE,
+  HALF_OPEN_FOUR,
+  OPEN_FOUR,
+  FIVE
 };
 static const uint8_t LINEVALUE_COUNT = 8;
 static const std::array<int32_t, LINEVALUE_COUNT> LineValues{
-		0,		// NONE
-		-9000,	// HALF_OPEN_TWO
-		10,		// OPEN_TWO
-		100,	// HALF_OPEN_THREE
-		4500,	// OPEN_THREE
-		8000,	// HALF_OPEN_FOUR
-		20000,	// OPEN_FOUR
-		100000	// FIVE
+    0,     // NONE
+    -9000, // HALF_OPEN_TWO
+    10,    // OPEN_TWO
+    100,   // HALF_OPEN_THREE
+    4500,  // OPEN_THREE
+    8000,  // HALF_OPEN_FOUR
+    20000, // OPEN_FOUR
+    100000 // FIVE
 };
 static const uint32_t CAPTURE_VALUE = 20000;
 
@@ -40,69 +40,71 @@ std::ostream &operator<<(std::ostream &o, const LineValue &lv);
 
 class Heuristic : public Bitboard {
 protected:
-	static std::hash<bitboard> hash_fn;
-	static std::unordered_map<std::bitset<BOARDSIZE>, int> tt;
+  static std::hash<bitboard> hash_fn;
+  static std::unordered_map<std::bitset<BOARDSIZE>, int> tt;
 
-	std::array<std::array<uint8_t, LINEVALUE_COUNT>, 2> values{};
-	int32_t h{};
-	uint8_t winner{},
-			player{},
-			created_open_threes{};
-	std::array<uint8_t, 2> captures{};
+  std::array<std::array<uint8_t, LINEVALUE_COUNT>, 2> values{};
+  int32_t h{};
+  uint8_t winner{}, player{}, created_open_threes{};
+  std::array<uint8_t, 2> captures{};
 
-	int set_h(const unsigned int new_stone_idx);
+  int set_h(const unsigned int new_stone_idx);
 
-	int add_h_for_captures();
+  int add_h_for_captures();
 
-	[[nodiscard]] bool isUnbreakable(unsigned int start_idx, unsigned int end_idx, int dir) const;
+  [[nodiscard]] bool isUnbreakable(unsigned int start_idx, unsigned int end_idx,
+                                   int dir) const;
 
-	[[nodiscard]] bool canGetCaptured(unsigned int start_idx, int dir) const;
+  [[nodiscard]] bool canGetCaptured(unsigned int start_idx, int dir) const;
 
 private:
-	unsigned int
-	get_length(unsigned int &idx, unsigned int stone_p, unsigned int d, bool &empty_space_inbetween) const;
+  unsigned int get_length(unsigned int &idx, unsigned int stone_p,
+                          unsigned int d, bool &empty_space_inbetween) const;
 
-	[[nodiscard]] unsigned int count_open_sides(unsigned int prev, unsigned int next) const;
+  [[nodiscard]] unsigned int count_open_sides(unsigned int prev,
+                                              unsigned int next) const;
 
-	[[nodiscard]] static LineValue calc_linevalue(unsigned int length, unsigned int open_sides);
+  [[nodiscard]] static LineValue calc_linevalue(unsigned int length,
+                                                unsigned int open_sides);
 
-	void tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int next, int dir, unsigned int stone_p) const;
+  void tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int next,
+                         int dir, unsigned int stone_p) const;
 
-	void calculate_heuristic();
+  void calculate_heuristic();
 
-	void
-	count_lines(unsigned int start_idx, unsigned int stone_p);
+  void count_lines(unsigned int start_idx, unsigned int stone_p);
 
-	bool enoughSpaceForFiveInARow(unsigned int idx, int dir, int opp_dir, unsigned int opp_stone) const;
+  bool enoughSpaceForFiveInARow(unsigned int idx, int dir, int opp_dir,
+                                unsigned int opp_stone) const;
 
-	void loop_over_tiles();
+  void loop_over_tiles();
 
-	Heuristic &operator=(const Heuristic &x);
+  Heuristic &operator=(const Heuristic &x);
 
 public:
-	Heuristic();
+  Heuristic();
 
-	~Heuristic();
+  ~Heuristic();
 
-	Heuristic(const Heuristic &x);
+  Heuristic(const Heuristic &x);
 
-	[[nodiscard]] int get_h() const;
+  [[nodiscard]] int get_h() const;
 
-	[[nodiscard]] bool has_winner() const;
+  [[nodiscard]] bool has_winner() const;
 
-	void set_winner(unsigned int p_winner);
+  void set_winner(unsigned int p_winner);
 
-	[[nodiscard]] uint8_t get_winner() const;
+  [[nodiscard]] uint8_t get_winner() const;
 
-	[[nodiscard]] uint8_t get_player() const;
+  [[nodiscard]] uint8_t get_player() const;
 
-	[[nodiscard]] uint8_t get_created_open_threes() const;
+  [[nodiscard]] uint8_t get_created_open_threes() const;
 
-	void print_heuristic(std::ostream &o) const;
+  void print_heuristic(std::ostream &o) const;
 
-	static unsigned int get_opponent_stone(unsigned int stone);
+  static unsigned int get_opponent_stone(unsigned int stone);
 
-	std::array<uint8_t, 2> get_captures() const;
+  std::array<uint8_t, 2> get_captures() const;
 };
 
-#endif //GOMOKUBOT_HEURISTIC_HPP
+#endif // GOMOKUBOT_HEURISTIC_HPP
