@@ -34,7 +34,7 @@ void	set_signal_handler() {
 	}
 }
 
-int main() {
+int loop(unsigned int flags) {
 #if THREADED
 # include "Threadpool.hpp"
 # include "AsyncQueue.hpp"
@@ -63,7 +63,6 @@ int main() {
 				std::cerr << "Client disconnected.\n";
 				break;
 			}
-			std::cout << "got the gamestate\n";
 			Gamestate *result = iterative_deepening(&gs, gs.get_player());
 			Move move = result->get_first_move(&gs);
 			std::cout << "Move: " << move;
@@ -72,15 +71,32 @@ int main() {
 			elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
 			std::cout << _PURPLE "Calculating move took " << elapsed_time << " ms.\n" _END;
 			client.send_move(move);
-//			result->print_history(std::cout, true);
+			if (flags & FLAG_HISTORY) {
+				result->print_history(std::cout, true);
+			}
 #if THREADED
 			std::cout << "lets wait for the workers\n";
 			threadpool.WaitForWorkers();
 			std::cout << "waited for the workers\n";
 			outputQ.clear();
 #endif
-			std::cout << "end of while loop\n";
 		}
 	}
 	return (0);
+}
+
+unsigned int get_flags(int argc, char **argv) {
+	unsigned int flags = 0;
+
+	for (int i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "history") == 0) {
+			flags |= FLAG_HISTORY;
+		}
+	}
+	return (flags);
+}
+
+int main(int argc, char **argv) {
+	unsigned int flags = get_flags(argc, argv);
+	return (loop(flags));
 }
