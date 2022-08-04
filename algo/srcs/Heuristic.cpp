@@ -114,9 +114,7 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 		if (g_checkedTiles[start_idx] & (1u << d)) {
 			continue;
 		}
-//		if (!this->enoughSpaceForFiveInARow(start_idx, dir, opp_dirs[d], get_opponent_stone(stone_p))) {
-//			continue ;
-//		}
+
 		unsigned int	next = start_idx + dir;
 		bool	empty_space_inbetween = false;
 		g_contains_newly_placed_stone = false;
@@ -126,7 +124,6 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 			continue;
 		unsigned int prev = start_idx - dir;
 		unsigned int open_sides = this->count_open_sides(prev, next);
-		// TODO: check that there is enough space for it to grow into a 5 (but would capturable pieces become tricky?)
 
 		if (!this->enoughSpaceForFiveInARow(start_idx, dir, opp_dir, opp_stone)) {
 			continue ;

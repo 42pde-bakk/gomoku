@@ -34,7 +34,7 @@ static const std::array<int32_t, LINEVALUE_COUNT> LineValues{
 		20000,	// OPEN_FOUR
 		100000	// FIVE
 };
-static const uint32_t CAPTURE_VALUE = 100;
+static const uint32_t CAPTURE_VALUE = 20000;
 
 std::ostream &operator<<(std::ostream &o, const LineValue &lv);
 
