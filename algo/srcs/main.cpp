@@ -8,6 +8,7 @@
 #include "IO/Server.hpp"
 #include "IO/Client.hpp"
 #include "Colours.hpp"
+#include <cstring>
 
 #include <chrono>
 #include <csignal>
