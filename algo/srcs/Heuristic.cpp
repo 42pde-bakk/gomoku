@@ -14,6 +14,7 @@ std::array<unsigned int, REALBOARDSIZE> g_checkedTiles;
 std::array<unsigned int, REALBOARDSIZE> g_checkedTiles2; // for across the water
 static unsigned int	g_newly_placed_stone_idx;
 static bool			g_contains_newly_placed_stone;
+bool	g_uses_lookuptable = false;
 
 int Heuristic::get_h() const {
 	return (this->h);
@@ -91,16 +92,6 @@ unsigned int Heuristic::count_open_sides(unsigned int prev, unsigned int next) c
 	return (open_sides);
 }
 
-void Heuristic::tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int next, const int dir,
-								  unsigned int stone_p) const {
-	unsigned int before_prev = prev - dir;
-	unsigned int after_next = next + dir;
-	if ((tile_is_empty(prev) && bitboard_get(before_prev) == stone_p) ||
-		(tile_is_empty(next) && bitboard_get(after_next) == stone_p)) {
-		lv = static_cast<LineValue>(int(lv) + 1);
-	}
-}
-
 void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 	static const std::array<int, 4> dirs = setup_dirs();
 	static const std::array<int, 4>	opp_dirs = setup_dirs_opposite();
@@ -114,9 +105,7 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 		if (g_checkedTiles[start_idx] & (1u << d)) {
 			continue;
 		}
-//		if (!this->enoughSpaceForFiveInARow(start_idx, dir, opp_dirs[d], get_opponent_stone(stone_p))) {
-//			continue ;
-//		}
+
 		unsigned int	next = start_idx + dir;
 		bool	empty_space_inbetween = false;
 		g_contains_newly_placed_stone = false;
@@ -126,7 +115,6 @@ void Heuristic::count_lines(unsigned int start_idx, unsigned int stone_p) {
 			continue;
 		unsigned int prev = start_idx - dir;
 		unsigned int open_sides = this->count_open_sides(prev, next);
-		// TODO: check that there is enough space for it to grow into a 5 (but would capturable pieces become tricky?)
 
 		if (!this->enoughSpaceForFiveInARow(start_idx, dir, opp_dir, opp_stone)) {
 			continue ;
@@ -185,14 +173,17 @@ void Heuristic::calculate_heuristic() {
 }
 
 int Heuristic::set_h(const unsigned int new_stone_idx) {
-//	static const int winner_values[3] = {0, -2000000, 2000000};
-//	auto hash = hash_fn(this->board);
+	unsigned long hash;
+
 	g_newly_placed_stone_idx = new_stone_idx;
 	this->h = 0;
-//	if (tt.find(hash) != tt.end()) {
-//		this->h = tt[hash];
-//		return (this->h);
-//	}
+	if (g_uses_lookuptable) {
+		hash = hash_fn(this->board);
+		if (tt.find(hash) != tt.end()) {
+			this->h = tt[hash];
+			return (this->h);
+		}
+	}
 	for (unsigned short int i = 0; i < 2; ++i)
 		this->values[i].fill(0);
 	this->h = 0;
@@ -204,11 +195,10 @@ int Heuristic::set_h(const unsigned int new_stone_idx) {
 	if (!this->has_winner()) {
 		this->h = std::min(std::max(h, -1900000), 1900000);
 	}
-//	if (this->has_winner())
-//		this->h = winner_values[this->get_winner()];
-//	else
 
-//	tt[hash] = this->h;
+	if (g_uses_lookuptable) {
+		tt[hash] = this->h;
+	}
 
 	return (this->h);
 }
