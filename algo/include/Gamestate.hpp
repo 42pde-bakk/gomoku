@@ -31,7 +31,7 @@ public:
 
 	~Gamestate();
 
-	void generate_children();
+	void generate_children(unsigned int depth_level);
 
 	std::vector<Move> generate_moves() const;
 

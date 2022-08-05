@@ -239,7 +239,7 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't", "[HeuristicTests]") {
 	this->calcH(0);
 	this->change_player();
 
-	this->generate_children();
+	this->generate_children(0);
 	REQUIRE(children[0]->get_move().move_idx == 154);
 
 	this->clear_children();
@@ -269,7 +269,7 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't - 2", "[HeuristicTests]") 
 
 	std::cerr << *this;
 	print_heuristic(std::cerr);
-	this->generate_children();
+	this->generate_children(0);
 	auto lastmove = children[0]->get_move();
 	std::cerr << children[0]->get_move();
 	std::cerr << *children[0];
@@ -307,7 +307,7 @@ TEST_CASE_METHOD(Gamestate, "Should block open 3", "[HeuristicTests]") {
     this->place_stone(8 * REALBOARDWIDTH + 8);
     std::cerr << *this << "\n\n\n";
 
-    this->generate_children();
+	this->generate_children(0);
     for (auto child : children) {
         std::cerr << *child << "\n";
         child->print_heuristic(std::cerr);
@@ -340,7 +340,7 @@ TEST_CASE_METHOD(Gamestate, "Mistake", "[HeuristicTests]") {
 	set_h(0);
 	std::cerr << *this << '\n';
 
-	generate_children();
+	generate_children(0);
 	for (auto& child : children) {
 		std::cerr << "Child:\n" << *child;
 		child->print_heuristic(std::cerr);

@@ -14,6 +14,7 @@
 std::chrono::time_point<std::chrono::steady_clock> start_time = std::chrono::steady_clock::now();;
 std::chrono::time_point<std::chrono::steady_clock> current_time = std::chrono::steady_clock::now();;
 long long int elapsed_time;
+unsigned int g_depth;
 
 int check_thinking_time_left() {
 //	if (elapsed_time >= TIMEOUT_VALUE) {
@@ -42,7 +43,7 @@ Gamestate *minimax(Gamestate *state, int depth, bool maximizing_player) {
 	int best_state_value;
 	Gamestate *new_state;
 
-	state->generate_children();
+	state->generate_children(g_depth);
 	if (maximizing_player) {
 		best_state_value = std::numeric_limits<int>::min();
 		for (auto &child: state->get_children()) {
@@ -79,7 +80,7 @@ Gamestate *ab_generate_gamestates(Gamestate *state, int depth, int alpha, int be
 	int best_state_value;
 	Gamestate *new_state;
 
-	state->generate_children();
+	state->generate_children(g_depth);
 	if (!state->has_children())
 		return (nullptr);
 	auto children = state->get_children();
@@ -219,6 +220,7 @@ Gamestate *iterative_deepening(Gamestate *gs, int player) {
 	g_moves = 0;
 	g_applied_moves = 0;
 	while (check_thinking_time_left() == HAS_TIME_LEFT) {
+		g_depth = depth;
 		std::cout << "Start loop, depth: " << depth << ", elapsed time: " << elapsed_time << '\n';
 		tmp = minimax_alphabeta_start(gs, depth, bool(player));
 		if (tmp)
