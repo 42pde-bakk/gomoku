@@ -8,7 +8,7 @@
 #include "IO/Server.hpp"
 #include "IO/Client.hpp"
 #include "Colours.hpp"
-
+#include <getopt.h>
 #include <chrono>
 #include <csignal>
 #include <exception>
@@ -34,7 +34,7 @@ void	set_signal_handler() {
 	}
 }
 
-int main() {
+int loop(unsigned int flags) {
 #if THREADED
 # include "Threadpool.hpp"
 # include "AsyncQueue.hpp"
@@ -63,7 +63,6 @@ int main() {
 				std::cerr << "Client disconnected.\n";
 				break;
 			}
-			std::cout << "got the gamestate\n";
 			Gamestate *result = iterative_deepening(&gs, gs.get_player());
 			Move move = result->get_first_move(&gs);
 			std::cout << "Move: " << move;
@@ -72,15 +71,75 @@ int main() {
 			elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
 			std::cout << _PURPLE "Calculating move took " << elapsed_time << " ms.\n" _END;
 			client.send_move(move);
-//			result->print_history(std::cout, true);
+			if (flags & FLAG_HISTORY) {
+				result->print_history(std::cout, true);
+			}
 #if THREADED
 			std::cout << "lets wait for the workers\n";
 			threadpool.WaitForWorkers();
 			std::cout << "waited for the workers\n";
 			outputQ.clear();
 #endif
-			std::cout << "end of while loop\n";
 		}
 	}
 	return (0);
+}
+
+static void	print_usage() {
+	fprintf(stderr, "usage: ./gomokubot [options]\n");
+	fprintf(stderr, "Available options:\n\t%s\n\t%s\n\t%s=[%s]\n\t%s\n",
+			"--history (-H)", "--lookuptable (-l/-L)", "--max_children (-m)", "amount", "--help (or -h)");
+}
+
+static unsigned int get_flags(int argc, char **argv) {
+	unsigned int flags = 0;
+	int opt;
+	long int arg_val;
+	const struct option long_options[] = {
+			{ "help", no_argument, NULL, 'h'},
+			{ "history", no_argument, NULL, 'H'},
+			{ "lookuptable", no_argument, NULL, 'l'},
+			{ "max_children", required_argument, NULL, 'c'},
+	};
+
+	while ((opt = getopt_long(argc, argv, "hHLlm:", long_options, NULL)) != -1) {
+		switch (opt) {
+			case 'h':
+				print_usage();
+				exit(EXIT_SUCCESS);
+			case 'H':
+				flags |= FLAG_HISTORY;
+				fprintf(stderr, "HISTORY!\n");
+				break ;
+			case 'L':
+			case 'l':
+				flags |= FLAG_LOOKUPTABLE;
+				g_uses_lookuptable = true;
+				fprintf(stderr, "Lookuptable!\n");
+				break ;
+			case 'm':
+			case 'c':
+				flags |= FLAG_MAX_CHILDREN;
+				arg_val = std::strtol(optarg, NULL, 10);
+				if (arg_val <= 0) {
+					fprintf(stderr, "Bad value for --max_children: %s\n", optarg);
+					return (-1);
+				}
+				g_max_children = static_cast<unsigned int>(arg_val);
+				break ;
+			case '?':
+				return (-1);
+		}
+	}
+	return (flags);
+}
+
+int main(int argc, char **argv) {
+	unsigned int flags = get_flags(argc, argv);
+
+	if (flags == (unsigned int)-1) {
+		return (1);
+	}
+
+	return (loop(flags));
 }

@@ -66,8 +66,6 @@ private:
 
 	[[nodiscard]] static LineValue calc_linevalue(unsigned int length, unsigned int open_sides);
 
-	void tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int next, int dir, unsigned int stone_p) const;
-
 	void calculate_heuristic();
 
 	void

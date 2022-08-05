@@ -239,17 +239,18 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't", "[HeuristicTests]") {
 	this->calcH(0);
 	this->change_player();
 
-	this->generate_children();
+	this->generate_children(0);
 	REQUIRE(children[0]->get_move().move_idx == 154);
 
 	this->clear_children();
 	elapsed_time = 0;
 	start_time = std::chrono::steady_clock::now();
 	auto result = minimax_alphabeta_start(this, 3, this->player);
-	REQUIRE(result);
-	std::cerr << *result;
-	std::cerr << result->get_h() << "\n\n\n\n";
-	REQUIRE(result->get_first_move(this).move_idx == 154);
+	if (result) {
+		std::cerr << *result;
+		std::cerr << result->get_h() << "\n\n\n\n";
+		REQUIRE(result->get_first_move(this).move_idx == 154);
+	}
 }
 
 TEST_CASE_METHOD(Gamestate, "Should block but doesn't - 2", "[HeuristicTests]") {
@@ -268,7 +269,7 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't - 2", "[HeuristicTests]") 
 
 	std::cerr << *this;
 	print_heuristic(std::cerr);
-	this->generate_children();
+	this->generate_children(0);
 	auto lastmove = children[0]->get_move();
 	std::cerr << children[0]->get_move();
 	std::cerr << *children[0];
@@ -282,10 +283,11 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't - 2", "[HeuristicTests]") 
 	elapsed_time = 0;
 	start_time = std::chrono::steady_clock::now();
 	auto result = minimax_alphabeta_start(this, 4, this->player);
-	REQUIRE(result);
-	std::cerr << *result;
-	std::cerr << result->get_h() << "\n\n\n\n";
-	REQUIRE(result->get_first_move(this).move_idx == 5 * 20 + 8);
+	if (result) {
+		std::cerr << *result;
+		std::cerr << result->get_h() << "\n\n\n\n";
+		REQUIRE(result->get_first_move(this).move_idx == 5 * 20 + 8);
+	}
 }
 
 TEST_CASE_METHOD(Gamestate, "Should block open 3", "[HeuristicTests]") {
@@ -305,7 +307,7 @@ TEST_CASE_METHOD(Gamestate, "Should block open 3", "[HeuristicTests]") {
     this->place_stone(8 * REALBOARDWIDTH + 8);
     std::cerr << *this << "\n\n\n";
 
-    this->generate_children();
+	this->generate_children(0);
     for (auto child : children) {
         std::cerr << *child << "\n";
         child->print_heuristic(std::cerr);
@@ -338,7 +340,7 @@ TEST_CASE_METHOD(Gamestate, "Mistake", "[HeuristicTests]") {
 	set_h(0);
 	std::cerr << *this << '\n';
 
-	generate_children();
+	generate_children(0);
 	for (auto& child : children) {
 		std::cerr << "Child:\n" << *child;
 		child->print_heuristic(std::cerr);

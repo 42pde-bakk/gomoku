@@ -37,7 +37,7 @@ TEST_CASE_METHOD(Gamestate, "Win by blocked ive", "[HeuristicTests]") {
 	this->set(start_idx + 5 * SOUTH, 1);
 	this->calcH((unsigned int)-1);
 
-	this->generate_children();
+	this->generate_children(0);
 	std::cerr << *this;
 	this->print_heuristic(std::cerr);
 	std::cerr << "\n\n\n";

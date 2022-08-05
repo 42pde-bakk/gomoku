@@ -22,7 +22,7 @@ TEST_CASE("Gamestate:: sorting_children", "[GamestateTests]") {
 //	gs->place_stone(middle_idx + 1);
 //	std::cerr << Bitboard(gs->get_empty_neighbours()) << "\n";
 	std::cerr << *gs << "\n";
-	gs->generate_children();
+	gs->generate_children(0);
 	auto children = gs->get_children();
 	auto move = children[0]->get_move();
 
@@ -46,7 +46,7 @@ TEST_CASE("Gamestate:: generate children", "[GamestateTests]") {
 	gs->place_stone(0);
 	gs->place_stone(middle_idx);
 	std::cerr << Bitboard(gs->get_empty_neighbours()) << "\n";
-	gs->generate_children();
+	gs->generate_children(0);
 
 	assert(gs->get_children().size() == 11);
 
@@ -60,8 +60,8 @@ TEST_CASE("Gamestate:: test move generation", "[GamestateTests]") {
 
 	gs->place_stone(2);
 
-	gs->generate_children();
-	gs->get_children()[0]->generate_children();
+	gs->generate_children(0);
+	gs->get_children()[0]->generate_children(0);
 //	std::cout << "placed stone on index 2:\n" << gs << '\n';
 //	auto *result = minimax(gs, 2, true);
 //	assert(result);
