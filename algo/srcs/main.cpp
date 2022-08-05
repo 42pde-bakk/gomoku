@@ -87,26 +87,28 @@ int loop(unsigned int flags) {
 	return (0);
 }
 
-void	print_usage() {
+static void	print_usage() {
 	fprintf(stderr, "usage: ./gomokubot [options]\n");
+	fprintf(stderr, "Available options:\n\t%s\n\t%s\n\t%s=[%s]\n\t%s\n",
+			"--history", "--lookuptable", "--max_children", "amount", "--help (or -h)");
 }
 
-unsigned int get_flags(int argc, char **argv) {
+static unsigned int get_flags(int argc, char **argv) {
 	unsigned int flags = 0;
 	int opt;
 	long int arg_val;
 	const struct option long_options[] = {
+			{ "help", no_argument, NULL, 'h'},
 			{ "history", no_argument, NULL, 'H'},
 			{ "lookuptable", no_argument, NULL, 'l'},
 			{ "max_children", required_argument, NULL, 'c'},
-			{ "-h;", no_argument, NULL, 'h'}
 	};
 
 	while ((opt = getopt_long(argc, argv, "h", long_options, NULL)) != -1) {
 		switch (opt) {
 			case 'h':
 				print_usage();
-				return (-1);
+				exit(0);
 			case 'H':
 				flags |= FLAG_HISTORY;
 				fprintf(stderr, "HISTORY!\n");
