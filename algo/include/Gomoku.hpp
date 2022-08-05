@@ -13,7 +13,11 @@
 # define THREADED 0
 #endif
 
-#define FLAG_HISTORY 0b1000
+#define FLAG_HISTORY		0b1000
+#define FLAG_LOOKUPTABLE	0b0100
+#define FLAG_MAX_CHILDREN	0b0010
+extern unsigned int g_max_children;
+extern bool	g_uses_lookuptable;
 
 
 #include <mutex>

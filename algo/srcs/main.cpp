@@ -9,6 +9,7 @@
 #include "IO/Client.hpp"
 #include "Colours.hpp"
 #include <cstring>
+#include <getopt.h>
 
 #include <chrono>
 #include <csignal>
@@ -86,18 +87,58 @@ int loop(unsigned int flags) {
 	return (0);
 }
 
+void	print_usage() {
+	fprintf(stderr, "usage: ./gomokubot [options]\n");
+}
+
 unsigned int get_flags(int argc, char **argv) {
 	unsigned int flags = 0;
+	int opt;
+	long int arg_val;
+	const struct option long_options[] = {
+			{ "history", no_argument, NULL, 'H'},
+			{ "lookuptable", no_argument, NULL, 'l'},
+			{ "max_children", required_argument, NULL, 'c'},
+			{ "-h;", no_argument, NULL, 'h'}
+	};
 
-	for (int i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "history") == 0) {
-			flags |= FLAG_HISTORY;
+	while ((opt = getopt_long(argc, argv, "h", long_options, NULL)) != -1) {
+		switch (opt) {
+			case 'h':
+				print_usage();
+				return (-1);
+			case 'H':
+				flags |= FLAG_HISTORY;
+				fprintf(stderr, "HISTORY!\n");
+				break ;
+			case 'l':
+				flags |= FLAG_LOOKUPTABLE;
+				g_uses_lookuptable = true;
+				fprintf(stderr, "Lookuptable!\n");
+				break ;
+			case 'c':
+				flags |= FLAG_MAX_CHILDREN;
+				arg_val = std::strtol(optarg, NULL, 10);
+				if (arg_val <= 0) {
+					fprintf(stderr, "Bad value for --max_children: %s\n", optarg);
+					return (-1);
+				}
+				g_max_children = static_cast<unsigned int>(arg_val);
+				break ;
+			case '?':
+				return (-1);
 		}
 	}
+
 	return (flags);
 }
 
 int main(int argc, char **argv) {
 	unsigned int flags = get_flags(argc, argv);
+
+	if (flags == (unsigned int)-1) {
+		return (1);
+	}
+
 	return (loop(flags));
 }
