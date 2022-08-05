@@ -248,7 +248,8 @@ class Game(tk.Frame):
 			self.ordered_moves.append(MoveSnapshot(row, col, self.player))
 			self.gamestate.place_stone(y=row, x=col, stone=self.player)
 			self.update_button(row, col)
-			self.check_forced_capture(row, col)
+			if self.check_forced_capture(row, col):
+				return
 			if self.after_move_check(row, col):
 				return
 		else:
@@ -273,6 +274,7 @@ class Game(tk.Frame):
 		self.update_captures()
 		self.previous_player = 0
 		self.force_break = False
+		self.update()
 
 	def new_game_bt(self, frm_options) -> None:
 		bt_new_game = ttk.Button(
@@ -370,7 +372,8 @@ class Game(tk.Frame):
 				self.update_captures()
 			if self.game_mode == GameMode.HOTSEAT:
 				self.previous_player = self.player
-			self.change_player()
+			self.player = last_move.player
+			# self.change_player()
 
 	def undo_move_bt(self, frm_options) -> None:
 		bt_undo_move = ttk.Button(
