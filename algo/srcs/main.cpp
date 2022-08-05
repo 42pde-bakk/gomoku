@@ -88,7 +88,7 @@ int loop(unsigned int flags) {
 static void	print_usage() {
 	fprintf(stderr, "usage: ./gomokubot [options]\n");
 	fprintf(stderr, "Available options:\n\t%s\n\t%s\n\t%s=[%s]\n\t%s\n",
-			"--history", "--lookuptable", "--max_children", "amount", "--help (or -h)");
+			"--history (-H)", "--lookuptable (-l/-L)", "--max_children (-m)", "amount", "--help (or -h)");
 }
 
 static unsigned int get_flags(int argc, char **argv) {
