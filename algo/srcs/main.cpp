@@ -8,9 +8,7 @@
 #include "IO/Server.hpp"
 #include "IO/Client.hpp"
 #include "Colours.hpp"
-#include <cstring>
 #include <getopt.h>
-
 #include <chrono>
 #include <csignal>
 #include <exception>
@@ -104,20 +102,22 @@ static unsigned int get_flags(int argc, char **argv) {
 			{ "max_children", required_argument, NULL, 'c'},
 	};
 
-	while ((opt = getopt_long(argc, argv, "h", long_options, NULL)) != -1) {
+	while ((opt = getopt_long(argc, argv, "hHLlm:", long_options, NULL)) != -1) {
 		switch (opt) {
 			case 'h':
 				print_usage();
-				exit(0);
+				exit(EXIT_SUCCESS);
 			case 'H':
 				flags |= FLAG_HISTORY;
 				fprintf(stderr, "HISTORY!\n");
 				break ;
+			case 'L':
 			case 'l':
 				flags |= FLAG_LOOKUPTABLE;
 				g_uses_lookuptable = true;
 				fprintf(stderr, "Lookuptable!\n");
 				break ;
+			case 'm':
 			case 'c':
 				flags |= FLAG_MAX_CHILDREN;
 				arg_val = std::strtol(optarg, NULL, 10);
@@ -131,7 +131,6 @@ static unsigned int get_flags(int argc, char **argv) {
 				return (-1);
 		}
 	}
-
 	return (flags);
 }
 

@@ -8,7 +8,29 @@
 #include "Colours.hpp"
 #include <random>
 
-//const int middle_idx = 9 * 20 + 9;
+extern bool g_uses_lookuptable;
+
+const int middle_idx = 9 * 20 + 9;
+
+void	place_stones_hash(Gamestate *gs) {
+	gs->set(middle_idx, 0);
+	gs->set(middle_idx + WEST, 0);
+	gs->set(middle_idx + EAST, 0);
+	gs->set(middle_idx + NORTHEAST, 0);
+	gs->set(middle_idx + 2 * NORTHEAST, 0);
+	gs->set(middle_idx + NORTHEAST + 2 * NORTH, 0);
+	gs->set(middle_idx + 4 * WEST + 2 * SOUTH, 0);
+
+	gs->set(middle_idx + 2 * NORTH, 1);
+	gs->set(middle_idx + 2 * NORTH + EAST, 1);
+	gs->set(middle_idx + NORTHWEST, 1);
+	gs->set(middle_idx + 2 * WEST, 1);
+	gs->set(middle_idx + 3 * WEST + SOUTH, 1);
+	gs->set(middle_idx + 2 * WEST + SOUTH, 1);
+	gs->set(middle_idx + WEST + SOUTH, 1);
+
+	gs->calcH(middle_idx + WEST + SOUTH);
+}
 
 void	place_random_stone(Gamestate *gs) {
 	unsigned int player = 0;
@@ -39,4 +61,17 @@ TEST_CASE("Bitset hash", "[HashingTests]") {
 	auto end_time = std::chrono::steady_clock::now();
 	auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 	std::cerr << _PURPLE "hashing 720x took " << elapsed_time.count() << " ms\n" _END;
+}
+
+TEST_CASE_METHOD(Gamestate, "Hash test 1", "[HashingTests]") {
+	std::cerr << "start Hash test 1\n";
+	g_uses_lookuptable = true;
+	place_stones_hash(this);
+	std::cerr << "h = " << this->get_h() << '\n';
+
+	auto test = new Gamestate();
+	place_stones_hash(test);
+	std::cerr << "h = " << test->get_h() << '\n';
+
+	g_uses_lookuptable = false;
 }

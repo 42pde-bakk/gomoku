@@ -186,14 +186,13 @@ int Heuristic::set_h(const unsigned int new_stone_idx) {
 	}
 	for (unsigned short int i = 0; i < 2; ++i)
 		this->values[i].fill(0);
-	this->h = 0;
-	this->loop_over_tiles();
-	if (this->has_winner())
-		return (this->h);
-	this->calculate_heuristic();
-
 	if (!this->has_winner()) {
-		this->h = std::min(std::max(h, -1900000), 1900000);
+		this->loop_over_tiles();
+		this->calculate_heuristic();
+
+		if (!this->has_winner()) {
+			this->h = std::min(std::max(h, -1900000), 1900000);
+		}
 	}
 
 	if (g_uses_lookuptable) {
