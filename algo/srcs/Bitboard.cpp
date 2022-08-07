@@ -132,7 +132,6 @@ void Bitboard::clear_tile(unsigned int idx) {
 	this->board[real_idx + 1] = false;
 }
 
-
 bitboard Bitboard::get_empty_neighbours() const {
 	Bitboard empty_cells(~this->board);
 	for (unsigned int n = 0; n < REALBOARDSIZE; n++) {
@@ -168,4 +167,8 @@ unsigned int Bitboard::count() const {
 
 bool Bitboard::isvalid_tile(unsigned int idx) {
 	return (idx < REALBOARDSIZE && !isSeperatingBitIndex(idx));
+}
+
+const bitboard& Bitboard::get_bitboard() const {
+	return (this->board);
 }
