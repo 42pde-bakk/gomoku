@@ -34,16 +34,15 @@ static const std::array<int32_t, LINEVALUE_COUNT> LineValues{
 		20000,	// OPEN_FOUR
 		100000	// FIVE
 };
-static const uint32_t CAPTURE_VALUE = 100;
+static const uint32_t CAPTURE_VALUE = 30000;
 
 std::ostream &operator<<(std::ostream &o, const LineValue &lv);
 
+typedef std::array<std::array<uint8_t, LINEVALUE_COUNT>, 2> ValueBoard;
+
 class Heuristic : public Bitboard {
 protected:
-	static std::hash<bitboard> hash_fn;
-	static std::unordered_map<std::bitset<BOARDSIZE>, int> tt;
-
-	std::array<std::array<uint8_t, LINEVALUE_COUNT>, 2> values{};
+	ValueBoard values{};
 	int32_t h{};
 	uint8_t winner{},
 			player{},
@@ -51,6 +50,7 @@ protected:
 	std::array<uint8_t, 2> captures{};
 
 	int set_h(const unsigned int new_stone_idx);
+	int set_h_with_lookup(const unsigned int new_stone_idx);
 
 	int add_h_for_captures();
 
@@ -101,6 +101,10 @@ public:
 	static unsigned int get_opponent_stone(unsigned int stone);
 
 	std::array<uint8_t, 2> get_captures() const;
+
+	static std::unordered_map<std::bitset<BOARDSIZE>, ValueBoard> tt;
 };
+
+std::string LineValueToStr(const LineValue &x);
 
 #endif //GOMOKUBOT_HEURISTIC_HPP

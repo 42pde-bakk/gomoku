@@ -3,7 +3,6 @@
 //
 
 #include "Gamestate.hpp"
-#include "Gomoku.hpp"
 #include <cassert>
 #include <algorithm>
 #include <sstream>
@@ -13,6 +12,7 @@ unsigned int g_nb = 0;
 unsigned int g_moves = 0;
 unsigned int g_applied_moves = 0;
 unsigned int g_max_children = 0;
+bool	g_uses_lookuptable = false;
 
 Gamestate::Gamestate() : Heuristic(), lastmove(), parent(nullptr), children() {
 }
@@ -181,7 +181,10 @@ void Gamestate::add_child(Gamestate *child) {
 }
 
 Gamestate *Gamestate::calcH(const unsigned int new_stone_idx) {
-	this->set_h(new_stone_idx);
+	if (g_uses_lookuptable)
+		this->set_h_with_lookup(new_stone_idx);
+	else
+		this->set_h(new_stone_idx);
 	this->add_h_for_captures();
 	return (this);
 }
