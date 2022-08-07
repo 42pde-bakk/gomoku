@@ -3,6 +3,7 @@
 //
 
 #include "Gamestate.hpp"
+#include "Gomoku.hpp"
 #include <cassert>
 #include <algorithm>
 #include <sstream>
@@ -11,6 +12,7 @@
 unsigned int g_nb = 0;
 unsigned int g_moves = 0;
 unsigned int g_applied_moves = 0;
+unsigned int g_max_children = 0;
 
 Gamestate::Gamestate() : Heuristic(), lastmove(), parent(nullptr), children() {
 }
@@ -34,7 +36,7 @@ bool compareGamestates(const Gamestate *a, const Gamestate *b) { return (*a < *b
 bool compareGamestatesReverse(const Gamestate *a, const Gamestate *b) { return (*b < *a); }
 
 // https://core.ac.uk/download/pdf/33500946.pdf
-void Gamestate::generate_children() {
+void Gamestate::generate_children(unsigned int depth_level) {
 	if (!this->children.empty() || this->has_winner()) {
 		return;
 	}
@@ -65,12 +67,17 @@ void Gamestate::generate_children() {
 		}
 	}
 	this->sort_children();
-//    if (this->children.size() > MAX_CHILDREN) {
-//        while (this->children.size() > MAX_CHILDREN) {
-//            delete this->children.back();
-//            this->children.pop_back();
-//        }
-//    }
+	// Only prune the last ones in case the option --max_children was given
+	// And when we already tried the first two depth levels at full strength
+	if (g_max_children > 0 && depth_level > 2) {
+//		size_t children_size = this->children.size();
+		if (this->children.size() > g_max_children) {
+			while (this->children.size() > g_max_children) {
+				delete this->children.back();
+				this->children.pop_back();
+			}
+		}
+	}
 }
 
 std::vector<Move> Gamestate::generate_moves() const {

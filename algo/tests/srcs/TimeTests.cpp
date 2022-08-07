@@ -18,7 +18,7 @@ TEST_CASE_METHOD(Gamestate, "Hala madrid", "[TimeTests]") {
 	this->place_stone(middle_idx - 1);
 
 	std::cerr << *this;
-	generate_children();
+	generate_children(0);
 	std::cerr << "after generate_children\n";
 	const size_t kids = children.size();
 	std::cerr << "generated " << kids << " kids\n";

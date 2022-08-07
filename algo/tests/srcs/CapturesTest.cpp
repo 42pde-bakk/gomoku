@@ -22,7 +22,7 @@ TEST_CASE_METHOD(Gamestate, "Capture-W", "[CaptureTests]") { // p1 captures p0
 	REQUIRE_FALSE(bitboard_get(start_idx));
 	REQUIRE_FALSE(bitboard_get(start_idx + direction));
 	REQUIRE(this->captures[1] == 2);
-	this->generate_children();
+	this->generate_children(0);
 	for (auto child : children)
 		REQUIRE(child->get_captures()[1] == 2);
 }

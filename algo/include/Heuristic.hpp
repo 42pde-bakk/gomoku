@@ -66,8 +66,6 @@ private:
 
 	[[nodiscard]] static LineValue calc_linevalue(unsigned int length, unsigned int open_sides);
 
-	void tryUpgradeLineVal(LineValue &lv, unsigned int prev, unsigned int next, int dir, unsigned int stone_p) const;
-
 	void calculate_heuristic();
 
 	void
@@ -89,6 +87,8 @@ public:
 	[[nodiscard]] int get_h() const;
 
 	[[nodiscard]] bool has_winner() const;
+
+	void	clear_winner();
 
 	void set_winner(unsigned int p_winner);
 
