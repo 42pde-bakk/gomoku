@@ -34,7 +34,7 @@ static const std::array<int32_t, LINEVALUE_COUNT> LineValues{
 		20000,	// OPEN_FOUR
 		100000	// FIVE
 };
-static const uint32_t CAPTURE_VALUE = 100;
+static const uint32_t CAPTURE_VALUE = 15000;
 
 std::ostream &operator<<(std::ostream &o, const LineValue &lv);
 
@@ -87,6 +87,8 @@ public:
 	[[nodiscard]] int get_h() const;
 
 	[[nodiscard]] bool has_winner() const;
+
+	void	clear_winner();
 
 	void set_winner(unsigned int p_winner);
 

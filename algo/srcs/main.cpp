@@ -58,11 +58,12 @@ int loop(unsigned int flags) {
 			bool error = false;
 			std::cout << "Lets receive a gamestate\n";
 			Gamestate gs = client.receiveGamestate(error);
-			gs.calcH((unsigned int)-1);
 			if (!client.isAlive()) {
 				std::cerr << "Client disconnected.\n";
 				break;
 			}
+			gs.calcH((unsigned int)-1);
+			gs.clear_winner();
 			Gamestate *result = iterative_deepening(&gs, gs.get_player());
 			Move move = result->get_first_move(&gs);
 			std::cout << "Move: " << move;
