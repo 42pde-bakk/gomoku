@@ -229,8 +229,9 @@ class Rules:
 		opponent = self.opponent_value(player)
 		five_row, five_col = five_indices
 		# print("call win_by_five from !is_breaking_move!")
-		if self.win_by_five(five_row, five_col, opponent, test_board):
+		if test_board.get(five_row, five_col) != 0 and self.win_by_five(five_row, five_col, opponent, test_board):
 			print("wrong_captures return FALSE")
+			print(f"board: {test_board}, winner player value:{opponent}, indices: {(five_row, five_col)}")
 			return False
 		print("has captures and broken five return TRUE")
 		return True
