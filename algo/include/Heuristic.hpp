@@ -30,8 +30,8 @@ static const std::array<int32_t, LINEVALUE_COUNT> LineValues{
 		10,		// OPEN_TWO
 		100,	// HALF_OPEN_THREE
 		4500,	// OPEN_THREE
-		8000,	// HALF_OPEN_FOUR
-		20000,	// OPEN_FOUR
+		4000,	// HALF_OPEN_FOUR
+		10000,	// OPEN_FOUR
 		100000	// FIVE
 };
 static const uint32_t CAPTURE_VALUE = 30000;

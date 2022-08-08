@@ -61,6 +61,8 @@ class Rules:
 					inside_zero = True
 				first_zero = False
 			else:
+				if first_zero:
+					break
 				return False
 		first_zero = False
 		for i in range(-1, -5, -1):
@@ -68,13 +70,17 @@ class Rules:
 			if stones == 2:
 				if board.get(row + rel[0], col + rel[1]):
 					return False
-				return True
+				elif inside_zero:
+					return True
 			if board.get(row + rel[0], col + rel[1]) == 0:
 				if inside_zero:
 					return False
 				if first_zero:
-					return False
-				first_zero = True
+					inside_zero = True
+					first_zero = False
+				else:
+					# return False
+					first_zero = True
 			elif not self.is_not_player_check(row + rel[0], col + rel[1], player, board):
 				stones += 1
 				if first_zero:
@@ -100,7 +106,6 @@ class Rules:
 
 	def is_winning_condition(self, row: int, col: int, player: int, board: Board, captures: list) -> bool:
 		opponent = self.opponent_value(player)
-		print("call win_by_five from ?is_winning_condition?")
 		if self.win_by_five(row, col, player, board):
 			if not self.five_can_be_broken(opponent, board):
 				print('WIN \nby five in a row for player: ' + str(player))
@@ -121,10 +126,7 @@ class Rules:
 		return row < 0 or row >= 19 or col < 0 or col >= 19 or board.get(row, col) != player_to_check
 
 	def win_by_five(self, row: int, col: int, player: int, board: np.ndarray) -> bool:
-		# print("!!!------------------------!!!")
-		# print(board, row, col, player)
-		# print("!!!------------------------!!!")
-		d = [(-1, 0), (-1, -1), (0, -1), (1, -1)] # hor(_), neg(\), ver(|), pos(/)
+		d = [(-1, 0), (-1, -1), (0, -1), (1, -1)]
 		for d_col, d_row in d:
 			n = 1
 			n_opp = -1
@@ -132,7 +134,6 @@ class Rules:
 				n += 1
 			while not self.is_not_player_check(row + (n_opp * d_row), col + (n_opp * d_col), player, board):
 				n_opp -= 1
-			print(f"n_value: {n} n_opp_value: {n_opp} five_in_a_row: {n+abs(n_opp)-1}")
 			if n + abs(n_opp) - 1 >= 5:
 				self.save_five_beginning_indices((d_col, d_row), row, col, n, n_opp)
 				return True
@@ -195,19 +196,14 @@ class Rules:
 		for place in possible_moves:
 			rel_row, rel_col = place
 			if test_board.get(row + rel_row, col + rel_col) == 0:
-				# always valid when capturing
 				captures = self.is_capturing(row + rel_row, col + rel_col, player, test_board)
 				if captures is not None:
 					self.place_on_test_board(captures, test_board, Stone.EMPTY.value)
 					if test_board.get(row, col) == 0:
 						return True
-					print("call win_by_five from has_breaking_moves")
 					if self.win_by_five(row, col, opponent, test_board):
 						self.place_on_test_board(captures, test_board, opponent)
-						print("Five remains")
 					else:
-						# self.place_on_test_board(captures, test_board, opponent)
-						print("Five is broken")
 						return True
 		return False
 
@@ -218,20 +214,13 @@ class Rules:
 		return has_breaking_move
 
 	def is_breaking_move(self, row: int, col: int, player: int, five_indices, board: Board):
-		# run this if previous move was five in the row
-		print("   is_breaking_move:")
 		captures = self.is_capturing(row, col, player, board)
 		if captures is None:
-			print("no captures return FALSE")
 			return False
 		test_board = deepcopy(board)
 		self.place_on_test_board(captures, test_board, Stone.EMPTY.value)
 		opponent = self.opponent_value(player)
 		five_row, five_col = five_indices
-		# print("call win_by_five from !is_breaking_move!")
 		if test_board.get(five_row, five_col) != 0 and self.win_by_five(five_row, five_col, opponent, test_board):
-			print("wrong_captures return FALSE")
-			print(f"board: {test_board}, winner player value:{opponent}, indices: {(five_row, five_col)}")
 			return False
-		print("has captures and broken five return TRUE")
 		return True

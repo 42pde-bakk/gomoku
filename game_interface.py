@@ -178,16 +178,12 @@ class Game(tk.Frame):
 
 	def check_forced_capture(self, row: int, col: int) -> bool:
 		if self.force_break:
-			print("DISABLE FORCE BREAK")
 			self.force_break = False
 			if not Game.rules.is_breaking_move(row, col, self.player, self.five_indices, self.gamestate.board):
 				congratulate_winner(Game.rules.opponent_value(self.player))
 				return True
 		else:
-			print("CHECK TO ENABLE")
-			print(f"{self.gamestate.board}, row{row}, col{col}, player{self.player}")
 			if Game.rules.win_by_five(row, col, self.player, self.gamestate.board):
-				print("ENABLE FORCE BREAK")
 				last_five_move = self.ordered_moves[-1]
 				self.five_indices = (last_five_move.y, last_five_move.x)
 				self.force_break = True
@@ -357,7 +353,6 @@ class Game(tk.Frame):
 	def undo_move(self) -> None:
 		self.force_break = False
 		if self.game_mode == GameMode.BOT_POT:
-			print("Bot pot and ended")
 			self.game_mode = GameMode.HOTSEAT
 			return
 		if self.ordered_moves:
