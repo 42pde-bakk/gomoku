@@ -181,6 +181,7 @@ class Game(tk.Frame):
 			self.force_break = False
 			if not Game.rules.is_breaking_move(row, col, self.player, self.five_indices, self.gamestate.board):
 				congratulate_winner(Game.rules.opponent_value(self.player))
+				self.reset_board()
 				return True
 		else:
 			if Game.rules.win_by_five(row, col, self.player, self.gamestate.board):
