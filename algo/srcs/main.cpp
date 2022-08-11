@@ -46,8 +46,6 @@ int loop(unsigned int flags) {
 
 	std::cout << "Welcome to Gomokubot! Connect on port " << server.getport() << "\n";
 	std::cout << "Waiting for client to connect\n";
-	std::cout << "Sizeof gamestate = " << sizeof(Bitboard) << ", " << sizeof(Heuristic) << ", " << sizeof(Gamestate)
-			  << "\n";
 
 	set_signal_handler();
 
@@ -56,7 +54,6 @@ int loop(unsigned int flags) {
 		Client client(&server);
 		while (client.isAlive()) {
 			bool error = false;
-			std::cout << "Lets receive a gamestate\n";
 			Gamestate gs = client.receiveGamestate(error);
 			if (!client.isAlive()) {
 				std::cerr << "Client disconnected.\n";

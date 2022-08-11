@@ -235,13 +235,11 @@ Gamestate *iterative_deepening(Gamestate *gs, int player) {
 		}
 
 		std::cout << "End of loop, elapsed time: " << elapsed_time << '\n';
-		std::cout << "created gamestates: " << g_nb << ", moves: " << g_moves << ", applied moves: " << g_applied_moves
-				  << '\n';
+		std::cout << "created gamestates: " << g_nb << '\n';
 		depth++;
 	}
 	std::cout << "End of turn, elapsed time: " << elapsed_time << '\n';
-	std::cout << "created gamestates: " << g_nb << ", moves: " << g_moves << ", applied moves: " << g_applied_moves
-			  << '\n';
+	std::cout << "created gamestates: " << g_nb << '\n';
 	items[0] += g_nb;
 	items[1] += g_moves;
 	turns++;
