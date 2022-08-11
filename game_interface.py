@@ -299,16 +299,16 @@ class Game(tk.Frame):
 
 	def update_captures(self):
 		text = '''
-		Player {} has {} captures
-		Player {} has {} captures
+		Player {} has {}/10 captures
+		Player {} has {}/10 captures
 		'''.format(1, self.gamestate.captures[0], 2, self.gamestate.captures[1])
 		self.lbl_captures1.configure(text=text)
 		self.update()
 
 	def display_captures(self, frm_options):
 		text = '''
-		Player {} has {} captures
-		Player {} has {} captures
+		Player {} has {}/10 captures
+		Player {} has {}/10 captures
 		'''.format(1, self.gamestate.captures[0], 2, self.gamestate.captures[1])
 		self.lbl_captures1 = ttk.Label(frm_options,
 									   text=text)
