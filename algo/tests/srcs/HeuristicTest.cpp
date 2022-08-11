@@ -275,10 +275,7 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't - 2", "[HeuristicTests]") 
 	auto lastmove = children[0]->get_move();
 	std::cerr << children[0]->get_move();
 	std::cerr << *children[0];
-//	REQUIRE(lastmove.move_idx == 149);
 
-//	children[0]->generate_children();
-//	lastmove = children[0]->get_children()[0]->get_move();
 	bool  isvalidmove = lastmove.move_idx == 108 || lastmove.move_idx == 149;
 	REQUIRE(isvalidmove);
 
