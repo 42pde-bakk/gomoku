@@ -260,6 +260,10 @@ bool Heuristic::has_winner() const {
 	return (this->winner != 0);
 }
 
+void Heuristic::clear_winner() {
+	this->winner = 0;
+}
+
 void Heuristic::set_winner(unsigned int p_winner) {
 	static const int winner_values[2] = {-2000000, 2000000};
 

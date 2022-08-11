@@ -39,11 +39,12 @@ class Game(tk.Frame):
 		self.pack()
 		self.gamestate = Gamestate()
 		self.buttons = []
-		self.frm_position = []
 		self.ordered_moves = []
 		self.size = size
 		self.player = 1
 		self.previous_player = 0
+		self.force_break = False
+		self.five_indices = None
 		self.minimax = Minimax()
 		self.game_mode = game_mode
 		self.frm_board = None
@@ -57,25 +58,29 @@ class Game(tk.Frame):
 		self.bot_socket = BotSocket(get_portnb('algo/portnb.txt'))
 		self.bot_socket_2 = BotSocket(get_portnb(f'{second_bot_path}/algo/portnb.txt')) if second_bot_path else None
 
-	def print_board(self):
+	def print_board(self) -> None:
 		print(self.gamestate.board.get_board())
 
-	def create_game_window(self):
-		lbl_name = ttk.Label(self, text=f"Go Go Gomoku\nGame Mode: {self.game_mode}")
+	def print_all_moves(self) -> None:
+		for move in self.ordered_moves:
+			print(f"{move.y, move.x},", end='')
+
+	def create_game_window(self) -> None:
+		lbl_name = ttk.Label(self, text=f"Go Go Gomoku")
 		lbl_name.pack()
 		s = ttk.Style()
 		s.configure('Board.TFrame', background='#A15A00',)
 		self.frm_board = ttk.Frame(self, relief=tk.RAISED, style='Board.TFrame', borderwidth=10, height=500, width=500)
 		self.frm_board.pack(padx=25, pady=25)
 
-	def create_options_window(self):
+	def create_options_window(self) -> None:
 		frm_options = ttk.Frame(self, relief=tk.RIDGE, borderwidth=10).pack(padx=25, pady=25)
 		self.display_captures(frm_options)
 		self.undo_move_bt(frm_options)
 		self.new_game_bt(frm_options)
 		self.choose_different_game_om(frm_options)
 
-	def create_game(self):
+	def create_game(self) -> None:
 		self.create_game_window()
 		self.create_options_window()
 		self.display_board()
@@ -112,7 +117,7 @@ class Game(tk.Frame):
 		self.previous_player = self.player
 		self.play_game(row, col)
 
-	def pick_color(self, row: int, col: int):
+	def pick_color(self, row: int, col: int) -> None:
 		if self.gamestate.board.get(row, col) == 0:
 			button_img = self.gray
 		elif self.gamestate.board.get(row, col) == 2:
@@ -121,7 +126,7 @@ class Game(tk.Frame):
 			button_img = self.black
 		return button_img
 
-	def pick_last_move_color(self, row: int, col: int):
+	def pick_last_move_color(self, row: int, col: int) -> None:
 		button_img = self.gray
 		if self.gamestate.board.get(row, col) == 1:
 			button_img = self.last_black
@@ -165,9 +170,25 @@ class Game(tk.Frame):
 			print("Position taken")
 			self.previous_player = Gamestate.get_other_player(self.player)
 			return
+		if self.check_forced_capture(row, col):
+			return
 		if not self.after_move_check(row, col):
 			self.change_player()
 			self.select_next_move()
+
+	def check_forced_capture(self, row: int, col: int) -> bool:
+		if self.force_break:
+			self.force_break = False
+			if not Game.rules.is_breaking_move(row, col, self.player, self.five_indices, self.gamestate.board):
+				congratulate_winner(Game.rules.opponent_value(self.player))
+				self.reset_board()
+				return True
+		else:
+			if Game.rules.win_by_five(row, col, self.player, self.gamestate.board):
+				last_five_move = self.ordered_moves[-1]
+				self.five_indices = (last_five_move.y, last_five_move.x)
+				self.force_break = True
+		return False
 
 	def after_move_check(self, row: int, col: int) -> bool:
 		""" Check for captures and wins"""
@@ -195,7 +216,7 @@ class Game(tk.Frame):
 		self.bot_socket.send_gamestate(self.gamestate)
 		return self.bot_socket.receive_move()
 
-	def select_next_move(self):
+	def select_next_move(self) -> None:
 		self.gamestate.moves.clear()
 		if self.game_mode == GameMode.HOTSEAT:
 			self.play_hotseat()
@@ -204,7 +225,7 @@ class Game(tk.Frame):
 		else:
 			self.play_vs_ai()
 
-	def play_hotseat(self):
+	def play_hotseat(self) -> None:
 		move = self.get_ai_move()
 		col, row = move.x, move.y
 		self.hotseat_move[0], self.hotseat_move[1] = row, col
@@ -215,7 +236,7 @@ class Game(tk.Frame):
 		self.buttons[row * self.size + col].config(image=self.red)
 		self.update()
 
-	def play_vs_ai(self):
+	def play_vs_ai(self) -> None:
 		time_start = time.time()
 		move = self.get_ai_move()
 		col, row = move.x, move.y
@@ -224,30 +245,35 @@ class Game(tk.Frame):
 			self.ordered_moves.append(MoveSnapshot(row, col, self.player))
 			self.gamestate.place_stone(y=row, x=col, stone=self.player)
 			self.update_button(row, col)
+			if self.check_forced_capture(row, col):
+				return
 			if self.after_move_check(row, col):
 				return
 		else:
 			raise ValueError()
 		self.change_player()
 
-	def play_bot_pot(self):
+	def play_bot_pot(self) -> None:
 		while self.game_mode == GameMode.BOT_POT:
 			self.play_vs_ai()
 
-	def reset_pieces(self):
+	def reset_pieces(self) -> None:
 		button_img = self.gray
 		for row in range(self.size):
 			for col in range(self.size):
 				self.buttons[row * self.size + col].config(image=button_img, relief='flat', borderwidth=0)
 
-	def reset_board(self):
+	def reset_board(self) -> None:
 		self.player = 1
+		self.ordered_moves = []
 		self.gamestate = Gamestate()
 		self.reset_pieces()
 		self.update_captures()
 		self.previous_player = 0
+		self.force_break = False
+		self.update()
 
-	def new_game_bt(self, frm_options):
+	def new_game_bt(self, frm_options) -> None:
 		bt_new_game = ttk.Button(
 			master=frm_options,
 			text="NEW GAME",
@@ -266,7 +292,7 @@ class Game(tk.Frame):
 			self.game_mode = GameMode.VERSUS_AI
 		self.previous_player = 0
 
-	def choose_different_game_om(self, frm_options):
+	def choose_different_game_om(self, frm_options) -> None:
 		lbl_choose_game_mode = ttk.Label(frm_options, text=f"Change Game Mode").pack()
 		options = ['Versus ai', 'Hotseat', 'Bot pot', 'Versus ai']
 		clicked = tk.StringVar()
@@ -291,21 +317,21 @@ class Game(tk.Frame):
 				self.ordered_moves[-1].capture_indices.append(capture_check[i])
 				self.ordered_moves[-1].capture_indices.append(capture_check[i + 1])
 
-	def remove_captured(self, pos1: tuple, pos2: tuple):
+	def remove_captured(self, pos1: tuple, pos2: tuple) -> None:
 		pos1_row, pos1_col = pos1
 		pos2_row, pos2_col = pos2
 		self.buttons[pos1_row * self.size + pos1_col].config(image=self.gray)
 		self.buttons[pos2_row * self.size + pos2_col].config(image=self.gray)
 
-	def update_captures(self):
+	def update_captures(self) -> None:
 		text = '''
-		Player {} has {} captures
-		Player {} has {} captures
+		Player {} has {}/10 captures
+		Player {} has {}/10 captures
 		'''.format(1, self.gamestate.captures[0], 2, self.gamestate.captures[1])
 		self.lbl_captures1.configure(text=text)
 		self.update()
 
-	def display_captures(self, frm_options):
+	def display_captures(self, frm_options) -> None:
 		text = '''
 		Player {} has {} captures
 		Player {} has {} captures
@@ -314,10 +340,10 @@ class Game(tk.Frame):
 									   text=text)
 		self.lbl_captures1.pack(side='left')
 
-	def update_board(self, row, col):
+	def update_board(self, row: int, col: int) -> None:
 		print(f'updating board, row={row}, h={col}')
 
-	def recreate_captured(self, captured, opponent):
+	def recreate_captured(self, captured, opponent: int) -> None:
 		for stone in captured:
 			row, col = stone
 			self.gamestate.board.set(row, col, opponent)
@@ -325,10 +351,9 @@ class Game(tk.Frame):
 			self.buttons[row * self.size + col].config(image=stone_color)
 			self.update()
 
-	def undo_move(self):
-		print(self.game_mode)
+	def undo_move(self) -> None:
+		self.force_break = False
 		if self.game_mode == GameMode.BOT_POT:
-			print("Bot pot and ended")
 			self.game_mode = GameMode.HOTSEAT
 			return
 		if self.ordered_moves:
@@ -343,9 +368,10 @@ class Game(tk.Frame):
 				self.update_captures()
 			if self.game_mode == GameMode.HOTSEAT:
 				self.previous_player = self.player
-			self.change_player()
+			self.player = last_move.player
+			# self.change_player()
 
-	def undo_move_bt(self, frm_options):
+	def undo_move_bt(self, frm_options) -> None:
 		bt_undo_move = ttk.Button(
 			master=frm_options,
 			text="UNDO MOVE",
