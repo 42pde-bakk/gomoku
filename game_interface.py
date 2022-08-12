@@ -61,10 +61,6 @@ class Game(tk.Frame):
 	def print_board(self) -> None:
 		print(self.gamestate.board.get_board())
 
-	def print_all_moves(self) -> None:
-		for move in self.ordered_moves:
-			print(f"{move.y, move.x},", end='')
-
 	def create_game_window(self) -> None:
 		lbl_name = ttk.Label(self, text=f"Go Go Gomoku")
 		lbl_name.pack()
@@ -117,7 +113,7 @@ class Game(tk.Frame):
 		self.previous_player = self.player
 		self.play_game(row, col)
 
-	def pick_color(self, row: int, col: int) -> None:
+	def pick_color(self, row: int, col: int):
 		if self.gamestate.board.get(row, col) == 0:
 			button_img = self.gray
 		elif self.gamestate.board.get(row, col) == 2:
@@ -126,7 +122,7 @@ class Game(tk.Frame):
 			button_img = self.black
 		return button_img
 
-	def pick_last_move_color(self, row: int, col: int) -> None:
+	def pick_last_move_color(self, row: int, col: int):
 		button_img = self.gray
 		if self.gamestate.board.get(row, col) == 1:
 			button_img = self.last_black
@@ -135,7 +131,6 @@ class Game(tk.Frame):
 		return button_img
 
 	def update_button(self, row: int, col: int) -> None:
-		print(f"placing a new button at row: {row}, col: {col}")
 		button_img = self.pick_last_move_color(row, col)
 		self.buttons[row * self.size + col].config(image=button_img)
 		self.update()
@@ -369,7 +364,6 @@ class Game(tk.Frame):
 			if self.game_mode == GameMode.HOTSEAT:
 				self.previous_player = self.player
 			self.player = last_move.player
-			# self.change_player()
 
 	def undo_move_bt(self, frm_options) -> None:
 		bt_undo_move = ttk.Button(
