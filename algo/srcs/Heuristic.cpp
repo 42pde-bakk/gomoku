@@ -8,13 +8,11 @@
 #include <cassert>
 #include <limits>
 
-std::hash<bitboard> Heuristic::hash_fn;
-std::unordered_map<std::bitset<BOARDSIZE>, int> Heuristic::tt;
+std::unordered_map<std::bitset<BOARDSIZE>, ValueBoard> Heuristic::tt;
 std::array<unsigned int, REALBOARDSIZE> g_checkedTiles;
 std::array<unsigned int, REALBOARDSIZE> g_checkedTiles2; // for across the water
 static unsigned int	g_newly_placed_stone_idx;
 static bool			g_contains_newly_placed_stone;
-bool	g_uses_lookuptable = false;
 
 int Heuristic::get_h() const {
 	return (this->h);
@@ -173,19 +171,11 @@ void Heuristic::calculate_heuristic() {
 }
 
 int Heuristic::set_h(const unsigned int new_stone_idx) {
-	unsigned long hash;
-
 	g_newly_placed_stone_idx = new_stone_idx;
 	this->h = 0;
-	if (g_uses_lookuptable) {
-		hash = hash_fn(this->board);
-		if (tt.find(hash) != tt.end()) {
-			this->h = tt[hash];
-			return (this->h);
-		}
-	}
-	for (unsigned short int i = 0; i < 2; ++i)
-		this->values[i].fill(0);
+	this->values[0].fill(0);
+	this->values[1].fill(0);
+
 	if (!this->has_winner()) {
 		this->loop_over_tiles();
 		this->calculate_heuristic();
@@ -195,10 +185,34 @@ int Heuristic::set_h(const unsigned int new_stone_idx) {
 		}
 	}
 
-	if (g_uses_lookuptable) {
-		tt[hash] = this->h;
+	return (this->h);
+}
+
+int Heuristic::set_h_with_lookup(const unsigned int new_stone_idx) {
+	g_newly_placed_stone_idx = new_stone_idx;
+
+	this->h = 0;
+	this->values[0].fill(0);
+	this->values[1].fill(0);
+
+	if (this->has_winner()) {
+		return (this->h);
 	}
 
+	auto it = tt.find(this->board);
+	if (tt.find(this->board) != tt.end()) {
+		this->values = it->second;
+	} else {
+		this->loop_over_tiles();
+	}
+
+	this->calculate_heuristic();
+
+	if (!this->has_winner()) {
+		this->h = std::min(std::max(h, -1900000), 1900000);
+	}
+
+	tt[this->board] = this->values;
 	return (this->h);
 }
 

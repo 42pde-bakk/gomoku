@@ -73,6 +73,8 @@ public:
 	[[nodiscard]] const bitboard &get() const;
 
 	[[nodiscard]] unsigned int count() const;
+
+	[[nodiscard]] const bitboard& get_bitboard() const;
 };
 
 

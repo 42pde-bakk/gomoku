@@ -239,16 +239,19 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't", "[HeuristicTests]") {
 	this->calcH(0);
 	this->change_player();
 
-	std::cerr << *this << "\n\n\n";
-
 	this->generate_children(0);
-	std::cerr << *children[0];
-	children[0]->print_heuristic(std::cerr);
-	std::cerr << "\n\n\n";
-	if (children[0]->get_move().move_idx == 131) {
-		children[0]->generate_children(0);
-	} else {
-		REQUIRE(children[0]->get_move().move_idx == 154);
+	bool isvalidmove = children[0]->get_move().move_idx == 154 || children[0]->get_move().move_idx == 131;
+	REQUIRE(isvalidmove);
+
+	this->clear_children();
+	elapsed_time = 0;
+	start_time = std::chrono::steady_clock::now();
+	auto result = minimax_alphabeta_start(this, 3, this->player);
+	if (result) {
+		std::cerr << *result;
+		std::cerr << result->get_h() << "\n\n\n\n";
+		isvalidmove = children[0]->get_move().move_idx == 154 || children[0]->get_move().move_idx == 131;
+		REQUIRE(isvalidmove);
 	}
 }
 
@@ -272,9 +275,21 @@ TEST_CASE_METHOD(Gamestate, "Should block but doesn't - 2", "[HeuristicTests]") 
 	auto lastmove = children[0]->get_move();
 	std::cerr << children[0]->get_move();
 	std::cerr << *children[0];
-	if (lastmove.move_idx != 149)
-		REQUIRE(lastmove.move_idx == 5 * 20 + 8);
 
+	bool  isvalidmove = lastmove.move_idx == 108 || lastmove.move_idx == 149;
+	REQUIRE(isvalidmove);
+
+	this->clear_children();
+	elapsed_time = 0;
+	start_time = std::chrono::steady_clock::now();
+	auto result = minimax_alphabeta_start(this, 4, this->player);
+	if (result) {
+		std::cerr << *result;
+		std::cerr << result->get_h() << "\n\n\n\n";
+		lastmove = result->get_first_move(this);
+		isvalidmove = lastmove.move_idx == 108 || lastmove.move_idx == 149;
+		REQUIRE(isvalidmove);
+	}
 }
 
 TEST_CASE_METHOD(Gamestate, "Should block open 3", "[HeuristicTests]") {
