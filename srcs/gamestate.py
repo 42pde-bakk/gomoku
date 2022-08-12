@@ -63,9 +63,6 @@ class Gamestate:
 	def __repr__(self):
 		return str(self.h)
 
-	# def player_check(self, y: int, x: int, player_to_check: int) -> bool:
-	# 	return y < 0 or y >= 19 or x < 0 or x >= 19 or self.board.get(y, x) != player_to_check
-
 	@staticmethod
 	def get_other_player(player):
 		if player == 1:
@@ -76,7 +73,7 @@ class Gamestate:
 	def capture(self, pos1: tuple, pos2: tuple, capturing_player: int) -> None:
 		pos1_y, pos1_x = pos1
 		pos2_y, pos2_x = pos2
-		self.captures[capturing_player - 1] += 2  # -1 because player 1 has index 0 in the captures array
+		self.captures[capturing_player - 1] += 2
 		self.board.set(pos1_y, pos1_x, Stone.EMPTY.value)
 		self.board.set(pos2_y, pos2_x, Stone.EMPTY.value)
 

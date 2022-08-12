@@ -79,7 +79,6 @@ class Rules:
 					inside_zero = True
 					first_zero = False
 				else:
-					# return False
 					first_zero = True
 			elif not self.is_not_player_check(row + rel[0], col + rel[1], player, board):
 				stones += 1
@@ -167,7 +166,6 @@ class Rules:
 			first_row, first_col = row + 1 + (n * d_row), col + (n * d_col)
 		else:
 			first_row, first_col = row - 1 + (n_opp * d_row), col + 1 + (n_opp * d_col)
-		print(f"*saving 5 indices - direction: {direction}; first_row: {first_row}; first_col: {first_col}")
 		self.winning_five_indices = (first_row, first_col, direction)
 
 	def get_possible_moves(self, direction: tuple):
