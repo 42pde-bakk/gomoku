@@ -56,6 +56,10 @@ Gamestate Client::receiveGamestate(bool &error) {
 	turn = intArray[0];
 	gs.player = turn % 2;
 	std::vector<int> captures = this->receive(8, error);
+	for (auto& c : captures) {
+		// Our front-end sees 10 as max captures, but our back-end sees 5.
+		c /= 2;
+	}
 	if (error) {
 		return (gs);
 	}
