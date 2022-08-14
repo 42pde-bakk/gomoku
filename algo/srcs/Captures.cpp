@@ -7,6 +7,7 @@
 #include <cassert>
 
 unsigned int Gamestate::capture_check_dir(unsigned int idx, unsigned int dir) {
+	static const unsigned int MAX_CAPTURES = 5;
 	const unsigned int player_stone = this->player + 1;
 	const unsigned int opp_stone = !this->player + 1;
 	const unsigned int pos[3] = {idx + dir, idx + 2 * dir, idx + 3 * dir};
@@ -22,8 +23,8 @@ unsigned int Gamestate::capture_check_dir(unsigned int idx, unsigned int dir) {
 	if (values[0] == opp_stone && values[1] == opp_stone && values[2] == player_stone) {
 		this->clear_tile(pos[0]);
 		this->clear_tile(pos[1]);
-		this->captures[this->player] += 2;
-		if (this->captures[this->player] >= 10) {
+		this->captures[this->player] += 1;
+		if (this->captures[this->player] >= MAX_CAPTURES) {
 			// Perhaps I should make winning by captures worth more but let's see
 			this->set_winner(this->player);
 		}
