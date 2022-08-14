@@ -217,14 +217,15 @@ int Heuristic::set_h_with_lookup(const unsigned int new_stone_idx) {
 }
 
 int Heuristic::add_h_for_captures() {
+	static const unsigned int MAX_CAPTURES = 5;
 	static const int winner_values[2] = {-2000000, 2000000};
-	assert(!(captures[0] >= 10 && captures[1] >= 10));
+	assert(!(captures[0] >= MAX_CAPTURES && captures[1] >= MAX_CAPTURES));
 	if (this->has_winner())
 		return (this->h);
 
-	if (captures[0] >= 10 || captures[1] >= 10) {
+	if (captures[0] >= MAX_CAPTURES || captures[1] >= MAX_CAPTURES) {
 		// winning condition
-		auto p = (captures[0] >= 10) ? 0 : 1;
+		auto p = (captures[0] >= MAX_CAPTURES) ? 0 : 1;
 		this->winner = p;
 		this->h = winner_values[p];
 	} else {
@@ -266,7 +267,7 @@ void Heuristic::print_heuristic(std::ostream &o) const {
 		for (auto &i: linevalues) {
 			o << '\t' << LineValueToStr(i) << ": " << (int) this->values[p][i] << "\n";
 		}
-		o << "\tCaptures: " << (int) this->captures[p] << '\n';
+		o << "\tCaptures: " << (int) this->captures[p] << "/5\n";
 	}
 }
 
