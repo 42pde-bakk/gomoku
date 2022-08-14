@@ -118,7 +118,7 @@ class Rules:
 
 	@staticmethod
 	def win_by_captures(player: int, captures: list) -> bool:
-		if captures[player - 1] == 10:
+		if captures[player - 1] >= 10:
 			return True
 		return False
 
