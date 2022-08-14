@@ -76,6 +76,8 @@ class Rules:
 				if inside_zero:
 					return False
 				if first_zero:
+					if stones < 2:
+						return False
 					inside_zero = True
 					first_zero = False
 				else:
