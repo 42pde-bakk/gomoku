@@ -76,6 +76,8 @@ class Rules:
 				if inside_zero:
 					return False
 				if first_zero:
+					if stones < 2:
+						return False
 					inside_zero = True
 					first_zero = False
 				else:
@@ -116,7 +118,7 @@ class Rules:
 
 	@staticmethod
 	def win_by_captures(player: int, captures: list) -> bool:
-		if captures[player - 1] == 10:
+		if captures[player - 1] >= 10:
 			return True
 		return False
 
