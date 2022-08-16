@@ -89,6 +89,20 @@ static void	print_usage() {
 			"--history (-H)", "--lookuptable (-l/-L)", "--max_children (-m)", "amount", "--help (or -h)");
 }
 
+static int	parse_set_capture_value(const std::string& str) {
+	if (str.empty() || !isdigit(str[0])) {
+		fprintf(stderr, "Bad capture value\n");
+		return (EXIT_FAILURE);
+	}
+	int value = std::stoi(str);
+	if (value < 0 || value >= LineValues[FIVE]) {
+		fprintf(stderr, "Bad capture value\n");
+		return (EXIT_FAILURE);
+	}
+	set_capture_value(value);
+	return (EXIT_SUCCESS);
+}
+
 static unsigned int get_flags(int argc, char **argv) {
 	unsigned int flags = 0;
 	int opt;
@@ -97,10 +111,11 @@ static unsigned int get_flags(int argc, char **argv) {
 			{ "help", no_argument, NULL, 'h'},
 			{ "history", no_argument, NULL, 'H'},
 			{ "lookuptable", no_argument, NULL, 'l'},
-			{ "max_children", required_argument, NULL, 'c'},
+			{ "max_children", required_argument, NULL, 'm'},
+			{"capture_value", required_argument, NULL, 'c'}
 	};
 
-	while ((opt = getopt_long(argc, argv, "hHLlm:", long_options, NULL)) != -1) {
+	while ((opt = getopt_long(argc, argv, "hHLlm:c:C:", long_options, NULL)) != -1) {
 		switch (opt) {
 			case 'h':
 				print_usage();
@@ -115,8 +130,12 @@ static unsigned int get_flags(int argc, char **argv) {
 				g_uses_lookuptable = true;
 				fprintf(stderr, "Lookuptable!\n");
 				break ;
-			case 'm':
+			case 'C':
 			case 'c':
+				if (parse_set_capture_value(optarg))
+					return (-1);
+				break ;
+			case 'm':
 				flags |= FLAG_MAX_CHILDREN;
 				arg_val = std::strtol(optarg, NULL, 10);
 				if (arg_val <= 0) {

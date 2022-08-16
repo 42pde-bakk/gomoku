@@ -5,6 +5,18 @@
 #include "Gamestate.hpp"
 #include "Directions.hpp"
 #include <cassert>
+#include <cstdio>
+
+static uint32_t	CAPTURE_VALUE = 5000;
+
+void		set_capture_value(uint32_t value) {
+	CAPTURE_VALUE = value;
+	fprintf(stderr, "Changed capture value to %u\n", CAPTURE_VALUE);
+}
+
+uint32_t	get_capture_value() {
+	return (CAPTURE_VALUE);
+}
 
 unsigned int Gamestate::capture_check_dir(unsigned int idx, unsigned int dir) {
 	static const unsigned int MAX_CAPTURES = 5;
