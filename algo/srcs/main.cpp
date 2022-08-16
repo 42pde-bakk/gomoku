@@ -134,6 +134,7 @@ static unsigned int get_flags(int argc, char **argv) {
 			case 'c':
 				if (parse_set_capture_value(optarg))
 					return (-1);
+				break ;
 			case 'm':
 				flags |= FLAG_MAX_CHILDREN;
 				arg_val = std::strtol(optarg, NULL, 10);
