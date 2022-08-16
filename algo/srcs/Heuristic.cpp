@@ -218,6 +218,7 @@ int Heuristic::set_h_with_lookup(const unsigned int new_stone_idx) {
 
 int Heuristic::add_h_for_captures() {
 	static const unsigned int MAX_CAPTURES = 5;
+	static const auto CAPTURE_VALUE = get_capture_value();
 	static const int winner_values[2] = {-2000000, 2000000};
 	assert(!(captures[0] >= MAX_CAPTURES && captures[1] >= MAX_CAPTURES));
 	if (this->has_winner())

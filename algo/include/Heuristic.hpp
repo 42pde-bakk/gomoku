@@ -34,7 +34,14 @@ static const std::array<int32_t, LINEVALUE_COUNT> LineValues{
 		10000,	// OPEN_FOUR
 		100000	// FIVE
 };
-static const uint32_t CAPTURE_VALUE = 4000;
+
+/*
+ * Default CAPTURE_VALUE is 5000
+ * This default value can be changed in Captures.cpp line 10
+ * Or set at launchtime by running ./gomokubot --capture_value=[YOUR_VALUE]
+ */
+void		set_capture_value(uint32_t value);
+uint32_t	get_capture_value();
 
 std::ostream &operator<<(std::ostream &o, const LineValue &lv);
 
